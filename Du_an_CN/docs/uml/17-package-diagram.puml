@@ -1,0 +1,57 @@
+@startuml
+title AR-03 — Sơ đồ gói backend phân lớp
+skinparam packageStyle rectangle
+skinparam shadowing false
+top to bottom direction
+
+package "src/routes" as Routes {
+  [auth.routes]
+  [user.routes]
+  [activity.routes]
+  [registration.routes]
+  [participation.routes]
+  [notification.routes]
+}
+package "src/middlewares" as Middleware {
+  [auth.middleware]
+  [authorize.middleware]
+  [error.middleware]
+}
+package "src/controllers" as Controllers {
+  [AuthController]
+  [UserController]
+  [ActivityController]
+  [RegistrationController]
+  [ParticipationController]
+  [NotificationController]
+}
+package "src/validators" as Validators {
+  [Request Validators]
+}
+package "src/services" as Services {
+  [AuthService]
+  [UserService]
+  [ActivityService]
+  [RegistrationService]
+  [ParticipationService]
+  [NotificationService]
+}
+package "src/repositories" as Repositories {
+  [UserRepository]
+  [ActivityRepository]
+  [RegistrationRepository]
+  [ParticipationRepository]
+}
+package "src/config" as Config {
+  [database.js]
+}
+database "MySQL" as DB
+
+Routes --> Middleware
+Routes --> Controllers
+Controllers --> Validators
+Controllers --> Services
+Services --> Repositories
+Repositories --> Config
+Config --> DB
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title UC-02 — Use Case chi tiết: Sinh viên
+left to right direction
+skinparam shadowing false
+actor "Sinh viên" as Student
+
+rectangle "Khu vực Sinh viên" {
+  usecase "Đăng ký tài khoản" as RegisterAccount
+  usecase "Đăng nhập / đăng xuất" as Login
+  usecase "Cập nhật hồ sơ cá nhân" as Profile
+  usecase "Xem danh sách hoạt động" as Browse
+  usecase "Tìm kiếm / lọc hoạt động" as Search
+  usecase "Xem chi tiết hoạt động" as Detail
+  usecase "Đăng ký tham gia" as RegisterActivity
+  usecase "Hủy đăng ký" as Cancel
+  usecase "Theo dõi trạng thái đăng ký" as Track
+  usecase "Xem lịch sử tham gia" as History
+  usecase "Xem điểm hoạt động" as Points
+  usecase "Xem / đánh dấu thông báo đã đọc" as Notifications
+  usecase "Kiểm tra tư cách theo trường/khoa/CLB" as ScopeCheck
+  usecase "Kiểm tra thời gian, sức chứa,\nđiều kiện và đăng ký trùng" as RuleCheck
+}
+
+Student -- RegisterAccount
+Student -- Login
+Student -- Profile
+Student -- Browse
+Student -- Search
+Student -- Detail
+Student -- RegisterActivity
+Student -- Cancel
+Student -- Track
+Student -- History
+Student -- Points
+Student -- Notifications
+
+Search .> Browse : <<extend>>
+RegisterActivity .> ScopeCheck : <<include>>
+RegisterActivity .> RuleCheck : <<include>>
+Cancel .> RuleCheck : <<include>>
+
+note right of ScopeCheck
+Sau khi tài khoản và tư cách sinh viên
+được xác thực, sinh viên có thể đăng ký
+hoạt động thuộc phạm vi trường/khoa phù hợp.
+Hoạt động CLB yêu cầu thành viên hợp lệ.
+Được phép đăng ký không đồng nghĩa
+đăng ký đã được duyệt.
+end note
+@enduml

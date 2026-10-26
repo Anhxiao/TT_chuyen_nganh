@@ -1,0 +1,166 @@
+@startuml
+title DB-01 — Sơ đồ thực thể liên kết (ERD) MySQL
+hide methods
+hide stereotypes
+skinparam linetype ortho
+skinparam shadowing false
+
+entity "users" as users {
+  * user_id : BIGINT <<PK>>
+  --
+  full_name : VARCHAR
+  email : VARCHAR <<UQ>>
+  password_hash : VARCHAR
+  student_code : VARCHAR <<UQ>>
+  phone : VARCHAR
+  account_status : ENUM
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+entity "roles" as roles {
+  * role_id : INT <<PK>>
+  --
+  role_code : VARCHAR <<UQ>>
+  role_name : VARCHAR
+}
+entity "user_roles" as user_roles {
+  * user_id : BIGINT <<PK, FK>>
+  * role_id : INT <<PK, FK>>
+  --
+  assigned_at : TIMESTAMP
+}
+entity "permissions" as permissions {
+  * permission_id : INT <<PK>>
+  --
+  permission_code : VARCHAR <<UQ>>
+  description : VARCHAR
+}
+entity "role_permissions" as role_permissions {
+  * role_id : INT <<PK, FK>>
+  * permission_id : INT <<PK, FK>>
+}
+entity "organizations" as organizations {
+  * organization_id : BIGINT <<PK>>
+  --
+  organization_name : VARCHAR
+  organization_type : ENUM
+  parent_organization_id : BIGINT <<FK>>
+  organization_status : ENUM
+}
+entity "organization_memberships" as memberships {
+  * membership_id : BIGINT <<PK>>
+  --
+  user_id : BIGINT <<FK>>
+  organization_id : BIGINT <<FK>>
+  membership_type : VARCHAR
+  membership_status : ENUM
+  permission_flags : BOOLEAN
+}
+entity "activity_categories" as categories {
+  * category_id : INT <<PK>>
+  --
+  category_name : VARCHAR <<UQ>>
+}
+entity "activities" as activities {
+  * activity_id : BIGINT <<PK>>
+  --
+  organization_id : BIGINT <<FK>>
+  category_id : INT <<FK>>
+  created_by : BIGINT <<FK>>
+  title : VARCHAR
+  start_at : DATETIME
+  end_at : DATETIME
+  registration_start_at : DATETIME
+  registration_end_at : DATETIME
+  capacity : INT
+  requires_approval : BOOLEAN
+  activity_status : ENUM
+}
+entity "activity_audiences" as audiences {
+  * audience_id : BIGINT <<PK>>
+  --
+  activity_id : BIGINT <<FK>>
+  audience_type : ENUM
+  organization_id : BIGINT <<FK, nullable>>
+}
+entity "activity_conditions" as conditions {
+  * condition_id : BIGINT <<PK>>
+  --
+  activity_id : BIGINT <<FK>>
+  condition_type : VARCHAR
+  condition_value : VARCHAR
+  is_required : BOOLEAN
+}
+entity "registrations" as registrations {
+  * registration_id : BIGINT <<PK>>
+  --
+  activity_id : BIGINT <<FK>>
+  student_id : BIGINT <<FK>>
+  registered_at : TIMESTAMP
+  registration_status : ENUM
+  reviewed_by : BIGINT <<FK, nullable>>
+  reviewed_at : DATETIME
+  cancelled_at : DATETIME
+}
+entity "participation_results" as results {
+  * result_id : BIGINT <<PK>>
+  --
+  registration_id : BIGINT <<FK, UQ>>
+  confirmed_by : BIGINT <<FK, nullable>>
+  attendance_status : ENUM
+  confirmed_at : DATETIME
+}
+entity "activity_points" as points {
+  * point_id : BIGINT <<PK>>
+  --
+  result_id : BIGINT <<FK, UQ>>
+  points : DECIMAL
+  recorded_by : BIGINT <<FK>>
+  reason : VARCHAR
+}
+entity "notifications" as notifications {
+  * notification_id : BIGINT <<PK>>
+  --
+  recipient_id : BIGINT <<FK>>
+  activity_id : BIGINT <<FK, nullable>>
+  title : VARCHAR
+  content : TEXT
+  is_read : BOOLEAN
+  created_at : TIMESTAMP
+}
+entity "audit_logs" as audit {
+  * log_id : BIGINT <<PK>>
+  --
+  actor_id : BIGINT <<FK, nullable>>
+  action : VARCHAR
+  entity_type : VARCHAR
+  entity_id : BIGINT
+  old_value : JSON
+  new_value : JSON
+  created_at : TIMESTAMP
+}
+
+users ||--o{ user_roles
+roles ||--o{ user_roles
+roles ||--o{ role_permissions
+permissions ||--o{ role_permissions
+users ||--o{ memberships
+organizations ||--o{ memberships
+organizations o|--o{ organizations : parent
+organizations ||--o{ activities
+categories o|--o{ activities
+users ||--o{ activities : creates
+activities ||--o{ audiences
+organizations o|--o{ audiences
+activities ||--o{ conditions
+activities ||--o{ registrations
+users ||--o{ registrations : student
+users o|--o{ registrations : reviewer
+registrations ||--o| results
+users o|--o{ results : confirmer
+results ||--o| points
+users ||--o{ points : recorder
+users ||--o{ notifications
+activities o|--o{ notifications
+users o|--o{ audit : actor
+@enduml

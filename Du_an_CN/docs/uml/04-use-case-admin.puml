@@ -1,0 +1,41 @@
+@startuml
+title UC-04 — Use Case chi tiết: Quản trị viên hệ thống
+left to right direction
+skinparam shadowing false
+actor "Quản trị viên\nhệ thống" as Admin
+
+rectangle "Khu vực quản trị hệ thống" {
+  usecase "Đăng nhập / đăng xuất" as Login
+  usecase "Xem danh sách tài khoản" as ViewUsers
+  usecase "Kích hoạt / khóa tài khoản" as ManageUsers
+  usecase "Quản lý vai trò và quyền" as Roles
+  usecase "Quản lý danh mục đơn vị" as Organizations
+  usecase "Quản lý cấu hình hệ thống" as Config
+  usecase "Xem nhật ký kiểm toán" as AuditLogs
+  usecase "Ghi nhật ký thao tác quản trị" as Audit
+  usecase "Kiểm tra quyền quản trị" as Permission
+}
+
+Admin -- Login
+Admin -- ViewUsers
+Admin -- ManageUsers
+Admin -- Roles
+Admin -- Organizations
+Admin -- Config
+Admin -- AuditLogs
+
+ManageUsers .> Permission : <<include>>
+Roles .> Permission : <<include>>
+Organizations .> Permission : <<include>>
+Config .> Permission : <<include>>
+ManageUsers .> Audit : <<include>>
+Roles .> Audit : <<include>>
+Organizations .> Audit : <<include>>
+Config .> Audit : <<include>>
+
+note bottom of Admin
+Quản trị viên không tự động có quyền nghiệp vụ
+để xem danh sách đăng ký, xác nhận tham gia
+hoặc chỉnh sửa điểm của sinh viên.
+end note
+@enduml

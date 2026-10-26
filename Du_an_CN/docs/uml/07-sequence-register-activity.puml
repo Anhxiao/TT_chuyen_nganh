@@ -1,0 +1,35 @@
+@startuml
+title SQ-01 — Luồng đăng ký tham gia hoạt động
+autonumber
+actor "Sinh viên" as Student
+boundary "Frontend\n(Browser)" as FE
+control "Registration Routes" as Route
+control "Auth + Permission Middleware" as Auth
+control "Registration Controller" as Controller
+control "Registration Service" as Service
+database "MySQL" as DB
+
+Student -> FE: Chọn hoạt động và nhấn Đăng ký
+FE -> Route: POST /api/activities/:id/registrations\nAuthorization: Bearer token
+Route -> Auth: Xác thực token
+Auth --> Route: userId, role, trạng thái tài khoản
+Route -> Controller: Gọi controller
+Controller -> Service: register(activityId, userId)
+Service -> DB: Đọc hoạt động, đối tượng, điều kiện
+DB --> Service: Dữ liệu hoạt động
+Service -> Service: Kiểm tra trạng thái công bố,\nthời gian, sức chứa, tư cách, điều kiện
+alt Không đủ điều kiện
+  Service --> Controller: Lỗi nghiệp vụ
+  Controller --> FE: 400/403 + thông báo
+  FE --> Student: Hiển thị lý do không đăng ký được
+else Đủ điều kiện
+  Service -> DB: Kiểm tra đăng ký trùng
+  DB --> Service: Không có đăng ký hợp lệ trùng
+  Service -> DB: INSERT registrations (PENDING hoặc APPROVED)
+  Service -> DB: Ghi audit/event nếu cần
+  DB --> Service: registrationId
+  Service --> Controller: Kết quả đăng ký
+  Controller --> FE: 201 + dữ liệu đăng ký
+  FE --> Student: Hiển thị trạng thái đăng ký
+end
+@enduml

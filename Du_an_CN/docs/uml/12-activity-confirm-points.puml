@@ -1,0 +1,29 @@
+@startuml
+title AC-02 — Xác nhận tham gia và ghi nhận điểm
+start
+:Người quản lý đăng nhập;
+:Chọn hoạt động thuộc phạm vi được phân công;
+:Mở danh sách đăng ký;
+:Đối chiếu người tham gia;
+:Chọn kết quả điểm danh;
+if (Có quyền xác nhận và dữ liệu hợp lệ?) then (Có)
+  :Lưu kết quả tham gia;
+  :Ghi nhật ký thao tác;
+  if (Người dùng có quyền ghi điểm?) then (Có)
+    if (Kết quả đủ điều kiện nhận điểm?) then (Có)
+      :Nhập điểm;
+      :Kiểm tra điểm và lý do;
+      :Lưu điểm;
+      :Ghi nhật ký điểm;
+    else (Không)
+      :Không ghi điểm;
+    endif
+  else (Không)
+    :Bỏ qua bước ghi điểm;
+  endif
+  :Thông báo kết quả cho sinh viên;
+else (Không)
+  :Từ chối thao tác và hiển thị lỗi;
+endif
+stop
+@enduml

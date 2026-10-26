@@ -1,0 +1,54 @@
+@startuml
+title UC-03 — Use Case chi tiết: Người quản lý hoạt động
+left to right direction
+skinparam shadowing false
+actor "Người quản lý\nhoạt động" as Organizer
+
+rectangle "Khu vực quản lý hoạt động" {
+  usecase "Đăng nhập / đăng xuất" as Login
+  usecase "Tạo hoạt động" as Create
+  usecase "Cập nhật hoạt động" as Update
+  usecase "Công bố / hủy / kết thúc hoạt động" as Publish
+  usecase "Thiết lập đối tượng và điều kiện" as Conditions
+  usecase "Xem danh sách đăng ký" as ListRegistrations
+  usecase "Duyệt / từ chối đăng ký" as Review
+  usecase "Xác nhận kết quả tham gia" as Confirm
+  usecase "Ghi nhận điểm hoạt động" as RecordPoints
+  usecase "Điều chỉnh điểm có lý do" as AdjustPoints
+  usecase "Xem thống kê hoạt động" as Statistics
+  usecase "Gửi thông báo hoạt động" as SendNotification
+  usecase "Kiểm tra quyền và phạm vi đơn vị" as Scope
+  usecase "Kiểm tra trạng thái đăng ký /\nkết quả tham gia" as Validate
+  usecase "Ghi nhật ký thay đổi" as Audit
+}
+
+Organizer -- Login
+Organizer -- Create
+Organizer -- Update
+Organizer -- Publish
+Organizer -- Conditions
+Organizer -- ListRegistrations
+Organizer -- Review
+Organizer -- Confirm
+Organizer -- RecordPoints
+Organizer -- AdjustPoints
+Organizer -- Statistics
+Organizer -- SendNotification
+
+Create .> Scope : <<include>>
+Update .> Scope : <<include>>
+Publish .> Scope : <<include>>
+ListRegistrations .> Scope : <<include>>
+Review .> Scope : <<include>>
+Review .> Validate : <<include>>
+Confirm .> Scope : <<include>>
+Confirm .> Validate : <<include>>
+RecordPoints .> Scope : <<include>>
+RecordPoints .> Validate : <<include>>
+AdjustPoints .> Audit : <<include>>
+
+note bottom of Organizer
+Chỉ thao tác trong đơn vị/hoạt động được phân công.
+Điều chỉnh kết quả hoặc điểm phải có lý do và nhật ký.
+end note
+@enduml

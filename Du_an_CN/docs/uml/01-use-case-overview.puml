@@ -1,0 +1,93 @@
+@startuml
+title UC-01 — Sơ đồ Use Case tổng quan
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+actor "Sinh viên" as Student
+actor "Người quản lý\nhoạt động" as Organizer
+actor "Quản trị viên\nhệ thống" as Admin
+
+rectangle "Website đăng ký và quản lý hoạt động phục vụ cộng đồng" {
+  usecase "UC01\nĐăng ký tài khoản" as UC01
+  usecase "UC02\nĐăng nhập / đăng xuất" as UC02
+  usecase "UC03\nQuản lý hồ sơ cá nhân" as UC03
+  usecase "UC04\nXem danh sách hoạt động" as UC04
+  usecase "UC05\nTìm kiếm và lọc hoạt động" as UC05
+  usecase "UC06\nXem chi tiết hoạt động" as UC06
+  usecase "UC07\nĐăng ký tham gia" as UC07
+  usecase "UC08\nHủy đăng ký" as UC08
+  usecase "UC09\nTheo dõi trạng thái đăng ký" as UC09
+  usecase "UC10\nXem lịch sử tham gia" as UC10
+  usecase "UC11\nXem điểm hoạt động" as UC11
+  usecase "UC12\nXem thông báo" as UC12
+
+  usecase "UC13\nQuản lý hoạt động" as UC13
+  usecase "UC14\nQuản lý danh sách đăng ký" as UC14
+  usecase "UC15\nDuyệt / từ chối đăng ký" as UC15
+  usecase "UC16\nXác nhận kết quả tham gia" as UC16
+  usecase "UC17\nGhi nhận / điều chỉnh điểm" as UC17
+  usecase "UC18\nXem thống kê hoạt động" as UC18
+  usecase "UC19\nGửi thông báo hoạt động" as UC19
+
+  usecase "UC20\nQuản lý tài khoản" as UC20
+  usecase "UC21\nQuản lý vai trò và quyền" as UC21
+  usecase "UC22\nQuản lý danh mục đơn vị" as UC22
+  usecase "UC23\nQuản lý cấu hình hệ thống" as UC23
+  usecase "UC24\nXem nhật ký kiểm toán" as UC24
+
+  usecase "Kiểm tra tư cách và\nphạm vi được tham gia" as CheckScope
+  usecase "Kiểm tra thời hạn,\nsức chứa và điều kiện" as CheckRules
+  usecase "Kiểm tra quyền và\nphạm vi đơn vị" as CheckPermission
+  usecase "Ghi nhật ký thao tác" as Audit
+}
+
+Student -- UC01
+Student -- UC02
+Student -- UC03
+Student -- UC04
+Student -- UC05
+Student -- UC06
+Student -- UC07
+Student -- UC08
+Student -- UC09
+Student -- UC10
+Student -- UC11
+Student -- UC12
+
+Organizer -- UC02
+Organizer -- UC13
+Organizer -- UC14
+Organizer -- UC15
+Organizer -- UC16
+Organizer -- UC17
+Organizer -- UC18
+Organizer -- UC19
+
+Admin -- UC02
+Admin -- UC20
+Admin -- UC21
+Admin -- UC22
+Admin -- UC23
+Admin -- UC24
+
+UC07 .> CheckScope : <<include>>
+UC07 .> CheckRules : <<include>>
+UC08 .> CheckRules : <<include>>
+UC13 .> CheckPermission : <<include>>
+UC14 .> CheckPermission : <<include>>
+UC15 .> CheckPermission : <<include>>
+UC16 .> CheckPermission : <<include>>
+UC17 .> CheckPermission : <<include>>
+UC20 .> Audit : <<include>>
+UC21 .> Audit : <<include>>
+UC22 .> Audit : <<include>>
+UC23 .> Audit : <<include>>
+UC17 .> Audit : <<include>>
+
+note bottom of Admin
+Admin không mặc nhiên được xem danh sách đăng ký,
+xác nhận tham gia hoặc chỉnh sửa điểm nghiệp vụ.
+end note
+@enduml

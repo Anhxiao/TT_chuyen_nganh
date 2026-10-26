@@ -1,0 +1,17 @@
+@startuml
+title SEC-01 — Phân quyền nghiệp vụ theo vai trò
+skinparam shadowing false
+skinparam linetype ortho
+
+rectangle "Ma trận quyền (minh họa)" as Matrix {
+  card "Sinh viên (STUDENT)\n\n+ Xem/tìm hoạt động công bố\n+ Đăng ký/hủy theo điều kiện\n+ Xem đăng ký, lịch sử, điểm của mình\n+ Xem thông báo\n\n- Không tự xác nhận tham gia\n- Không tự ghi/sửa điểm" as Student
+  card "Người quản lý (ORGANIZER)\n\n+ Quản lý hoạt động được giao\n+ Xem và xử lý đăng ký trong phạm vi\n+ Xác nhận kết quả nếu được cấp quyền\n+ Ghi điểm nếu được cấp quyền\n+ Thống kê/gửi thông báo trong phạm vi" as Organizer
+  card "Quản trị viên (ADMIN)\n\n+ Quản lý tài khoản và vai trò\n+ Quản lý danh mục hệ thống\n+ Cấu hình và xem nhật ký\n\n- Không mặc nhiên xử lý đăng ký\n- Không mặc nhiên xác nhận/đổi điểm" as Admin
+}
+note bottom
+Mọi thao tác backend phải kiểm tra: (1) đã xác thực,
+(2) có quyền, (3) đúng phạm vi đơn vị/hoạt động,
+(4) thỏa điều kiện nghiệp vụ. Ẩn nút trên frontend
+không thay thế kiểm tra quyền ở backend.
+end note
+@enduml

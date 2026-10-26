@@ -1,0 +1,33 @@
+@startuml
+title SQ-04 — Luồng đăng nhập
+autonumber
+actor "Người dùng" as User
+boundary "Trang đăng nhập" as FE
+control "Auth Routes" as Route
+control "Auth Controller" as Controller
+control "Auth Service" as Service
+database "MySQL" as DB
+
+User -> FE: Nhập email và mật khẩu
+FE -> Route: POST /api/auth/login
+Route -> Controller: Chuyển yêu cầu
+Controller -> Service: login(email, password)
+Service -> DB: Tìm tài khoản theo email
+DB --> Service: Thông tin tài khoản
+Service -> Service: Kiểm tra trạng thái tài khoản\nvà so sánh mật khẩu đã băm
+alt Thông tin không hợp lệ hoặc tài khoản bị khóa
+  Service --> Controller: Lỗi xác thực
+  Controller --> FE: 401/403 + thông báo chung
+  FE --> User: Hiển thị lỗi
+else Đăng nhập hợp lệ
+  Service -> DB: Đọc vai trò và quyền
+  DB --> Service: Danh sách vai trò/quyền
+  Service --> Controller: Token và thông tin tối thiểu
+  Controller --> FE: 200 OK
+  FE --> User: Chuyển đến giao diện theo vai trò
+end
+note bottom
+Mật khẩu không được lưu hoặc trả về dạng văn bản thuần.
+Token cần được xử lý an toàn; mọi API riêng tư vẫn phải kiểm tra quyền ở backend.
+end note
+@enduml

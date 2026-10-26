@@ -1,0 +1,24 @@
+@startuml
+title AR-02 — Sơ đồ triển khai
+skinparam shadowing false
+node "Máy người dùng" as Client {
+  artifact "Trình duyệt web" as Browser
+  artifact "HTML / CSS / JavaScript" as StaticFiles
+  Browser -- StaticFiles
+}
+node "Máy phát triển / Máy chủ ứng dụng" as AppHost {
+  node "Node.js Runtime" as Node {
+    artifact "Express.js REST API\nPort 5000" as API
+  }
+}
+node "Máy chủ cơ sở dữ liệu" as DBHost {
+  database "MySQL 8+\ncommunity_service_db\nPort 3306" as MySQL
+}
+Browser --> API : HTTPS/HTTP + JSON
+API --> MySQL : MySQL protocol\nChỉ mạng nội bộ
+note right of API
+Cấu hình qua biến môi trường.
+Không commit .env.
+Dùng tài khoản DB riêng, không dùng root.
+end note
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+title SQ-03 — Xác nhận tham gia và ghi nhận điểm
+autonumber
+actor "Người quản lý hoạt động" as Organizer
+boundary "Frontend quản lý" as FE
+control "Participation Routes" as Route
+control "Auth / Permission Middleware" as Auth
+control "Participation Controller" as Controller
+control "Participation Service" as Service
+database "MySQL" as DB
+
+Organizer -> FE: Chọn sinh viên và kết quả điểm danh
+FE -> Route: POST /api/registrations/:id/participation
+Route -> Auth: Xác thực và kiểm tra CONFIRM_PARTICIPATION
+Auth --> Route: Kết quả quyền và phạm vi
+alt Không có quyền
+  Route --> FE: 403 Forbidden
+else Có quyền
+  Route -> Controller: Gửi kết quả điểm danh
+  Controller -> Service: confirm(registrationId, attendanceStatus)
+  Service -> DB: Đọc đăng ký và hoạt động
+  DB --> Service: Dữ liệu đăng ký
+  Service -> Service: Kiểm tra đăng ký hợp lệ\nvà trạng thái có thể xác nhận
+  alt Dữ liệu không hợp lệ
+    Service --> Controller: 400/409
+    Controller --> FE: Thông báo lỗi
+  else Hợp lệ
+    Service -> DB: INSERT/UPDATE participation_results
+    Service -> DB: INSERT audit_logs
+    DB --> Service: resultId
+    Service --> Controller: Kết quả đã xác nhận
+    Controller --> FE: 200 OK
+    FE --> Organizer: Hiển thị kết quả
+
+    opt Có quyền RECORD_POINTS và người tham gia đủ điều kiện nhận điểm
+      Organizer -> FE: Nhập số điểm và lý do (nếu điều chỉnh)
+      FE -> Route: POST/PATCH /api/participation-results/:id/points
+      Route -> Auth: Kiểm tra RECORD_POINTS / ADJUST_POINTS
+      Auth --> Route: Kết quả quyền
+      Route -> Controller: Gửi dữ liệu điểm
+      Controller -> Service: recordOrAdjustPoints(resultId, points, reason)
+      Service -> DB: Kiểm tra kết quả tham gia và quyền theo đơn vị
+      Service -> DB: INSERT/UPDATE activity_points
+      Service -> DB: INSERT audit_logs
+      DB --> Service: Thành công
+      Service --> Controller: Điểm đã ghi nhận
+      Controller --> FE: 200 OK
+      FE --> Organizer: Hiển thị điểm
+    end
+  end
+end
+@enduml

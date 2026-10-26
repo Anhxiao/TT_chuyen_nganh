@@ -1,0 +1,228 @@
+@startuml
+title CL-01 — Sơ đồ lớp phân tích và thiết kế
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+hide empty members
+
+package "Tài khoản và phân quyền" {
+  class User {
+    +userId: BIGINT
+    +fullName: VARCHAR
+    +email: VARCHAR
+    -passwordHash: VARCHAR
+    +studentCode: VARCHAR
+    +phone: VARCHAR
+    +accountStatus: AccountStatus
+    +createdAt: DATETIME
+    +updateProfile()
+    +changePassword()
+  }
+  enum AccountStatus {
+    PENDING
+    ACTIVE
+    LOCKED
+  }
+  class Role {
+    +roleId: INT
+    +roleCode: VARCHAR
+    +roleName: VARCHAR
+  }
+  class UserRole {
+    +userId: BIGINT
+    +roleId: INT
+    +assignedAt: DATETIME
+  }
+  class Permission {
+    +permissionId: INT
+    +permissionCode: VARCHAR
+    +description: VARCHAR
+  }
+  class RolePermission {
+    +roleId: INT
+    +permissionId: INT
+  }
+}
+
+package "Đơn vị tổ chức" {
+  class Organization {
+    +organizationId: BIGINT
+    +organizationName: VARCHAR
+    +organizationType: OrganizationType
+    +status: OrganizationStatus
+  }
+  enum OrganizationType {
+    UNIVERSITY
+    FACULTY
+    CLUB
+    OTHER
+  }
+  enum OrganizationStatus {
+    ACTIVE
+    INACTIVE
+  }
+  class OrganizationMembership {
+    +membershipId: BIGINT
+    +membershipType: VARCHAR
+    +membershipStatus: MembershipStatus
+    +canManageActivities: BOOLEAN
+    +canManageRegistrations: BOOLEAN
+    +canConfirmParticipation: BOOLEAN
+    +canRecordPoints: BOOLEAN
+    +canViewStatistics: BOOLEAN
+  }
+  enum MembershipStatus {
+    PENDING
+    ACTIVE
+    INACTIVE
+  }
+}
+
+package "Hoạt động" {
+  class ActivityCategory {
+    +categoryId: INT
+    +categoryName: VARCHAR
+    +description: VARCHAR
+  }
+  class Activity {
+    +activityId: BIGINT
+    +title: VARCHAR
+    +description: TEXT
+    +location: VARCHAR
+    +startAt: DATETIME
+    +endAt: DATETIME
+    +registrationStartAt: DATETIME
+    +registrationEndAt: DATETIME
+    +capacity: INT
+    +requiresApproval: BOOLEAN
+    +status: ActivityStatus
+    +createdAt: DATETIME
+    +updatedAt: DATETIME
+    +publish()
+    +cancel()
+    +isRegistrationOpen(): BOOLEAN
+  }
+  enum ActivityStatus {
+    DRAFT
+    PUBLISHED
+    CANCELLED
+    COMPLETED
+  }
+  class ActivityAudience {
+    +audienceId: BIGINT
+    +audienceType: AudienceType
+  }
+  enum AudienceType {
+    UNIVERSITY
+    FACULTY
+    CLUB
+    CUSTOM
+  }
+  class ActivityCondition {
+    +conditionId: BIGINT
+    +conditionType: VARCHAR
+    +conditionValue: VARCHAR
+    +description: TEXT
+    +isRequired: BOOLEAN
+  }
+}
+
+package "Đăng ký và kết quả" {
+  class Registration {
+    +registrationId: BIGINT
+    +registeredAt: DATETIME
+    +status: RegistrationStatus
+    +reviewedAt: DATETIME
+    +reviewNote: VARCHAR
+    +cancelledAt: DATETIME
+    +submit()
+    +cancel()
+    +approve()
+    +reject()
+  }
+  enum RegistrationStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    CANCELLED
+  }
+  class ParticipationResult {
+    +resultId: BIGINT
+    +attendanceStatus: AttendanceStatus
+    +confirmedAt: DATETIME
+    +note: VARCHAR
+    +confirm()
+  }
+  enum AttendanceStatus {
+    ATTENDED
+    ABSENT
+    PARTIAL
+    EXCUSED
+  }
+  class ActivityPoint {
+    +pointId: BIGINT
+    +points: DECIMAL
+    +recordedAt: DATETIME
+    +updatedAt: DATETIME
+    +reason: VARCHAR
+    +record()
+    +adjust()
+  }
+}
+
+package "Thông báo và kiểm toán" {
+  class Notification {
+    +notificationId: BIGINT
+    +title: VARCHAR
+    +content: TEXT
+    +notificationType: VARCHAR
+    +isRead: BOOLEAN
+    +createdAt: DATETIME
+    +readAt: DATETIME
+    +markAsRead()
+  }
+  class AuditLog {
+    +logId: BIGINT
+    +action: VARCHAR
+    +entityType: VARCHAR
+    +entityId: BIGINT
+    +oldValue: JSON
+    +newValue: JSON
+    +reason: VARCHAR
+    +ipAddress: VARCHAR
+    +createdAt: DATETIME
+  }
+}
+
+User "1" -- "0..*" UserRole
+Role "1" -- "0..*" UserRole
+Role "1" -- "0..*" RolePermission
+Permission "1" -- "0..*" RolePermission
+User "1" -- "0..*" OrganizationMembership
+Organization "1" -- "0..*" OrganizationMembership
+Organization "0..1" -- "0..*" Organization : parent / children
+Organization "1" -- "0..*" Activity : owns
+User "1" -- "0..*" Activity : createdBy
+ActivityCategory "0..1" -- "0..*" Activity
+Activity "1" *-- "0..*" ActivityAudience
+Activity "1" *-- "0..*" ActivityCondition
+Activity "1" -- "0..*" Registration
+User "1" -- "0..*" Registration : student
+User "0..1" -- "0..*" Registration : reviewer
+Registration "1" -- "0..1" ParticipationResult
+User "0..1" -- "0..*" ParticipationResult : confirmer
+ParticipationResult "1" -- "0..1" ActivityPoint
+User "1" -- "0..*" ActivityPoint : recorder
+User "1" -- "0..*" Notification : recipient
+Activity "0..1" -- "0..*" Notification
+User "0..1" -- "0..*" AuditLog : actor
+
+note right of OrganizationMembership
+Quyền được kiểm tra đồng thời theo
+vai trò, membership và phạm vi đơn vị.
+end note
+note bottom of ActivityPoint
+Chỉ ghi điểm khi kết quả tham gia hợp lệ;
+điều chỉnh điểm cần lý do và audit log.
+end note
+@enduml

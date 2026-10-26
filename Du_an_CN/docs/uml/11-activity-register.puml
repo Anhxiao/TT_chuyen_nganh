@@ -1,0 +1,35 @@
+@startuml
+title AC-01 — Sơ đồ hoạt động đăng ký tham gia
+start
+:Đăng nhập;
+:Mở danh sách hoạt động;
+:Tìm kiếm / lọc hoạt động;
+:Xem chi tiết hoạt động;
+if (Hoạt động đã công bố?) then (Có)
+  if (Còn trong thời hạn đăng ký?) then (Có)
+    :Kiểm tra tư cách theo trường/khoa/CLB;
+    if (Đúng đối tượng?) then (Có)
+      :Kiểm tra điều kiện và sức chứa;
+      if (Đủ điều kiện và chưa đăng ký trùng?) then (Có)
+        :Gửi yêu cầu đăng ký;
+        :Backend lưu đăng ký;
+        if (Cần xét duyệt?) then (Có)
+          :Đặt trạng thái Chờ duyệt;
+        else (Không)
+          :Đặt trạng thái Đã duyệt;
+        endif
+        :Thông báo kết quả cho sinh viên;
+      else (Không)
+        :Hiển thị lý do không đủ điều kiện;
+      endif
+    else (Không)
+      :Thông báo không thuộc đối tượng;
+    endif
+  else (Không)
+    :Thông báo đã hết hạn đăng ký;
+  endif
+else (Không)
+  :Không cho đăng ký hoạt động;
+endif
+stop
+@enduml

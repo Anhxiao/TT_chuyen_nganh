@@ -1,0 +1,20 @@
+@startuml
+title ST-01 — Máy trạng thái của hoạt động
+[*] --> DRAFT : Tạo hoạt động
+DRAFT --> DRAFT : Chỉnh sửa bản nháp
+DRAFT --> PUBLISHED : Công bố / được duyệt công bố
+DRAFT --> CANCELLED : Hủy bản nháp
+PUBLISHED --> CANCELLED : Hủy hoạt động
+PUBLISHED --> COMPLETED : Kết thúc và hoàn tất
+CANCELLED --> [*]
+COMPLETED --> [*]
+
+note right of DRAFT
+Chỉ người quản lý có quyền và
+phạm vi phù hợp được chỉnh sửa.
+end note
+note right of PUBLISHED
+Sinh viên chỉ đăng ký khi hoạt động
+đã công bố và còn thời hạn đăng ký.
+end note
+@enduml

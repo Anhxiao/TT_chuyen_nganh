@@ -1,0 +1,41 @@
+@startuml
+title AR-01 — Sơ đồ thành phần kiến trúc hệ thống
+skinparam componentStyle rectangle
+skinparam shadowing false
+left to right direction
+
+package "Client" {
+  [HTML Pages] as HTML
+  [Bootstrap 5 / CSS] as CSS
+  [JavaScript + fetch()] as JS
+}
+package "Backend — Node.js / Express.js" {
+  [REST API Routes] as Routes
+  [Authentication Middleware] as Auth
+  [Authorization / Scope Middleware] as Permission
+  [Controllers] as Controllers
+  [Services: Business Rules] as Services
+  [Repositories: SQL Queries] as Repositories
+  [Validation / Error Handling] as Validation
+}
+database "MySQL Database" as DB
+
+HTML --> JS
+CSS .. HTML
+JS --> Routes : HTTP/JSON
+Routes --> Auth
+Auth --> Permission
+Permission --> Controllers
+Controllers --> Validation
+Controllers --> Services
+Services --> Repositories
+Repositories --> DB : SQL
+DB --> Repositories
+Repositories --> Services
+Services --> Controllers
+Controllers --> JS : JSON response
+
+note bottom of JS
+Frontend không kết nối trực tiếp MySQL.
+end note
+@enduml

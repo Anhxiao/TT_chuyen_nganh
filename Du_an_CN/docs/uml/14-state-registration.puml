@@ -1,0 +1,17 @@
+@startuml
+title ST-02 — Máy trạng thái của đăng ký
+[*] --> PENDING : Gửi đăng ký cần xét duyệt
+[*] --> APPROVED : Gửi đăng ký không cần xét duyệt\nvà thỏa điều kiện
+PENDING --> APPROVED : Duyệt
+PENDING --> REJECTED : Từ chối
+PENDING --> CANCELLED : Sinh viên hủy hợp lệ
+APPROVED --> CANCELLED : Hủy được phép theo quy định
+REJECTED --> [*]
+CANCELLED --> [*]
+APPROVED --> [*] : Hoàn tất quy trình đăng ký
+
+note right of PENDING
+Không đồng nghĩa với việc
+đã được chấp nhận tham gia.
+end note
+@enduml

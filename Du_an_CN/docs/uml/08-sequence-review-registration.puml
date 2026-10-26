@@ -1,0 +1,40 @@
+@startuml
+title SQ-02 — Luồng duyệt hoặc từ chối đăng ký
+autonumber
+actor "Người quản lý hoạt động" as Organizer
+boundary "Frontend quản lý" as FE
+control "Registration Routes" as Route
+control "Auth Middleware" as Auth
+control "Permission Middleware" as Permission
+control "Registration Controller" as Controller
+control "Registration Service" as Service
+database "MySQL" as DB
+
+Organizer -> FE: Chọn đăng ký và quyết định
+FE -> Route: PATCH /api/registrations/:id/review
+Route -> Auth: Xác thực token
+Auth --> Route: Danh tính và vai trò
+Route -> Permission: Kiểm tra MANAGE_REGISTRATIONS\nvà phạm vi đơn vị
+Permission --> Route: Cho phép / từ chối
+alt Không đủ quyền hoặc sai phạm vi
+  Route --> FE: 403 Forbidden
+else Có quyền
+  Route -> Controller: Gửi yêu cầu duyệt
+  Controller -> Service: review(registrationId, decision, note)
+  Service -> DB: Đọc đăng ký + hoạt động
+  DB --> Service: Trạng thái hiện tại và đơn vị
+  Service -> Service: Kiểm tra trạng thái cho phép duyệt
+  alt Trạng thái không hợp lệ
+    Service --> Controller: 409 Conflict
+    Controller --> FE: Thông báo không thể duyệt
+  else Hợp lệ
+    Service -> DB: UPDATE registrations
+    Service -> DB: INSERT notifications cho sinh viên
+    Service -> DB: INSERT audit_logs
+    DB --> Service: Thành công
+    Service --> Controller: Trạng thái mới
+    Controller --> FE: 200 OK
+    FE --> Organizer: Cập nhật danh sách
+  end
+end
+@enduml
