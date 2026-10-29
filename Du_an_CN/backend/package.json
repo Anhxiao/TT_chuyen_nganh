@@ -1,0 +1,35 @@
+{
+    "name": "student-activity-management-backend",
+    "version": "1.0.0",
+    "description": "Backend website đăng ký và quản lý hoạt động phục vụ cộng đồng của sinh viên",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "check": "node --check server.js && node --check src/app.js",
+        "test:db": "node -e \"require('./src/config/database').testDatabaseConnection().then(ok => process.exit(ok ? 0 : 1))\""
+    },
+    "keywords": [
+        "student-activity",
+        "community-service",
+        "nodejs",
+        "express",
+        "mysql"
+    ],
+    "author": "Du_an_CN",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mssql": "^12.7.13",
+        "mysql2": "^3.14.2",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10"
+    }
+}
