@@ -1,0 +1,41 @@
+{
+    "name": "student-activity-management-frontend",
+    "private": true,
+    "version": "1.0.0",
+    "description": "Frontend website đăng ký và quản lý hoạt động phục vụ cộng đồng của sinh viên",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "lint": "eslint src --ext js,jsx"
+    },
+    "dependencies": {
+        "axios": "^1.7.9",
+        "bootstrap": "^5.3.8",
+        "bootstrap-icons": "^1.13.2",
+        "chart.js": "^4.4.7",
+        "dayjs": "^1.11.13",
+        "jwt-decode": "^4.0.0",
+        "react": "^18.3.1",
+        "react-bootstrap": "^2.10.7",
+        "react-chartjs-2": "^5.3.0",
+        "react-dom": "^18.3.1",
+        "react-hook-form": "^7.54.2",
+        "react-icons": "^5.4.0",
+        "react-router-dom": "^6.28.1",
+        "react-toastify": "^11.0.3"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.18",
+        "@types/react-dom": "^18.3.5",
+        "@vitejs/plugin-react": "^4.3.4",
+        "eslint": "^9.17.0",
+        "eslint-plugin-react": "^7.37.3",
+        "eslint-plugin-react-hooks": "^5.1.0",
+        "eslint-plugin-react-refresh": "^0.4.16",
+        "vite": "^5.4.11"
+    },
+    "author": "Du_an_CN",
+    "license": "ISC"
+}

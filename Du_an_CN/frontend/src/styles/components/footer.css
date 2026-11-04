@@ -1,0 +1,15 @@
+
+/* =====================================================
+   FOOTER SOCIAL HOVER
+===================================================== */
+
+footer a.rounded-circle {
+    transition:
+        transform 0.25s ease,
+        filter 0.25s ease;
+}
+
+footer a.rounded-circle:hover {
+    transform: translateY(-5px) scale(1.06);
+    filter: brightness(1.12);
+}

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Hoạt động Phục vụ Cộng đồng</title>
+    <!-- Bootstrap 5 -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap 5 JS Bundle (bao gồm Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- CSS nguyên bài -->
+    <link rel="stylesheet" href="/frontend/src/styles/global.css">
+
+    <!-- CSS trang chủ -->
+    <link rel="stylesheet" href="/frontend/src/styles/styles-index.css">
+
+    <!-- CSS Header -->
+    <link rel="stylesheet" href="/frontend/src/styles/components/header.css">
+
+    <!-- CSS Footer -->
+    <link rel="stylesheet" href="/frontend/src/styles/components/footer.css">
+</head>
+<body> 
+    <header class="top-header">
+        <div class="container-fluid px-4">
+            <div class="header-inner">
+
+                <!-- Logo -->
+                <div class="logo-section">
+                    <div class="logo-img">
+                        <img src="/frontend/public/assets/Logo-DH-Tra-Vinh-TVU.webp"
+                            alt="TVU Logo">
+                    </div>
+
+                    <div class="logo-text">
+                        <div class="logo-university">
+                            ĐẠI HỌC TRÀ VINH
+                        </div>
+                    </div>
+                </div>
+
+                <!-- menu -->
+                <nav>
+                    <ul class="nav-menu">
+
+                        <li>
+                            <a href="#" class="nav-item home-active">
+                                <i class="bi bi-house"></i>
+                                Trang chủ
+                            </a>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#"
+                            class="nav-item dropdown-toggle"
+                            data-bs-toggle="dropdown">
+                                <i class="bi bi-bell"></i>
+                                Thông báo
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="bi bi-bell me-2"></i>
+                                        Thông báo đồ án
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#"
+                            class="nav-item dropdown-toggle"
+                            data-bs-toggle="dropdown">
+                                <i class="bi bi-search"></i>
+                                Tra cứu
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="bi bi-person-badge me-2"></i>
+                                        Khoa Công nghệ thông tin
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#">
+                                        <i class="bi bi-journal-text me-2"></i>
+                                        Danh sách đề tài
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#" target="">
+                                        <i class="bi bi-file-earmark-text me-2"></i>
+                                        Kết quả thi
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#"
+                            class="nav-item dropdown-toggle"
+                            data-bs-toggle="dropdown">
+                                <i class="bi bi-info-circle"></i>
+                                Giới thiệu
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#">
+                                        <i class="bi bi-mortarboard me-2"></i>
+                                        Sinh viên
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#">
+                                        <i class="bi bi-person-badge me-2"></i>
+                                        Giảng viên
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#">
+                                        <i class="bi bi-shield-lock me-2"></i>
+                                        Lãnh đạo
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#"
+                            class="nav-item dropdown-toggle"
+                            data-bs-toggle="dropdown">
+                                <i class="bi bi-people"></i>
+                                Biểu mẫu
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#" target="">
+                                        <i class="bi bi-file-earmark-text me-2"></i>
+                                        Biểu mẫu cho sinh viên
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                    href="#" target="">
+                                        <i class="bi bi-file-earmark-text me-2"></i>
+                                        Biểu mẫu cho giảng viên
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- section GT -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-stretch g-4">
+                
+                <!-- Cột trái -->
+                <div class="col-lg-7">
+                    <div class="hero-card">
+                        <div class="hero-badge">
+                            <i class="bi bi-mortarboard-fill me-2"></i>
+                            TRA VINH UNIVERSITY
+                        </div>
+                        
+                        <h1 class="hero-title">
+                            Hệ thống quản lý hoạt động phục vụ cộng đồng
+                        </h1>
+                        
+                        <p class="hero-desc">
+                            Nền tảng hỗ trợ sinh viên tra cứu, đăng ký và theo dõi các hoạt động tình nguyện, hiến máu và phục vụ cộng đồng. 
+                        </p>
+                        
+                        <p class="hero-desc mb-0">
+                            Đồng thời, hệ thống giúp các đơn vị tổ chức quản lý hoạt động, xét duyệt đăng ký, xác nhận tham gia và ghi nhận điểm phục vụ cộng đồng, góp phần nâng cao hiệu quả quản lý và khuyến khích sinh viên tích cực tham gia các hoạt động xã hội..
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Cột phải  -->
+                <div class="col-lg-5">
+                    <div class="hero-card login-selection-card">
+
+                        <div class="hero-badge">
+                            <i class="bi bi-person-lock me-2"></i>
+                            ĐĂNG NHẬP HỆ THỐNG
+                        </div>
+
+                        <h2 class="hero-title">
+                            Chào mừng bạn!
+                        </h2>
+
+                        <p class="hero-desc">
+                            Vui lòng lựa chọn loại tài khoản để tiếp tục sử dụng hệ thống.
+                        </p>
+
+                        <div class="d-grid gap-3 mt-4">
+                            <a href="/frontend/pages/auth/login.html?role=STUDENT"
+                            class="btn btn-light login-choice-btn student-login-btn">
+                                <i class="bi bi-mortarboard-fill"></i>
+                                <span>
+                                    <strong>Tài khoản sinh viên</strong>
+                                    <small>Đăng nhập dành cho sinh viên</small>
+                                </span>
+                                <i class="bi bi-arrow-right ms-auto"></i>
+                            </a>
+
+                            <a href="/frontend/pages/auth/login.html?role=ORGANIZER"
+                            class="btn btn-light login-choice-btn organizer-login-btn">
+                                <i class="bi bi-building-fill"></i>
+                                <span>
+                                    <strong>Tài khoản đơn vị tổ chức</strong>
+                                    <small>Đăng nhập dành cho đơn vị quản lý</small>
+                                </span>
+                                <i class="bi bi-arrow-right ms-auto"></i>
+                            </a>
+                        </div>
+
+                        <p class="text-center text-white-50 mt-4 mb-0">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Hệ thống quản lý hoạt động phục vụ cộng đồng
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mô tả -->
+    <section class="py-5 section-doi-tuong">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-4 mb-lg-5 display-6">Dành cho mọi đối tượng</h2>
+            
+            <div class="row g-4 g-lg-5">
+            <!-- Sinh viên -->
+                <div class="col-md-4">
+                    <div class="card border-primary rounded-4 h-100 bg-white bg-opacity-80 shadow-sm card-doi-tuong">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="icon-doi-tuong bg-primary bg-opacity-10 text-primary mb-3">
+                            <i class="bi bi-mortarboard"></i>
+                            </div>
+                            <h4 class="card-title text-primary fw-bold mb-3">
+                            Sinh viên
+                            </h4>
+                            <ul class="list-unstyled mb-0 fs-5">
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Đăng ký / hủy hoạt động
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Theo dõi trạng thái
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Xem lịch sử & điểm
+                            </li>
+                            <li>
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Nhận thông báo
+                            </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Đơn vị tổ chức -->
+                <div class="col-md-4">
+                    <div class="card border-success rounded-4 h-100 bg-white bg-opacity-80 shadow-sm card-doi-tuong">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="icon-doi-tuong bg-success bg-opacity-10 text-success mb-3">
+                            <i class="bi bi-briefcase"></i>
+                            </div>
+                            <h4 class="card-title text-success fw-bold mb-3">
+                            Đơn vị tổ chức
+                            </h4>
+                            <ul class="list-unstyled mb-0 fs-5">
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Tạo & quản lý hoạt động
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Duyệt đăng ký
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Xác nhận tham gia & ghi điểm
+                            </li>
+                            <li>
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Thống kê & thông báo
+                            </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quản trị viên -->
+                <div class="col-md-4">
+                    <div class="card border-danger rounded-4 h-100 bg-white bg-opacity-80 shadow-sm card-doi-tuong">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="icon-doi-tuong bg-danger bg-opacity-10 text-danger mb-3">
+                                <i class="bi bi-shield-lock"></i>
+                            </div>
+                            <h4 class="card-title text-danger fw-bold mb-3">
+                            Quản trị viên
+                            </h4>
+                            <ul class="list-unstyled mb-0 fs-5">
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Quản lý tài khoản
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Phân quyền
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Theo dõi toàn hệ thống
+                            </li>
+                            <li>
+                                <i class="bi bi-check2-circle text-success me-2"></i>
+                                Báo cáo tổng hợp
+                            </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        
+    <footer class="bg-primary text-white mt-5 pt-5 pb-3">
+        <div class="container-fluid px-4">
+            <!-- Phần thông tin chính -->
+            <div class="row justify-content-between">
+                <!-- Thông tin Khoa -->
+                <div class="col-lg-9 col-md-9 col-12">
+
+                    <h2 class="fw-bold mb-3">
+                        Đại học Trà Vinh
+                    </h2>
+
+                    <p class="fs-5 text-light mb-4">
+                        Tra Vinh University
+                    </p>
+
+                    <div class="bg-warning mb-4"
+                        style="height: 4px; width: 150px;">
+                    </div>
+
+                    <!-- Địa chỉ -->
+                    <p class="fs-5 mb-3">
+                        <i class="bi bi-geo-alt-fill me-3"></i>
+                        Số 126, Nguyễn Thiện Thành, Khóm 4,
+                        Phường Hòa Thuận, Tỉnh Vĩnh Long
+                    </p>
+
+                    <!-- Điện thoại -->
+                    <p class="fs-5 mb-3">
+                        <i class="bi bi-telephone-fill me-3"></i>
+                        (+84) 294.3855246
+                    </p>
+
+                    <!-- Email -->
+                    <p class="fs-5 mb-3">
+                        <i class="bi bi-envelope-fill me-3"></i>
+                        <a href="mailto:tvu@tvu.edu.vn"
+                        class="text-warning text-decoration-none">
+                            tvu@tvu.edu.vn
+                        </a>
+                    </p>
+
+                    <!-- Website -->
+                    <p class="fs-5 mb-3">
+                        <i class="bi bi-globe me-3"></i>
+                        <a href="https://www.tvu.edu.vn/"
+                        target="_blank"
+                        class="text-warning text-decoration-none">
+                            https://www.tvu.edu.vn/
+                        </a>
+                    </p>
+
+                </div>
+
+                <!-- Mạng xã hội -->
+                <div class="col-lg-3 col-md-3 col-12
+                            d-flex justify-content-lg-end
+                            justify-content-start align-items-start
+                            gap-3 mt-4 mt-lg-0">
+
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/?locale=vi_VN"
+                    class="bg-info text-white rounded-circle
+                            d-flex align-items-center justify-content-center
+                            text-decoration-none"
+                    style="width: 65px; height: 65px;">
+                        <i class="bi bi-facebook fs-2"></i>
+                    </a>
+
+                    <!-- YouTube -->
+                    <a href="https://www.youtube.com/?app=desktop&hl=vi"
+                    class="bg-danger text-white rounded-circle
+                            d-flex align-items-center justify-content-center
+                            text-decoration-none"
+                    style="width: 65px; height: 65px;">
+                        <i class="bi bi-youtube fs-2"></i>
+                    </a>
+
+                    <!-- GitHub -->
+                    <a href="https://github.com/Anhxiao/TT_chuyen_nganh.git"
+                    class="bg-dark text-white rounded-circle
+                            d-flex align-items-center justify-content-center
+                            text-decoration-none"
+                    style="width: 65px; height: 65px;">
+                        <i class="bi bi-github fs-2"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Phần cuối Footer -->
+            <div class="row mt-4 align-items-center">
+
+                <div class="col-12">
+                    <div class="bg-warning mb-3"
+                        style="height: 3px; width: 230px;">
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-12">
+                    <h4 class="fw-bold text-warning mb-0">
+                        Tra Vinh University
+                    </h4>
+                </div>
+
+                <div class="col-md-8 col-12 text-md-end mt-3 mt-md-0">
+                    <small class="text-light">
+                        © 2025 Hệ thống Quản lý Hoạt động Phục vụ Cộng đồng
+                        · Đồ án chuyên ngành · Thạch Nam Anh
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- ReactJS Entry Point -->
+    <script type="module" src="/src/main.jsx"></script>
+    
+</body>
+</html>

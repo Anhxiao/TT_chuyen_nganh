@@ -1,0 +1,151 @@
+
+/* =====================================================
+   1. ROOT VARIABLES
+===================================================== */
+
+:root {
+    --tvu-blue: #0a3d91;
+    --tvu-blue-dark: #062c6b;
+    --tvu-blue-light: #1a5bb8;
+}
+
+
+/* =====================================================
+   2. BODY AND BACKGROUND
+===================================================== */
+
+body {
+    min-height: 100vh;
+    margin: 0;
+
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+    background-image: url("/frontend/public/assets/images.jpg");
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Các khu vực nội dung ở giữa trang */
+section.py-5:not(.bg-primary) {
+    background: transparent !important;
+}
+
+
+/* =====================================================
+   3. CARDS AND FEATURES
+===================================================== */
+
+.card {
+    border-radius: 1.15rem !important;
+
+    background: rgba(255, 255, 255, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    box-shadow: 0 8px 24px rgba(20, 55, 90, 0.08) !important;
+
+    transition:
+        transform 0.28s ease,
+        box-shadow 0.28s ease,
+        background-color 0.28s ease,
+        border-color 0.28s ease;
+}
+
+.card:hover {
+    transform: translateY(-7px);
+
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-color: rgba(13, 110, 253, 0.35) !important;
+
+    box-shadow: 0 14px 30px rgba(13, 110, 253, 0.17) !important;
+}
+
+.card.border-primary:hover {
+    border-color: rgba(13, 110, 253, 0.75) !important;
+}
+
+.card.border-success:hover {
+    border-color: rgba(25, 135, 84, 0.75) !important;
+
+    box-shadow: 0 14px 30px rgba(25, 135, 84, 0.16) !important;
+}
+
+.card.border-danger:hover {
+    border-color: rgba(220, 53, 69, 0.65) !important;
+
+    box-shadow: 0 14px 30px rgba(220, 53, 69, 0.15) !important;
+}
+
+
+/* =====================================================
+   4. ICONS IN CARDS
+===================================================== */
+
+.stat-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 1rem;
+    font-size: 1.5rem;
+
+    transition:
+        transform 0.28s ease,
+        filter 0.28s ease;
+}
+
+.card:hover .stat-icon {
+    transform: scale(1.1) rotate(-4deg);
+    filter: saturate(1.2);
+}
+
+
+/* =====================================================
+   5. BUTTONS
+===================================================== */
+
+.btn {
+    border-radius: 0.7rem;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(0, 0, 0, 0.14);
+}
+
+
+/* =====================================================
+   6. ACCESSIBILITY
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .card,
+    .btn,
+    .stat-icon,
+    .nav-item,
+    .nav-item i,
+    .logo-img img,
+    .hero-card,
+    .hero-badge,
+    .hero-title,
+    .hero-desc,
+    .nav-menu .dropdown-item,
+    footer a.rounded-circle {
+        transition: none !important;
+    }
+}
