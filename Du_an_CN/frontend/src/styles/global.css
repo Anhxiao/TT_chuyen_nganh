@@ -20,7 +20,7 @@ body {
 
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 
-    background-image: url("/frontend/public/assets/images.jpg");
+    background-image: url("/assets/images.jpg");
 
     background-position: center;
     background-repeat: no-repeat;

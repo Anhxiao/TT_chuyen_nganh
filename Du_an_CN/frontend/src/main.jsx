@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
-import App from './app.jsx';
+import App from './App.jsx';                    
 
 // Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,13 +8,21 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Bootstrap Icons
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
+// Bootstrap JavaScript
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 // CSS toàn cục
 import './styles/global.css';
 
-// Bootstrap JavaScript (dropdown, modal, collapse...)
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// CSS header
+import './styles/components/header.css';
 
-// Khởi chạy ứng dụng React
+// CSS footer
+import './styles/components/footer.css';
+
+// CSS index
+import './styles/styles-index.css';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <App />
