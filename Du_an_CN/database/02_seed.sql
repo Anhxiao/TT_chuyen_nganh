@@ -110,49 +110,175 @@ VALUES
     (N'Trường Y Dược');
 GO
 
+
 /* =========================================================
-    7. ORGANIZATIONS
-   ========================================================= */
+7. ORGANIZATIONS
+Mô hình tổ chức 3 cấp:
+- Cấp Đại học: đứng tên pháp danh
+- Cấp trường thành viên: Đoàn trường
+- Cấp CLB: trực thuộc Hội Sinh viên
+========================================================= */
 
--- Đoàn Thanh niên TVU
-INSERT INTO Organizations (organization_code, organization_name, organization_type)
-VALUES ('TVU_UNION', N'Đoàn Thanh niên Đại học Trà Vinh', 'SCHOOL_UNION');
+-- CẤP ĐẠI HỌC: ĐOÀN THANH NIÊN
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+VALUES
+(
+    'TVU_UNION',
+    N'Đoàn Thanh niên Đại học Trà Vinh',
+    'SCHOOL_UNION',
+    NULL,
+    NULL
+);
 GO
 
--- Hội Sinh viên TVU
-INSERT INTO Organizations (organization_code, organization_name, organization_type)
-VALUES ('TVU_STUDENT_ASSOC', N'Hội Sinh viên Đại học Trà Vinh', 'STUDENT_ASSOCIATION');
+-- CẤP ĐẠI HỌC: HỘI SINH VIÊN
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+VALUES
+(
+    'TVU_STUDENT_ASSOC',
+    N'Hội Sinh viên Đại học Trà Vinh',
+    'STUDENT_ASSOCIATION',
+    NULL,
+    NULL
+);
 GO
 
--- Đoàn Trường Kỹ thuật và Công nghệ
-INSERT INTO Organizations (organization_code, organization_name, organization_type, faculty_id)
-VALUES ('TECH_UNION', N'Đoàn Trường Kỹ thuật và Công nghệ', 'FACULTY_UNION', 1);
+
+-- CẤP TRƯỜNG THÀNH VIÊN
+-- Trực thuộc Đoàn Thanh niên Đại học Trà Vinh
+
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+SELECT
+    'TECH_UNION',
+    N'Đoàn Trường Kỹ thuật và Công nghệ',
+    'FACULTY_UNION',
+    f.faculty_id,
+    p.organization_id
+FROM Faculties f
+CROSS JOIN Organizations p
+WHERE f.faculty_name = N'Trường Kỹ thuật và Công nghệ'
+AND p.organization_code = 'TVU_UNION';
 GO
 
--- Đoàn Trường Kinh tế và Luật
-INSERT INTO Organizations (organization_code, organization_name, organization_type, faculty_id)
-VALUES ('LAW_UNION', N'Đoàn Trường Kinh tế và Luật', 'FACULTY_UNION', 2);
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+SELECT
+    'LAW_UNION',
+    N'Đoàn Trường Kinh tế và Luật',
+    'FACULTY_UNION',
+    f.faculty_id,
+    p.organization_id
+FROM Faculties f
+CROSS JOIN Organizations p
+WHERE f.faculty_name = N'Trường Kinh tế và Luật'
+AND p.organization_code = 'TVU_UNION';
 GO
 
--- Đoàn Trường Y Dược
-INSERT INTO Organizations (organization_code, organization_name, organization_type, faculty_id)
-VALUES ('MED_UNION', N'Đoàn Trường Y Dược', 'FACULTY_UNION', 3);
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+SELECT
+    'MED_UNION',
+    N'Đoàn Trường Y Dược',
+    'FACULTY_UNION',
+    f.faculty_id,
+    p.organization_id
+FROM Faculties f
+CROSS JOIN Organizations p
+WHERE f.faculty_name = N'Trường Y Dược'
+AND p.organization_code = 'TVU_UNION';
 GO
 
--- CLB Kỹ năng sống
-INSERT INTO Organizations (organization_code, organization_name, organization_type)
-VALUES ('LIFE_SKILL_CLUB', N'Câu lạc bộ Kỹ năng sống', 'CLUB');
+
+-- CẤP CÂU LẠC BỘ
+-- Trực thuộc Hội Sinh viên Đại học Trà Vinh
+
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+SELECT
+    'LIFE_SKILL_CLUB',
+    N'Câu lạc bộ Kỹ năng sống',
+    'CLUB',
+    NULL,
+    p.organization_id
+FROM Organizations p
+WHERE p.organization_code = 'TVU_STUDENT_ASSOC';
 GO
 
--- CLB Truyền thông
-INSERT INTO Organizations (organization_code, organization_name, organization_type)
-VALUES ('MEDIA_CLUB', N'Câu lạc bộ Truyền thông TVU', 'CLUB');
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+SELECT
+    'MEDIA_CLUB',
+    N'Câu lạc bộ Truyền thông TVU',
+    'CLUB',
+    NULL,
+    p.organization_id
+FROM Organizations p
+WHERE p.organization_code = 'TVU_STUDENT_ASSOC';
 GO
 
--- CLB Văn hóa Nghệ thuật
-INSERT INTO Organizations (organization_code, organization_name, organization_type)
-VALUES ('ART_CLUB', N'Câu lạc bộ Văn hóa Nghệ thuật TVU', 'CLUB');
+INSERT INTO Organizations
+(
+    organization_code,
+    organization_name,
+    organization_type,
+    faculty_id,
+    parent_organization_id
+)
+SELECT
+    'ART_CLUB',
+    N'Câu lạc bộ Văn hóa Nghệ thuật TVU',
+    'CLUB',
+    NULL,
+    p.organization_id
+FROM Organizations p
+WHERE p.organization_code = 'TVU_STUDENT_ASSOC';
 GO
+
 
 /* =========================================================
     8. SYSTEM CONFIGS

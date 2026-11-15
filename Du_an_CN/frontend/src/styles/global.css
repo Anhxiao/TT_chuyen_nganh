@@ -1,6 +1,6 @@
 
 /* =====================================================
-   1. ROOT VARIABLES
+1. ROOT VARIABLES
 ===================================================== */
 
 :root {
@@ -11,17 +11,28 @@
 
 
 /* =====================================================
-   2. BODY AND BACKGROUND
+2. BODY AND BACKGROUND
 ===================================================== */
+
+/* Nền mặc định cho toàn bộ website */
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     min-height: 100vh;
-    margin: 0;
-
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #ffffff;
+}
 
+/* Chỉ các trang chưa đăng nhập sử dụng ảnh nền */
+.home-page,
+.login-page {
+    min-height: 100vh;
     background-image: url("/assets/images.jpg");
-
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -35,7 +46,7 @@ section.py-5:not(.bg-primary) {
 
 
 /* =====================================================
-   3. CARDS AND FEATURES
+3. CARDS AND FEATURES
 ===================================================== */
 
 .card {
@@ -83,7 +94,7 @@ section.py-5:not(.bg-primary) {
 
 
 /* =====================================================
-   4. ICONS IN CARDS
+4. ICONS IN CARDS
 ===================================================== */
 
 .stat-icon {
@@ -109,7 +120,7 @@ section.py-5:not(.bg-primary) {
 
 
 /* =====================================================
-   5. BUTTONS
+5. BUTTONS
 ===================================================== */
 
 .btn {
@@ -129,7 +140,7 @@ section.py-5:not(.bg-primary) {
 
 
 /* =====================================================
-   6. ACCESSIBILITY
+6. ACCESSIBILITY
 ===================================================== */
 
 @media (prefers-reduced-motion: reduce) {

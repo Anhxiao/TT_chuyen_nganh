@@ -1,20 +1,30 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';                 // đổi tên App cũ thành Home nếu muốn
+import { Routes, Route } from 'react-router-dom';
+
+import Home from './pages/Home';
 import StudentLogin from './pages/StudentLogin';
 import OrganizerLogin from './pages/OrganizerLogin';
-
-// Nếu bạn vẫn giữ nội dung trang chủ trong App.jsx thì đổi tên file thành Home.jsx
-// hoặc giữ nguyên và import App làm trang chủ.
+import StudentDashboard from './pages/StudentDashboard';
+import OrganizerDashboard from './pages/OrganizerDashboard';
+import ActivitiesStudent from "./pages/ActivitiesStudent";
 
 function App() {
     return (
-        <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Home />} />                    {/* Trang chủ */}
+            {/* Trang chủ */}
+            <Route path="/" element={<Home />} />
+
+            {/* Trang đăng nhập */}
             <Route path="/student-login" element={<StudentLogin />} />
             <Route path="/organizer-login" element={<OrganizerLogin />} />
+
+            {/* Dashboard sinh viên */}
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/activities" element={<ActivitiesStudent />} />
+            
+            {/* Dashboard đơn vị tổ chức */}
+            <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
+            
         </Routes>
-        </BrowserRouter>
     );
 }
 

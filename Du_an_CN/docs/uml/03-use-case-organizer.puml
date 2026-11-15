@@ -2,7 +2,7 @@
 title UC-03 — Use Case chi tiết: Người quản lý hoạt động
 left to right direction
 skinparam shadowing false
-actor "Người quản lý\nhoạt động" as Organizer
+actor "Đơn vị tổ chức" as Organizer
 
 rectangle "Khu vực quản lý hoạt động" {
   usecase "Đăng nhập / đăng xuất" as Login

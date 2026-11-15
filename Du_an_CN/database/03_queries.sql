@@ -249,3 +249,130 @@ VALUES
     @OldData,
     @NewData
 );
+
+
+/* ---------------------------------------------------------
+16. XEM CÂY PHÂN CẤP TỔ CHỨC
+--------------------------------------------------------- */
+
+WITH OrganizationHierarchy AS
+(
+    SELECT
+        organization_id,
+        organization_code,
+        organization_name,
+        organization_type,
+        parent_organization_id,
+        0 AS hierarchy_level
+    FROM Organizations
+    WHERE parent_organization_id IS NULL
+
+    UNION ALL
+
+    SELECT
+        child.organization_id,
+        child.organization_code,
+        child.organization_name,
+        child.organization_type,
+        child.parent_organization_id,
+        parent.hierarchy_level + 1
+    FROM Organizations child
+    INNER JOIN OrganizationHierarchy parent
+        ON child.parent_organization_id = parent.organization_id
+)
+SELECT
+    organization_id,
+    organization_code,
+    REPLICATE(N'    ', hierarchy_level)
+        + organization_name AS organization_hierarchy,
+    organization_type,
+    parent_organization_id,
+    hierarchy_level
+FROM OrganizationHierarchy
+ORDER BY
+    hierarchy_level,
+    organization_code;
+GO
+
+
+/* ---------------------------------------------------------
+17. XEM CÁC ĐƠN VỊ TRỰC THUỘC
+--------------------------------------------------------- */
+
+DECLARE @ParentOrganizationCode VARCHAR(50) = 'TVU_STUDENT_ASSOC';
+
+SELECT
+    child.organization_id,
+    child.organization_code,
+    child.organization_name,
+    child.organization_type,
+    parent.organization_name AS parent_organization
+FROM Organizations child
+INNER JOIN Organizations parent
+    ON child.parent_organization_id = parent.organization_id
+WHERE parent.organization_code = @ParentOrganizationCode
+ORDER BY child.organization_name;
+GO
+
+
+/* ---------------------------------------------------------
+18. XEM HOẠT ĐỘNG VÀ ĐƠN VỊ ĐỨNG TÊN
+--------------------------------------------------------- */
+
+SELECT
+    a.activity_id,
+    a.activity_code,
+    a.activity_name,
+    a.status,
+
+    creator.organization_name AS organizing_organization,
+
+    COALESCE(
+        representative.organization_name,
+        creator.organization_name
+    ) AS represented_organization,
+
+    u.full_name AS created_by_name,
+    a.created_at
+
+FROM Activities a
+
+INNER JOIN Organizations creator
+    ON a.organization_id = creator.organization_id
+
+LEFT JOIN Organizations representative
+    ON a.represented_by_organization_id =
+    representative.organization_id
+
+INNER JOIN Users u
+    ON a.created_by = u.user_id
+
+ORDER BY a.created_at DESC;
+GO
+
+
+/* ---------------------------------------------------------
+20. HOẠT ĐỘNG MANG PHÁP DANH HỘI SINH VIÊN
+--------------------------------------------------------- */
+
+SELECT
+    a.activity_code,
+    a.activity_name,
+    creator.organization_name AS organizing_organization,
+    representative.organization_name AS represented_organization,
+    a.status,
+    a.activity_start,
+    a.activity_end
+
+FROM Activities a
+
+INNER JOIN Organizations creator
+    ON a.organization_id = creator.organization_id
+
+INNER JOIN Organizations representative
+    ON a.represented_by_organization_id =
+    representative.organization_id
+
+WHERE representative.organization_code = 'TVU_STUDENT_ASSOC'
+ORDER BY a.activity_start;
+GO

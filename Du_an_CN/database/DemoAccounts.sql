@@ -1,0 +1,342 @@
+
+/* =========================================================
+DemoAccounts.sql
+Database: StudentActivityDB
+3 STUDENT + 6 ORGANIZER
+Passwords are bcrypt hashed.
+========================================================= */
+
+USE StudentActivityDB;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @Accounts TABLE (
+    username VARCHAR(50),
+    email VARCHAR(255),
+    password_hash VARCHAR(255),
+    full_name NVARCHAR(255),
+    role_code VARCHAR(30),
+    student_code VARCHAR(20) NULL,
+    faculty_name NVARCHAR(255) NULL,
+    organization_code VARCHAR(50) NULL
+);
+
+INSERT INTO @Accounts (
+    username, email, password_hash, full_name,
+    role_code, student_code, faculty_name, organization_code
+)
+VALUES
+(
+            N'sv.ktcn',
+            N'sv.ktcn@st.tvu.edu.vn',
+            N'$2b$10$WW/YkQmsG7cOi1eL7Gcwf./WrNFYo7WetNL3B6F7NwiThbZvao6HK',
+            N'Sinh viên kiểm thử Kỹ thuật và Công nghệ',
+            N'STUDENT',
+            N'SVTEST001',
+            N'Trường Kỹ thuật và Công nghệ',
+            NULL
+        ),
+(
+            N'sv.ktl',
+            N'sv.ktl@st.tvu.edu.vn',
+            N'$2b$10$WW/YkQmsG7cOi1eL7Gcwf./WrNFYo7WetNL3B6F7NwiThbZvao6HK',
+            N'Sinh viên kiểm thử Kinh tế và Luật',
+            N'STUDENT',
+            N'SVTEST002',
+            N'Trường Kinh tế và Luật',
+            NULL
+        ),
+(
+            N'sv.yd',
+            N'sv.yd@st.tvu.edu.vn',
+            N'$2b$10$WW/YkQmsG7cOi1eL7Gcwf./WrNFYo7WetNL3B6F7NwiThbZvao6HK',
+            N'Sinh viên kiểm thử Y Dược',
+            N'STUDENT',
+            N'SVTEST003',
+            N'Trường Y Dược',
+            NULL
+        ),
+(
+            N'doanktcn',
+            N'doanktcn@organizer.local',
+            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'Tài khoản Đoàn Trường Kỹ thuật và Công nghệ',
+            N'ORGANIZER',
+            NULL,
+            NULL,
+            N'TECH_UNION'
+        ),
+(
+            N'doanktl',
+            N'doanktl@organizer.local',
+            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'Tài khoản Đoàn Trường Kinh tế và Luật',
+            N'ORGANIZER',
+            NULL,
+            NULL,
+            N'LAW_UNION'
+        ),
+(
+            N'doanyd',
+            N'doanyd@organizer.local',
+            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'Tài khoản Đoàn Trường Y Dược',
+            N'ORGANIZER',
+            NULL,
+            NULL,
+            N'MED_UNION'
+        ),
+(
+            N'clbkynang',
+            N'clbkynang@organizer.local',
+            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'Tài khoản CLB Kỹ năng sống',
+            N'ORGANIZER',
+            NULL,
+            NULL,
+            N'LIFE_SKILL_CLUB'
+        ),
+(
+            N'clbtruyenthong',
+            N'clbtruyenthong@organizer.local',
+            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'Tài khoản CLB Truyền thông TVU',
+            N'ORGANIZER',
+            NULL,
+            NULL,
+            N'MEDIA_CLUB'
+        ),
+(
+            N'clbvanhoa',
+            N'clbvanhoa@organizer.local',
+            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'Tài khoản CLB Văn hóa Nghệ thuật TVU',
+            N'ORGANIZER',
+            NULL,
+            NULL,
+            N'ART_CLUB'
+        );
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- 1. Kiểm tra vai trò
+    IF EXISTS (
+        SELECT 1
+        FROM @Accounts a
+        LEFT JOIN Roles r ON r.role_code = a.role_code
+        WHERE r.role_id IS NULL
+    )
+        THROW 50001, N'Thiếu vai trò STUDENT hoặc ORGANIZER trong Roles.', 1;
+
+    -- 2. Kiểm tra khoa/trường của sinh viên
+    IF EXISTS (
+        SELECT 1
+        FROM @Accounts a
+        LEFT JOIN Faculties f ON f.faculty_name = a.faculty_name
+        WHERE a.role_code = 'STUDENT'
+        AND f.faculty_id IS NULL
+    )
+        THROW 50002, N'Không tìm thấy Faculty tương ứng với sinh viên.', 1;
+
+    -- 3. Kiểm tra đơn vị tổ chức
+    IF EXISTS (
+        SELECT 1
+        FROM @Accounts a
+        LEFT JOIN Organizations o
+            ON o.organization_code = a.organization_code
+        WHERE a.role_code = 'ORGANIZER'
+        AND (
+            o.organization_id IS NULL
+            OR o.status <> 'ACTIVE'
+        )
+    )
+        THROW 50003, N'Thiếu hoặc đơn vị tổ chức không hoạt động.', 1;
+
+    -- 4. Chỉ cho phép tài khoản kiểm thử khớp cả username và email.
+    -- Tránh cập nhật nhầm tài khoản có sẵn.
+    IF EXISTS (
+        SELECT 1
+        FROM @Accounts a
+        WHERE EXISTS (
+            SELECT 1 FROM Users u
+            WHERE u.username = a.username
+            AND u.email <> a.email
+        )
+        OR EXISTS (
+            SELECT 1 FROM Users u
+            WHERE u.email = a.email
+            AND u.username <> a.username
+        )
+    )
+        THROW 50004, N'Username hoặc email đã thuộc tài khoản khác.', 1;
+
+    -- 5. Kiểm tra mã sinh viên không bị tài khoản khác sử dụng
+    IF EXISTS (
+        SELECT 1
+        FROM @Accounts a
+        INNER JOIN Students s
+            ON s.student_code = a.student_code
+        INNER JOIN Users u
+            ON u.user_id = s.user_id
+        WHERE a.role_code = 'STUDENT'
+        AND u.username <> a.username
+    )
+        THROW 50005, N'Mã sinh viên đã được sử dụng bởi tài khoản khác.', 1;
+
+    -- 6. Tạo tài khoản mới
+    INSERT INTO Users (
+        username, password_hash, full_name, email, status
+    )
+    SELECT
+        a.username,
+        a.password_hash,
+        a.full_name,
+        a.email,
+        'ACTIVE'
+    FROM @Accounts a
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM Users u
+        WHERE u.username = a.username
+        OR u.email = a.email
+    );
+
+    -- 7. Cập nhật mật khẩu và thông tin cho tài khoản kiểm thử đã tồn tại
+    UPDATE u
+    SET
+        u.password_hash = a.password_hash,
+        u.full_name = a.full_name,
+        u.status = 'ACTIVE'
+    FROM Users u
+    INNER JOIN @Accounts a
+        ON a.username = u.username
+    AND a.email = u.email;
+
+    -- 8. Đồng bộ đúng một vai trò cho từng tài khoản kiểm thử
+    DELETE ur
+    FROM UserRoles ur
+    INNER JOIN Users u ON u.user_id = ur.user_id
+    INNER JOIN @Accounts a ON a.username = u.username;
+
+    INSERT INTO UserRoles (user_id, role_id)
+    SELECT u.user_id, r.role_id
+    FROM @Accounts a
+    INNER JOIN Users u
+        ON u.username = a.username
+    AND u.email = a.email
+    INNER JOIN Roles r
+        ON r.role_code = a.role_code;
+
+    -- 9. Tạo hồ sơ sinh viên
+    INSERT INTO Students (
+        user_id, student_code, faculty_id, class_name
+    )
+    SELECT
+        u.user_id,
+        a.student_code,
+        f.faculty_id,
+        N'Lớp kiểm thử'
+    FROM @Accounts a
+    INNER JOIN Users u
+        ON u.username = a.username
+    AND u.email = a.email
+    INNER JOIN Faculties f
+        ON f.faculty_name = a.faculty_name
+    WHERE a.role_code = 'STUDENT'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM Students s
+        WHERE s.user_id = u.user_id
+    );
+
+    -- 10. Đồng bộ khoa/trường của hồ sơ sinh viên
+    UPDATE s
+    SET
+        s.student_code = a.student_code,
+        s.faculty_id = f.faculty_id
+    FROM Students s
+    INNER JOIN Users u ON u.user_id = s.user_id
+    INNER JOIN @Accounts a ON a.username = u.username
+    INNER JOIN Faculties f ON f.faculty_name = a.faculty_name
+    WHERE a.role_code = 'STUDENT';
+
+    -- 11. Mỗi tài khoản ORGANIZER chỉ liên kết đơn vị được chỉ định
+    DELETE ou
+    FROM OrganizationUsers ou
+    INNER JOIN Users u ON u.user_id = ou.user_id
+    INNER JOIN @Accounts a ON a.username = u.username
+    WHERE a.role_code = 'ORGANIZER';
+
+    INSERT INTO OrganizationUsers (organization_id, user_id)
+    SELECT o.organization_id, u.user_id
+    FROM @Accounts a
+    INNER JOIN Users u
+        ON u.username = a.username
+    AND u.email = a.email
+    INNER JOIN Organizations o
+        ON o.organization_code = a.organization_code
+    WHERE a.role_code = 'ORGANIZER';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Tạo và cập nhật 9 tài khoản kiểm thử thành công.';
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+-- 12. Kiểm tra danh sách tài khoản
+SELECT
+    u.user_id,
+    u.username,
+    u.email,
+    u.full_name,
+    u.status,
+    r.role_code,
+    s.student_code,
+    f.faculty_name,
+    o.organization_code,
+    o.organization_name
+FROM Users u
+INNER JOIN UserRoles ur ON ur.user_id = u.user_id
+INNER JOIN Roles r ON r.role_id = ur.role_id
+LEFT JOIN Students s ON s.user_id = u.user_id
+LEFT JOIN Faculties f ON f.faculty_id = s.faculty_id
+LEFT JOIN OrganizationUsers ou ON ou.user_id = u.user_id
+LEFT JOIN Organizations o ON o.organization_id = ou.organization_id
+WHERE u.username IN (
+    N'sv.ktcn',
+    N'sv.ktl',
+    N'sv.yd',
+    N'doanktcn',
+    N'doanktl',
+    N'doanyd',
+    N'clbkynang',
+    N'clbtruyenthong',
+    N'clbvanhoa'
+)
+ORDER BY r.role_code, u.username;
+GO
+
+/* 1. Tài khoản sinh viên
+Đơn vị	Tên đăng nhập	Email	Mật khẩu
+Trường Kỹ thuật và Công nghệ	sv.ktcn	sv.ktcn@st.tvu.edu.vn	Student@123
+Trường Kinh tế và Luật	sv.ktl	sv.ktl@st.tvu.edu.vn	Student@123
+Trường Y Dược	sv.yd	sv.yd@st.tvu.edu.vn	Student@123
+
+2. Tài khoản đơn vị tổ chức
+Đơn vị	Tên đăng nhập	Email	Mật khẩu
+Đoàn Trường Kỹ thuật và Công nghệ	doanktcn	doanktcn@organizer.local	Organizer@123
+Đoàn Trường Kinh tế và Luật	doanktl	doanktl@organizer.local	Organizer@123
+Đoàn Trường Y Dược	doanyd	doanyd@organizer.local	Organizer@123
+CLB Kỹ năng sống	clbkynang	clbkynang@organizer.local	Organizer@123
+CLB Truyền thông	clbtruyenthong	clbtruyenthong@organizer.local	Organizer@123
+CLB Văn hóa Nghệ thuật	clbvanhoa	clbvanhoa@organizer.local	Organizer@123 */

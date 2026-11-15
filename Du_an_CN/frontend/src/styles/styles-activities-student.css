@@ -1,0 +1,267 @@
+
+.student-activities-page {
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+.activities-page-heading {
+    padding: 15px 0;
+}
+
+.activities-subtitle {
+    color: #0d6efd;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.activities-page-heading h2 {
+    margin: 10px 0;
+    color: #17365d;
+    font-weight: 700;
+}
+
+.activities-page-heading p {
+    color: #758397;
+    margin-bottom: 0;
+}
+
+/* Khung danh sách đơn vị */
+.organization-box,
+.organization-activities-box {
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid #e5eaf1;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(30, 55, 90, 0.05);
+}
+
+.organization-box-header {
+    padding: 22px 18px 15px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.organization-box-header h5 {
+    color: #203b5c;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.organization-box-header p {
+    margin: 0;
+    color: #8491a2;
+    font-size: 13px;
+}
+
+/* Danh sách đơn vị */
+.organization-menu {
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+}
+
+.organization-menu li {
+    margin-bottom: 5px;
+}
+
+.organization-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 11px;
+    padding: 12px 10px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.organization-menu-item:hover {
+    background: #f1f6ff;
+}
+
+.organization-menu-item.active {
+    background: #eaf2ff;
+}
+
+.organization-menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: #f0f4f9;
+    color: #0d6efd;
+    font-size: 18px;
+}
+
+.organization-menu-item.active .organization-menu-icon {
+    background: #d5e6ff;
+}
+
+.organization-menu-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    gap: 4px;
+}
+
+.organization-menu-content strong {
+    color: #263b55;
+    font-size: 13px;
+}
+
+.organization-menu-content small {
+    overflow: hidden;
+    color: #8390a0;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.organization-chevron {
+    color: #9aa7b6;
+    font-size: 12px;
+}
+
+/* Khu vực hoạt động */
+.organization-activities-box {
+    min-height: 550px;
+    padding: 25px;
+}
+
+.selected-organization-header {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.selected-organization-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 65px;
+    height: 65px;
+    border-radius: 13px;
+    background: #eaf2ff;
+    color: #0d6efd;
+    font-size: 28px;
+}
+
+.selected-organization-header span {
+    color: #0d6efd;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.selected-organization-header h4 {
+    margin: 5px 0;
+    color: #203b5c;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.selected-organization-header p {
+    margin: 0;
+    color: #8390a0;
+    font-size: 13px;
+}
+
+/* Tiêu đề danh sách hoạt động */
+.organization-activities-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.organization-activities-title h5 {
+    color: #203b5c;
+    font-weight: 700;
+}
+
+.organization-activities-title p {
+    margin: 0;
+    color: #8995a5;
+    font-size: 13px;
+}
+
+.activity-total {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #edf4ff;
+    color: #0d6efd;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Trạng thái chưa có hoạt động */
+.activity-empty-state,
+.organization-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 340px;
+    padding: 30px 15px;
+    text-align: center;
+}
+
+.activity-empty-icon,
+.organization-welcome-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 85px;
+    height: 85px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: #f0f5fc;
+    color: #8ca9cf;
+    font-size: 38px;
+}
+
+.activity-empty-state h5,
+.organization-welcome h4 {
+    color: #344b68;
+    font-weight: 700;
+}
+
+.activity-empty-state p,
+.organization-welcome p {
+    max-width: 430px;
+    color: #8794a5;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+@media (max-width: 991px) {
+    .organization-activities-box {
+        min-height: 450px;
+    }
+}
+
+@media (max-width: 575px) {
+    .organization-activities-box {
+        padding: 17px;
+    }
+
+    .selected-organization-header h4 {
+        font-size: 16px;
+    }
+
+    .organization-activities-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

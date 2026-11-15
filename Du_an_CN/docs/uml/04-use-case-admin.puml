@@ -5,7 +5,6 @@ skinparam shadowing false
 actor "Quản trị viên\nhệ thống" as Admin
 
 rectangle "Khu vực quản trị hệ thống" {
-  usecase "Đăng nhập / đăng xuất" as Login
   usecase "Xem danh sách tài khoản" as ViewUsers
   usecase "Kích hoạt / khóa tài khoản" as ManageUsers
   usecase "Quản lý vai trò và quyền" as Roles
@@ -16,7 +15,6 @@ rectangle "Khu vực quản trị hệ thống" {
   usecase "Kiểm tra quyền quản trị" as Permission
 }
 
-Admin -- Login
 Admin -- ViewUsers
 Admin -- ManageUsers
 Admin -- Roles

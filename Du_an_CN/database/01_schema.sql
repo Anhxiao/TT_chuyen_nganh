@@ -131,17 +131,30 @@ CREATE TABLE Organizations (
     organization_name NVARCHAR(255) NOT NULL,
     organization_type VARCHAR(30) NOT NULL
     CHECK (organization_type IN (
-    'SCHOOL_UNION',
-    'STUDENT_ASSOCIATION',
-    'FACULTY_UNION',
-    'CLUB'
+        'SCHOOL_UNION',
+        'STUDENT_ASSOCIATION',
+        'FACULTY_UNION',
+        'CLUB'
     )),
     faculty_id        INT NULL,
+    parent_organization_id BIGINT NULL,
     status            VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
     CHECK (status IN ('ACTIVE', 'INACTIVE')),
-    FOREIGN KEY (faculty_id) REFERENCES Faculties(faculty_id)
+
+    FOREIGN KEY (faculty_id)
+        REFERENCES Faculties(faculty_id),
+
+    FOREIGN KEY (parent_organization_id)
+        REFERENCES Organizations(organization_id),
+
+    CONSTRAINT CK_Organizations_NotSelfParent
+        CHECK (
+            parent_organization_id IS NULL
+            OR parent_organization_id <> organization_id
+        )
 );
 GO
+
 
 /* =========================================================
     ORGANIZATION USERS
@@ -185,7 +198,13 @@ GO
 CREATE TABLE Activities (
     activity_id           BIGINT IDENTITY(1,1) PRIMARY KEY,
     activity_code         VARCHAR(50) NOT NULL UNIQUE,
+
+    -- Đơn vị trực tiếp tạo và tổ chức hoạt động
     organization_id       BIGINT NOT NULL,
+
+    -- Đơn vị đứng tên pháp danh, NULL nếu không chọn đơn vị khác
+    represented_by_organization_id BIGINT NULL,
+
     activity_name         NVARCHAR(255) NOT NULL,
     description           NVARCHAR(MAX) NULL,
     location              NVARCHAR(255) NULL,
@@ -195,20 +214,31 @@ CREATE TABLE Activities (
     activity_end          DATETIME NULL,
     max_participants      INT NULL,
     current_participants  INT NOT NULL DEFAULT 0,
+
     registration_mode     VARCHAR(20) NOT NULL DEFAULT 'OPEN'
     CHECK (registration_mode IN ('OPEN', 'APPROVAL')),
+
     status                VARCHAR(20) NOT NULL DEFAULT 'DRAFT'
     CHECK (status IN (
-    'DRAFT', 'PUBLISHED', 'REGISTERING',
-    'ONGOING', 'COMPLETED', 'CANCELLED'
+        'DRAFT', 'PUBLISHED', 'REGISTERING',
+        'ONGOING', 'COMPLETED', 'CANCELLED'
     )),
+
     created_by            BIGINT NOT NULL,
     created_at            DATETIME NOT NULL DEFAULT GETDATE(),
     updated_at            DATETIME NULL,
-    FOREIGN KEY (organization_id) REFERENCES Organizations(organization_id),
-    FOREIGN KEY (created_by) REFERENCES Users(user_id)
+
+    FOREIGN KEY (organization_id)
+        REFERENCES Organizations(organization_id),
+
+    FOREIGN KEY (represented_by_organization_id)
+        REFERENCES Organizations(organization_id),
+
+    FOREIGN KEY (created_by)
+        REFERENCES Users(user_id)
 );
 GO
+
 
 /* =========================================================
     ACTIVITY CONDITIONS
