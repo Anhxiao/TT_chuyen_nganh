@@ -1,27 +1,49 @@
-import { useState } from 'react';
+
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
 
 function OrganizerLogin() {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
-    const [account, setAccount] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         setError('');
 
-        // Kiểm tra thông tin đăng nhập
-        if (!account.trim() || !password.trim()) {
-            setError('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
+        if (!email.trim() || !password) {
+            setError('Vui lòng nhập đầy đủ email và mật khẩu.');
             return;
         }
 
-        // Tạm thời chuyển hướng để kiểm tra Router.
-        // Chưa xác thực tài khoản với Backend.
-        navigate('/organizer/dashboard');
+        try {
+            setLoading(true);
+
+            const result = await login(
+                email,
+                password,
+                'ORGANIZER'
+            );
+
+            if (!result.success) {
+                setError(result.message);
+                return;
+            }
+
+            navigate('/organizer/dashboard', {
+                replace: true
+            });
+        } catch (error) {
+            setError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -31,7 +53,6 @@ function OrganizerLogin() {
                     <div className="col-md-6 col-lg-5">
                         <div className="hero-card login-selection-card p-4 p-md-5">
 
-                            {/* Badge */}
                             <div className="hero-badge mb-3">
                                 <i className="bi bi-building-fill me-2"></i>
                                 ĐĂNG NHẬP ĐƠN VỊ TỔ CHỨC
@@ -46,13 +67,12 @@ function OrganizerLogin() {
                                 đăng ký sinh viên.
                             </p>
 
-                            {/* Form đăng nhập */}
                             <form onSubmit={handleSubmit}>
 
-                                {/* Email / Tên đăng nhập */}
+                                {/* Email */}
                                 <div className="mb-3">
                                     <label className="form-label text-white">
-                                        Email / Tên đăng nhập
+                                        Địa chỉ email
                                     </label>
 
                                     <div className="input-group">
@@ -61,13 +81,13 @@ function OrganizerLogin() {
                                         </span>
 
                                         <input
-                                            type="text"
+                                            type="email"
                                             className="form-control bg-white bg-opacity-25 border-0 text-white"
-                                            placeholder="Nhập email hoặc tên đăng nhập"
-                                            autoComplete="username"
-                                            value={account}
+                                            placeholder="Nhập địa chỉ email đơn vị"
+                                            autoComplete="email"
+                                            value={email}
                                             onChange={(event) =>
-                                                setAccount(event.target.value)
+                                                setEmail(event.target.value)
                                             }
                                             required
                                         />
@@ -106,18 +126,27 @@ function OrganizerLogin() {
                                     </div>
                                 )}
 
-                                {/* Nút đăng nhập */}
+                                {/* Đăng nhập */}
                                 <div className="d-grid mb-3">
                                     <button
                                         type="submit"
                                         className="btn btn-light btn-lg fw-semibold"
+                                        disabled={loading}
                                     >
-                                        <i className="bi bi-box-arrow-in-right me-2"></i>
-                                        Đăng nhập
+                                        {loading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                Đang đăng nhập...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="bi bi-box-arrow-in-right me-2"></i>
+                                                Đăng nhập
+                                            </>
+                                        )}
                                     </button>
                                 </div>
 
-                                {/* Quay lại trang chủ */}
                                 <div className="text-center">
                                     <Link
                                         to="/"
@@ -127,6 +156,7 @@ function OrganizerLogin() {
                                         Quay lại trang chủ
                                     </Link>
                                 </div>
+
                             </form>
                         </div>
                     </div>

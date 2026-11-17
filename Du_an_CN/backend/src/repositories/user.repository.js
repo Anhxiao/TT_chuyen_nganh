@@ -1,11 +1,12 @@
 
 const { sql, poolPromise } = require('../config/database');
 
-async function findByUsername(username) {
+
+async function findByEmail(email) {
     const pool = await poolPromise;
 
     const result = await pool.request()
-        .input('username', sql.NVarChar(100), username)
+        .input('email', sql.VarChar(255), email)
         .query(`
             SELECT
                 u.user_id,
@@ -18,11 +19,12 @@ async function findByUsername(username) {
                 u.last_login_at,
                 u.created_at
             FROM dbo.Users AS u
-            WHERE u.username = @username;
+            WHERE u.email = @email;
         `);
 
     return result.recordset[0] || null;
 }
+
 
 async function findById(userId) {
     const pool = await poolPromise;
@@ -98,7 +100,7 @@ async function updateLastLogin(userId) {
             UPDATE dbo.Users
             SET last_login_at = SYSDATETIME()
             WHERE user_id = @userId
-              AND status = 'ACTIVE';
+            AND status = 'ACTIVE';
         `);
 }
 
@@ -117,7 +119,7 @@ async function updateProfile(userId, data) {
                 email = COALESCE(@email, email),
                 phone = COALESCE(@phone, phone)
             WHERE user_id = @userId
-              AND status = 'ACTIVE';
+                AND status = 'ACTIVE';
 
             SELECT @@ROWCOUNT AS affected_rows;
         `);
@@ -194,11 +196,36 @@ async function updateUserStatus(userId, status) {
     return result.recordset[0].affected_rows > 0;
 }
 
+async function getUserOrganizations(userId) {
+    const pool = await poolPromise;
+
+    const result = await pool.request()
+        .input('userId', sql.BigInt, userId)
+        .query(`
+            SELECT
+                o.organization_id,
+                o.organization_code,
+                o.organization_name,
+                o.organization_type,
+                o.faculty_id,
+                o.parent_organization_id
+            FROM dbo.OrganizationUsers AS ou
+            INNER JOIN dbo.Organizations AS o
+                ON o.organization_id = ou.organization_id
+            WHERE ou.user_id = @userId
+            AND o.status = 'ACTIVE'
+            ORDER BY o.organization_name;
+        `);
+
+    return result.recordset;
+}
+
 module.exports = {
-    findByUsername,
+    findByEmail,
     findById,
     getUserRoles,
     getUserPermissions,
+    getUserOrganizations,
     updateLastLogin,
     updateProfile,
     getUsers,

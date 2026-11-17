@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 
 const accounts = [
     // STUDENT
+    // Kỹ thuật & Công nghệ
     {
         username: 'sv.ktcn',
         email: 'sv.ktcn@st.tvu.edu.vn',
@@ -15,6 +16,23 @@ const accounts = [
         faculty: 'Trường Kỹ thuật và Công nghệ'
     },
     {
+        username: 'sv.ktcn01',
+        email: 'sv.ktcn01@st.tvu.edu.vn',
+        fullName: 'Sinh viên kiểm thử Kỹ thuật và Công nghệ 01',
+        password: 'Student@123',
+        role: 'STUDENT',
+        faculty: 'Trường Kỹ thuật và Công nghệ'
+    },
+    {
+        username: 'sv.ktcn02',
+        email: 'sv.ktcn02@st.tvu.edu.vn',
+        fullName: 'Sinh viên kiểm thử Kỹ thuật và Công nghệ 02',
+        password: 'Student@123',
+        role: 'STUDENT',
+        faculty: 'Trường Kỹ thuật và Công nghệ'
+    },
+    // Kinh tế luật
+    {
         username: 'sv.ktl',
         email: 'sv.ktl@st.tvu.edu.vn',
         fullName: 'Sinh viên kiểm thử Kinh tế và Luật',
@@ -24,6 +42,23 @@ const accounts = [
         faculty: 'Trường Kinh tế và Luật'
     },
     {
+        username: 'sv.ktl01',
+        email: 'sv.ktl01@st.tvu.edu.vn',
+        fullName: 'Sinh viên kiểm thử Kinh tế và Luật 01',
+        password: 'Student@123',
+        role: 'STUDENT',
+        faculty: 'Trường Kinh tế và Luật'
+    },
+    {
+        username: 'sv.ktl02',
+        email: 'sv.ktl02@st.tvu.edu.vn',
+        fullName: 'Sinh viên kiểm thử Kinh tế và Luật 02',
+        password: 'Student@123',
+        role: 'STUDENT',
+        faculty: 'Trường Kinh tế và Luật'
+    },
+    // Y dược
+    {
         username: 'sv.yd',
         email: 'sv.yd@st.tvu.edu.vn',
         fullName: 'Sinh viên kiểm thử Y Dược',
@@ -32,7 +67,22 @@ const accounts = [
         studentCode: 'SVTEST003',
         faculty: 'Trường Y Dược'
     },
-
+    {
+        username: 'sv.yd01',
+        email: 'sv.yd01@st.tvu.edu.vn',
+        fullName: 'Sinh viên kiểm thử Y Dược 01',
+        password: 'Student@123',
+        role: 'STUDENT',
+        faculty: 'Trường Y Dược'
+    },
+    {
+        username: 'sv.yd02',
+        email: 'sv.yd02@st.tvu.edu.vn',
+        fullName: 'Sinh viên kiểm thử Y Dược 02',
+        password: 'Student@123',
+        role: 'STUDENT',
+        faculty: 'Trường Y Dược'
+    },
     // ORGANIZER - ĐOÀN TRƯỜNG
     {
         username: 'doanktcn',

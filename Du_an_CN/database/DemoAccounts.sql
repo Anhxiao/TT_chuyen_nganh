@@ -31,7 +31,7 @@ VALUES
 (
             N'sv.ktcn',
             N'sv.ktcn@st.tvu.edu.vn',
-            N'$2b$10$WW/YkQmsG7cOi1eL7Gcwf./WrNFYo7WetNL3B6F7NwiThbZvao6HK',
+            N'$2b$10$6qrQ3XC5i49WgH5GjoMHvOH1I8QOmSS/hQRVyrPkb9t91i5U2y/Pq',
             N'Sinh viên kiểm thử Kỹ thuật và Công nghệ',
             N'STUDENT',
             N'SVTEST001',
@@ -41,7 +41,7 @@ VALUES
 (
             N'sv.ktl',
             N'sv.ktl@st.tvu.edu.vn',
-            N'$2b$10$WW/YkQmsG7cOi1eL7Gcwf./WrNFYo7WetNL3B6F7NwiThbZvao6HK',
+            N'$2b$10$6qrQ3XC5i49WgH5GjoMHvOH1I8QOmSS/hQRVyrPkb9t91i5U2y/Pq',
             N'Sinh viên kiểm thử Kinh tế và Luật',
             N'STUDENT',
             N'SVTEST002',
@@ -51,7 +51,7 @@ VALUES
 (
             N'sv.yd',
             N'sv.yd@st.tvu.edu.vn',
-            N'$2b$10$WW/YkQmsG7cOi1eL7Gcwf./WrNFYo7WetNL3B6F7NwiThbZvao6HK',
+            N'$2b$10$6qrQ3XC5i49WgH5GjoMHvOH1I8QOmSS/hQRVyrPkb9t91i5U2y/Pq',
             N'Sinh viên kiểm thử Y Dược',
             N'STUDENT',
             N'SVTEST003',
@@ -61,7 +61,7 @@ VALUES
 (
             N'doanktcn',
             N'doanktcn@organizer.local',
-            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'$2b$10$ugTTfTxHVXXtG31WUvwzgOkgPyuwKgy7n5gyG8V07cACdCGRY.nZS',
             N'Tài khoản Đoàn Trường Kỹ thuật và Công nghệ',
             N'ORGANIZER',
             NULL,
@@ -71,7 +71,7 @@ VALUES
 (
             N'doanktl',
             N'doanktl@organizer.local',
-            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'$2b$10$ugTTfTxHVXXtG31WUvwzgOkgPyuwKgy7n5gyG8V07cACdCGRY.nZS',
             N'Tài khoản Đoàn Trường Kinh tế và Luật',
             N'ORGANIZER',
             NULL,
@@ -81,7 +81,7 @@ VALUES
 (
             N'doanyd',
             N'doanyd@organizer.local',
-            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'$2b$10$ugTTfTxHVXXtG31WUvwzgOkgPyuwKgy7n5gyG8V07cACdCGRY.nZS',
             N'Tài khoản Đoàn Trường Y Dược',
             N'ORGANIZER',
             NULL,
@@ -91,7 +91,7 @@ VALUES
 (
             N'clbkynang',
             N'clbkynang@organizer.local',
-            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'$2b$10$ugTTfTxHVXXtG31WUvwzgOkgPyuwKgy7n5gyG8V07cACdCGRY.nZS',
             N'Tài khoản CLB Kỹ năng sống',
             N'ORGANIZER',
             NULL,
@@ -101,7 +101,7 @@ VALUES
 (
             N'clbtruyenthong',
             N'clbtruyenthong@organizer.local',
-            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'$2b$10$ugTTfTxHVXXtG31WUvwzgOkgPyuwKgy7n5gyG8V07cACdCGRY.nZS',
             N'Tài khoản CLB Truyền thông TVU',
             N'ORGANIZER',
             NULL,
@@ -111,7 +111,7 @@ VALUES
 (
             N'clbvanhoa',
             N'clbvanhoa@organizer.local',
-            N'$2b$10$XSQhgvDCQ2ZQgDAbMKRx9uPUCESwsUpwiidg0099RF3s7Vr7f/bOi',
+            N'$2b$10$ugTTfTxHVXXtG31WUvwzgOkgPyuwKgy7n5gyG8V07cACdCGRY.nZS',
             N'Tài khoản CLB Văn hóa Nghệ thuật TVU',
             N'ORGANIZER',
             NULL,
@@ -326,17 +326,3 @@ WHERE u.username IN (
 ORDER BY r.role_code, u.username;
 GO
 
-/* 1. Tài khoản sinh viên
-Đơn vị	Tên đăng nhập	Email	Mật khẩu
-Trường Kỹ thuật và Công nghệ	sv.ktcn	sv.ktcn@st.tvu.edu.vn	Student@123
-Trường Kinh tế và Luật	sv.ktl	sv.ktl@st.tvu.edu.vn	Student@123
-Trường Y Dược	sv.yd	sv.yd@st.tvu.edu.vn	Student@123
-
-2. Tài khoản đơn vị tổ chức
-Đơn vị	Tên đăng nhập	Email	Mật khẩu
-Đoàn Trường Kỹ thuật và Công nghệ	doanktcn	doanktcn@organizer.local	Organizer@123
-Đoàn Trường Kinh tế và Luật	doanktl	doanktl@organizer.local	Organizer@123
-Đoàn Trường Y Dược	doanyd	doanyd@organizer.local	Organizer@123
-CLB Kỹ năng sống	clbkynang	clbkynang@organizer.local	Organizer@123
-CLB Truyền thông	clbtruyenthong	clbtruyenthong@organizer.local	Organizer@123
-CLB Văn hóa Nghệ thuật	clbvanhoa	clbvanhoa@organizer.local	Organizer@123 */

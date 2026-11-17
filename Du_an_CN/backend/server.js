@@ -1,49 +1,17 @@
+require('dotenv').config();
 
-const { pool } = require('./src/config/database');
+const app = require('./src/app');
 
-const services = {
-    /**
-     * Thực hiện truy vấn lấy dữ liệu.
-     */
-    async query(sql, params = []) {
-        const [rows] = await pool.execute(sql, params);
-        return rows;
-    },
+const PORT = Number(process.env.PORT) || 5000;
 
-    /**
-     * Thực hiện INSERT, UPDATE hoặc DELETE.
-     */
-    async execute(sql, params = []) {
-        const [result] = await pool.execute(sql, params);
+const server = app.listen(PORT, () => {
+    console.log('====================================');
+    console.log('STUDENT ACTIVITY MANAGEMENT');
+    console.log(`Backend đang chạy tại: http://localhost:${PORT}`);
+    console.log(`Kiểm tra API: http://localhost:${PORT}/api/health`);
+    console.log('====================================');
+});
 
-        return {
-            affectedRows: result.affectedRows,
-            insertId: result.insertId,
-            changedRows: result.changedRows
-        };
-    },
-
-    /**
-     * Thực hiện nhiều thao tác trong một transaction.
-     */
-    async transaction(callback) {
-        const connection = await pool.getConnection();
-
-        try {
-            await connection.beginTransaction();
-
-            const result = await callback(connection);
-
-            await connection.commit();
-
-            return result;
-        } catch (error) {
-            await connection.rollback();
-            throw error;
-        } finally {
-            connection.release();
-        }
-    }
-};
-
-module.exports = services;
+server.on('error', (error) => {
+    console.error('Không thể khởi động Backend:', error.message);
+});

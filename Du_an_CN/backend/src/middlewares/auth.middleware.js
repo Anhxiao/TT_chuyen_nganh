@@ -64,10 +64,11 @@ function authenticateToken(req, res, next) {
 
         req.user = {
             userId: decoded.userId,
-            username: decoded.username
+            username: decoded.username,
+            role: decoded.role
         };
 
-        return next();
+        return next();  
     });
 }
 

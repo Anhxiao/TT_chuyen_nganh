@@ -3,15 +3,16 @@ const authService = require('../services/auth.service');
 
 /**
  * POST /api/auth/login
- * Đăng nhập bằng tài khoản và mật khẩu.
+ * Đăng nhập bằng email và mật khẩu.
  */
 async function login(req, res, next) {
     try {
-        const { username, password } = req.body;
+        const { email, password, role } = req.body;
 
         const result = await authService.login({
-            username,
-            password
+            email,
+            password,
+            role
         });
 
         return res.status(200).json({
@@ -26,8 +27,7 @@ async function login(req, res, next) {
 
 /**
  * POST /api/auth/logout
- * Với JWT không lưu phiên phía máy chủ, logout thường do
- * Frontend xóa token. Endpoint này không tự thu hồi JWT.
+ * JWT được xóa ở frontend.
  */
 async function logout(req, res, next) {
     try {
@@ -48,8 +48,9 @@ async function logout(req, res, next) {
 async function getCurrentUser(req, res, next) {
     try {
         const userId = req.user.userId;
+        const role = req.user.role;
 
-        const result = await authService.getCurrentUser(userId);
+        const result = await authService.getCurrentUser(userId, role);
 
         return res.status(200).json({
             success: true,
