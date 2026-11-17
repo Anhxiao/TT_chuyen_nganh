@@ -1,0 +1,680 @@
+
+/* =====================================
+   STUDENT PROFILE PAGE
+===================================== */
+
+.student-profile-page {
+    width: 100%;
+    padding: 28px;
+    background: #f7f9fd;
+    border: 1px solid #edf0f5;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(31, 55, 90, 0.05);
+}
+
+/* Heading */
+
+.profile-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 4px 28px;
+}
+
+.profile-page-heading h2 {
+    margin: 0 0 8px;
+    color: #17478e;
+    font-size: 29px;
+    font-weight: 750;
+}
+
+.profile-page-heading p {
+    margin: 0;
+    color: #788398;
+    font-size: 15px;
+}
+
+.profile-heading-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #3165f5;
+    background: #eaf1ff;
+    border-radius: 14px;
+    font-size: 28px;
+}
+
+/* Main layout */
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* Sidebar */
+
+.profile-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-avatar-card,
+.profile-status-card,
+.profile-help-card,
+.profile-section {
+    background: #fff;
+    border: 1px solid #edf0f5;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(30, 48, 75, 0.06);
+}
+
+.profile-avatar-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 132px;
+    height: 132px;
+    margin-bottom: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #6d91df;
+    background: #edf3ff;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #dce7ff;
+    font-size: 65px;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-card h4 {
+    margin: 0 0 7px;
+    color: #25334a;
+    font-size: 19px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.profile-student-id {
+    margin: 0 0 18px;
+    color: #758197;
+    font-size: 14px;
+}
+
+.btn-upload-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    color: #3265ef;
+    background: #eef3ff;
+    border: 1px solid #dce6ff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-upload-avatar:hover {
+    color: #fff;
+    background: #3265ef;
+}
+
+.profile-avatar-card small {
+    margin-top: 12px;
+    color: #9aa4b4;
+    font-size: 11px;
+}
+
+/* Status */
+
+.profile-status-card {
+    padding: 20px;
+}
+
+.profile-status-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 16px;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 650;
+}
+
+.profile-status-heading i {
+    color: #3985e9;
+    font-size: 19px;
+}
+
+.profile-status-value {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #229b55;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    background: #36b66b;
+    border-radius: 50%;
+}
+
+.profile-status-card p {
+    margin: 12px 0 0;
+    color: #8490a2;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* Help */
+
+.profile-help-card {
+    display: flex;
+    gap: 12px;
+    padding: 18px;
+    color: #3674d9;
+    background: #f0f6ff;
+    border-color: #dfebff;
+}
+
+.profile-help-card > i {
+    font-size: 21px;
+}
+
+.profile-help-card strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #315b9e;
+    font-size: 13px;
+}
+
+.profile-help-card p {
+    margin: 0;
+    color: #6d7f9a;
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+/* Main sections */
+
+.profile-main {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.profile-section {
+    padding: 26px;
+}
+
+.profile-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.profile-section-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    font-size: 21px;
+}
+
+.profile-section-icon.blue {
+    color: #3472ef;
+    background: #edf3ff;
+}
+
+.profile-section-icon.green {
+    color: #27a767;
+    background: #eaf8f0;
+}
+
+.profile-section-heading h5 {
+    margin: 0 0 5px;
+    color: #273449;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.profile-section-heading p {
+    margin: 0;
+    color: #8994a6;
+    font-size: 12px;
+}
+
+/* Form grid */
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.profile-field {
+    min-width: 0;
+}
+
+.profile-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.profile-field label {
+    display: block;
+    margin-bottom: 9px;
+    color: #445066;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.profile-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.profile-input-wrap > i {
+    position: absolute;
+    left: 14px;
+    z-index: 1;
+    color: #8c9ab0;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.profile-input-wrap input,
+.profile-input-wrap select {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px 0 42px;
+    color: #344054;
+    background: #fff;
+    border: 1px solid #dfe5ed;
+    border-radius: 8px;
+    outline: none;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.profile-input-wrap input::placeholder {
+    color: #a6afbd;
+}
+
+.profile-input-wrap input:focus,
+.profile-input-wrap select:focus {
+    border-color: #5484f5;
+    box-shadow: 0 0 0 3px rgba(65, 111, 239, 0.1);
+}
+
+.profile-input-wrap input[readonly] {
+    color: #667085;
+    background: #f7f9fc;
+    cursor: not-allowed;
+}
+
+/* Actions */
+.profile-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+    padding: 20px 0 0;
+}
+
+.btn-profile-logout,
+.btn-profile-reset,
+.btn-profile-save {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+/* Đăng xuất */
+.btn-profile-logout {
+    color: #dc3545;
+    background: #fff;
+    border: 1px solid #dc3545;
+}
+
+.btn-profile-logout:hover {
+    color: #fff;
+    background: #dc3545;
+}
+
+/* Xóa thông tin */
+.btn-profile-reset {
+    color: #586579;
+    background: #fff;
+    border: 1px solid #dce2eb;
+}
+
+.btn-profile-reset:hover {
+    background: #f2f5f9;
+}
+
+/* Lưu thay đổi */
+.btn-profile-save {
+    color: #fff;
+    background: #3265ef;
+    border: 1px solid #3265ef;
+    box-shadow: 0 4px 10px rgba(50, 101, 239, 0.16);
+}
+
+.btn-profile-save:hover {
+    background: #2454d9;
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+    .profile-layout {
+        grid-template-columns: 250px minmax(0, 1fr);
+    }
+
+    .profile-section {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 850px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-avatar-card {
+        grid-row: span 2;
+    }
+}
+
+@media (max-width: 600px) {
+    .student-profile-page {
+        padding: 18px 12px;
+    }
+
+    .profile-page-heading h2 {
+        font-size: 23px;
+    }
+
+    .profile-page-heading p {
+        font-size: 12px;
+    }
+
+    .profile-sidebar {
+        display: flex;
+    }
+
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .profile-field.full-width {
+        grid-column: auto;
+    }
+
+    .profile-section {
+        padding: 18px 14px;
+    }
+
+    .profile-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .profile-save-message {
+        margin: 0 0 5px;
+    }
+
+    .btn-profile-reset,
+    .btn-profile-save {
+        width: 100%;
+    }
+}
+
+/* Nút đăng xuất */
+.btn-profile-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    background: #fff;
+    color: #dc3545;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-profile-logout:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+.btn-profile-logout i {
+    font-size: 16px;
+}
+
+
+/* =====================================
+   LOGOUT CONFIRMATION MODAL
+===================================== */
+
+.logout-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+
+    animation: logoutOverlayShow 0.2s ease;
+}
+
+.logout-modal {
+    width: 100%;
+    max-width: 420px;
+
+    padding: 32px 28px;
+
+    background: #ffffff;
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+    animation: logoutModalShow 0.25s ease;
+}
+
+.logout-modal-icon {
+    width: 68px;
+    height: 68px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fff1f2;
+    color: #dc3545;
+}
+
+.logout-modal-icon i {
+    font-size: 30px;
+}
+
+.logout-modal h3 {
+    margin-bottom: 12px;
+
+    color: #1e293b;
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.logout-modal p {
+    margin-bottom: 26px;
+
+    color: #64748b;
+
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.logout-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+}
+
+.logout-modal-actions button {
+    min-width: 125px;
+    min-height: 43px;
+
+    padding: 10px 16px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-logout-cancel {
+    border: 1px solid #dbe2ea;
+
+    background: #ffffff;
+    color: #475569;
+}
+
+.btn-logout-cancel:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.btn-logout-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border: 1px solid #dc3545;
+
+    background: #dc3545;
+    color: #ffffff;
+}
+
+.btn-logout-confirm:hover:not(:disabled) {
+    border-color: #bb2d3b;
+    background: #bb2d3b;
+}
+
+.logout-modal-actions button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =====================================
+MODAL ANIMATION
+===================================== */
+
+@keyframes logoutOverlayShow {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes logoutModalShow {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =====================================
+RESPONSIVE
+===================================== */
+
+@media (max-width: 480px) {
+    .logout-modal {
+        padding: 26px 20px;
+    }
+
+    .logout-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .logout-modal-actions button {
+        width: 100%;
+    }
+}

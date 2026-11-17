@@ -1,39 +1,50 @@
 
 import React, {
     createContext,
+    useContext,
     useState,
     useEffect,
     useCallback
-} from 'react';
+} from "react";
 
-import authService from '../services/authService';
+import authService from "../services/authService";
 
+// Khởi tạo AuthContext
 export const AuthContext = createContext(null);
 
+// AuthProvider quản lý trạng thái đăng nhập toàn hệ thống
 export const AuthProvider = ({ children }) => {
 
+    // Lấy thông tin người dùng đã lưu
     const [user, setUser] = useState(() => {
         try {
-            const savedUser = localStorage.getItem('currentUser');
+            const savedUser = localStorage.getItem("currentUser");
             return savedUser ? JSON.parse(savedUser) : null;
-        } catch {
-            localStorage.removeItem('currentUser');
+        } catch (error) {
+            localStorage.removeItem("currentUser");
             return null;
         }
     });
 
+    // Kiểm tra trạng thái tải phiên đăng nhập
     const [isLoading, setIsLoading] = useState(
-        () => !!localStorage.getItem('accessToken')
+        () => !!localStorage.getItem("accessToken")
     );
 
-    // Kiểm tra phiên đăng nhập khi tải lại trang
+    // =====================================
+    // KIỂM TRA PHIÊN ĐĂNG NHẬP
+    // =====================================
     useEffect(() => {
+        let isMounted = true;
+
         const verifySession = async () => {
-            const token = localStorage.getItem('accessToken');
+            const token = localStorage.getItem("accessToken");
 
             if (!token) {
-                setUser(null);
-                setIsLoading(false);
+                if (isMounted) {
+                    setUser(null);
+                    setIsLoading(false);
+                }
                 return;
             }
 
@@ -41,93 +52,146 @@ export const AuthProvider = ({ children }) => {
                 const currentUser = await authService.getCurrentUser();
 
                 if (!currentUser) {
-                    throw new Error('Không lấy được thông tin tài khoản.');
+                    throw new Error(
+                        "Không lấy được thông tin tài khoản."
+                    );
                 }
+
+                if (!isMounted) return;
 
                 setUser(currentUser);
 
                 localStorage.setItem(
-                    'currentUser',
+                    "currentUser",
                     JSON.stringify(currentUser)
                 );
 
             } catch (error) {
-                console.error('Không thể xác thực phiên:', error);
+                console.error(
+                    "Không thể xác thực phiên:",
+                    error
+                );
 
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('currentUser');
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("currentUser");
 
-                setUser(null);
+                if (isMounted) {
+                    setUser(null);
+                }
 
             } finally {
-                setIsLoading(false);
+                if (isMounted) {
+                    setIsLoading(false);
+                }
             }
         };
 
         verifySession();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
-    // Đăng nhập
-    const login = useCallback(async (email, password, expectedRole) => {
-        try {
-            const result = await authService.login(
-                email,
-                password,
-                expectedRole
-            );
+    // =====================================
+    // ĐĂNG NHẬP
+    // =====================================
+    const login = useCallback(
+        async (email, password, expectedRole) => {
+            try {
+                const result = await authService.login(
+                    email,
+                    password,
+                    expectedRole
+                );
 
-            const userData = {
-                ...result.user,
-                role: result.user.role || expectedRole
-            };
+                if (!result || !result.user) {
+                    throw new Error(
+                        "Thông tin đăng nhập không hợp lệ."
+                    );
+                }
 
-            setUser(userData);
+                const userData = {
+                    ...result.user,
+                    role: result.user.role || expectedRole
+                };
 
-            localStorage.setItem(
-                'currentUser',
-                JSON.stringify(userData)
-            );
+                setUser(userData);
 
-            return {
-                success: true,
-                user: userData
-            };
+                localStorage.setItem(
+                    "currentUser",
+                    JSON.stringify(userData)
+                );
 
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message || 'Đăng nhập thất bại.'
-            };
-        }
-    }, []);
+                return {
+                    success: true,
+                    user: userData
+                };
 
-    // Đăng xuất
+            } catch (error) {
+                return {
+                    success: false,
+                    message:
+                        error.message || "Đăng nhập thất bại."
+                };
+            }
+        },
+        []
+    );
+
+    // =====================================
+    // ĐĂNG XUẤT
+    // =====================================
     const logout = useCallback(async () => {
         try {
             await authService.logout();
 
         } catch (error) {
-            console.error('Lỗi đăng xuất:', error);
+            console.error(
+                "Lỗi đăng xuất:",
+                error
+            );
 
         } finally {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('currentUser');
+            // Xóa thông tin phiên đăng nhập
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("currentUser");
 
+            // Cập nhật trạng thái người dùng
             setUser(null);
         }
     }, []);
 
+    // =====================================
+    // GIÁ TRỊ CUNG CẤP CHO TOÀN HỆ THỐNG
+    // =====================================
+    const contextValue = {
+        user,
+        setUser,
+        login,
+        logout,
+        isAuthenticated: !!user,
+        isLoading
+    };
+
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                login,
-                logout,
-                isAuthenticated: !!user,
-                isLoading
-            }}
-        >
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );
+};
+
+// =====================================
+// CUSTOM HOOK: USEAUTH
+// =====================================
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+
+    if (!context) {
+        throw new Error(
+            "useAuth phải được sử dụng bên trong AuthProvider."
+        );
+    }
+
+    return context;
 };

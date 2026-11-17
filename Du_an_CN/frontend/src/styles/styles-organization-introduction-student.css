@@ -1,0 +1,401 @@
+
+/* =========================================
+ORGANIZATION INTRODUCTION - TVU
+========================================= */
+
+.org-intro-page {
+    min-height: 100vh;
+    padding: 30px 0 55px;
+    background: #f3f6fa;
+    color: #26384d;
+}
+
+.org-intro-page .container {
+    max-width: 1200px;
+}
+
+/* =========================================
+BREADCRUMB
+========================================= */
+
+.org-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 22px;
+    color: #7b8797;
+    font-size: 13px;
+}
+
+.org-breadcrumb strong {
+    color: #07569c;
+    font-weight: 600;
+}
+
+.org-breadcrumb i {
+    font-size: 10px;
+}
+
+/* =========================================
+ORGANIZATION HERO
+========================================= */
+
+.org-hero {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 32px 38px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    background: linear-gradient(115deg, #064d8b, #0879bb);
+    color: #fff;
+    box-shadow: 0 5px 18px rgba(5, 69, 119, 0.12);
+}
+
+.org-hero-icon {
+    width: 95px;
+    height: 95px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.13);
+    font-size: 43px;
+}
+
+.org-hero-content {
+    min-width: 0;
+}
+
+.org-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #d5edff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.org-hero h1 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.org-hero p {
+    max-width: 850px;
+    margin: 0;
+    color: #e4f2ff;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* =========================================
+COMMON SECTION
+========================================= */
+
+.org-info-section,
+.org-members-section {
+    padding: 28px 30px;
+    margin-bottom: 25px;
+    border: 1px solid #e5ebf2;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 14px rgba(30, 55, 80, 0.04);
+}
+
+.org-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.org-section-heading h2 {
+    margin: 0 0 6px;
+    color: #173b5c;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.org-section-heading p {
+    margin: 0;
+    color: #7d8998;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.org-section-heading > i {
+    color: #0879bb;
+    font-size: 27px;
+}
+
+/* =========================================
+ORGANIZATION INFORMATION
+========================================= */
+
+.org-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.org-info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    min-height: 85px;
+    padding: 16px 18px;
+    border: 1px solid #edf1f5;
+    border-radius: 9px;
+    background: #f8fafc;
+    transition: 0.2s ease;
+}
+
+.org-info-item:hover {
+    border-color: #c9e2f4;
+    background: #f2f8fd;
+}
+
+.org-info-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #e5f2fc;
+    color: #0876b9;
+    font-size: 20px;
+}
+
+.org-info-item > div {
+    min-width: 0;
+}
+
+.org-info-item span {
+    display: block;
+    margin-bottom: 6px;
+    color: #7d8998;
+    font-size: 12px;
+}
+
+.org-info-item strong {
+    display: block;
+    overflow-wrap: anywhere;
+    color: #2d4056;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* =========================================
+EXECUTIVE COMMITTEE
+========================================= */
+
+.org-members-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.org-member-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid #d9eaf7;
+    border-radius: 30px;
+    background: #edf6fd;
+    color: #0876b9;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* =========================================
+MEMBER CARD
+========================================= */
+
+.org-member-card {
+    min-width: 0;
+    min-height: 265px;
+    padding: 25px 16px;
+    border: 1px solid #e5ebf2;
+    border-radius: 11px;
+    background: #fff;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.org-member-card:hover {
+    transform: translateY(-4px);
+    border-color: #b9d9ef;
+    box-shadow: 0 7px 20px rgba(13, 91, 148, 0.09);
+}
+
+/* Avatar */
+
+.org-member-avatar {
+    width: 105px;
+    height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto 16px;
+    border: 4px solid #e5f2fc;
+    border-radius: 50%;
+    background: #edf5fb;
+    color: #6d9fc5;
+    font-size: 45px;
+}
+
+.org-member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Position */
+
+.org-member-position {
+    display: inline-block;
+    padding: 7px 17px;
+    border-radius: 20px;
+    background: #e8f3fc;
+    color: #086eae;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Name */
+
+.org-member-card h3 {
+    min-height: 23px;
+    margin: 14px 0 12px;
+    color: #233d57;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* Phone */
+
+.org-member-phone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #778597;
+    font-size: 13px;
+}
+
+.org-member-phone i {
+    color: #0879bb;
+    font-size: 14px;
+}
+
+/* =========================================
+RESPONSIVE - TABLET
+========================================= */
+
+@media (max-width: 991px) {
+    .org-intro-page .container {
+        max-width: 95%;
+    }
+
+    .org-members-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .org-hero {
+        padding: 28px;
+    }
+}
+
+/* =========================================
+RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 576px) {
+    .org-intro-page {
+        padding: 18px 0 35px;
+    }
+
+    .org-intro-page .container {
+        max-width: 100%;
+        padding: 0 14px;
+    }
+
+    .org-hero {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+        padding: 23px 19px;
+        border-radius: 10px;
+    }
+
+    .org-hero-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+    }
+
+    .org-hero h1 {
+        font-size: 21px;
+    }
+
+    .org-hero p {
+        font-size: 13px;
+    }
+
+    .org-info-section,
+    .org-members-section {
+        padding: 21px 15px;
+        border-radius: 10px;
+    }
+
+    .org-section-heading {
+        align-items: flex-start;
+    }
+
+    .org-section-heading h2 {
+        font-size: 18px;
+    }
+
+    .org-section-heading p {
+        font-size: 12px;
+    }
+
+    .org-info-grid,
+    .org-members-grid {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .org-info-item {
+        padding: 14px;
+    }
+
+    .org-member-card {
+        min-height: 245px;
+    }
+
+    .org-member-count {
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+}
