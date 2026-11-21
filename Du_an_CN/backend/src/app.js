@@ -15,7 +15,15 @@ const clubRoutes = require('./routes/club.routes');
 const { errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
+const path = require('path');
 
+// Cho phép frontend truy cập ảnh đã upload.
+app.use(
+    '/uploads',
+    express.static(
+        path.join(__dirname, 'uploads')
+    )
+);
 // ==========================================
 // 1. Cấu hình middleware chung
 // ==========================================

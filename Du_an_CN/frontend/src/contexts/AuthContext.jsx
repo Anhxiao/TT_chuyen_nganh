@@ -9,24 +9,38 @@ import React, {
 
 import authService from "../services/authService";
 
-// Khởi tạo AuthContext
+// =====================================
+// KHỞI TẠO AUTH CONTEXT
+// =====================================
+
 export const AuthContext = createContext(null);
 
-// AuthProvider quản lý trạng thái đăng nhập toàn hệ thống
+// =====================================
+// AUTH PROVIDER
+// =====================================
+
 export const AuthProvider = ({ children }) => {
 
-    // Lấy thông tin người dùng đã lưu
+    // =====================================
+    // STATE NGƯỜI DÙNG
+    // =====================================
+
     const [user, setUser] = useState(() => {
         try {
             const savedUser = localStorage.getItem("currentUser");
+
             return savedUser ? JSON.parse(savedUser) : null;
+
         } catch (error) {
+            console.error("Lỗi đọc thông tin người dùng:", error);
+
             localStorage.removeItem("currentUser");
+
             return null;
         }
     });
 
-    // Kiểm tra trạng thái tải phiên đăng nhập
+    // Trạng thái tải phiên đăng nhập
     const [isLoading, setIsLoading] = useState(
         () => !!localStorage.getItem("accessToken")
     );
@@ -34,6 +48,7 @@ export const AuthProvider = ({ children }) => {
     // =====================================
     // KIỂM TRA PHIÊN ĐĂNG NHẬP
     // =====================================
+
     useEffect(() => {
         let isMounted = true;
 
@@ -45,13 +60,20 @@ export const AuthProvider = ({ children }) => {
                     setUser(null);
                     setIsLoading(false);
                 }
+
                 return;
             }
 
             try {
+                // Lấy thông tin đầy đủ từ Backend
                 const currentUser = await authService.getCurrentUser();
 
-                if (!currentUser) {
+                console.log(
+                    "Dữ liệu API getCurrentUser:",
+                    currentUser
+                );
+
+                if (!currentUser || typeof currentUser !== "object") {
                     throw new Error(
                         "Không lấy được thông tin tài khoản."
                     );
@@ -91,36 +113,75 @@ export const AuthProvider = ({ children }) => {
         return () => {
             isMounted = false;
         };
+
     }, []);
 
     // =====================================
     // ĐĂNG NHẬP
     // =====================================
+
     const login = useCallback(
         async (email, password, expectedRole) => {
+
             try {
+                setIsLoading(true);
+
+                // BƯỚC 1: GỬI YÊU CẦU ĐĂNG NHẬP
                 const result = await authService.login(
                     email,
                     password,
                     expectedRole
                 );
 
-                if (!result || !result.user) {
+                console.log(
+                    "Dữ liệu API login:",
+                    result
+                );
+
+                if (!result || !result.token || !result.user) {
                     throw new Error(
                         "Thông tin đăng nhập không hợp lệ."
                     );
                 }
 
+                // BƯỚC 2: LẤY ĐẦY ĐỦ THÔNG TIN TÀI KHOẢN
+                // Token đã được authService lưu vào localStorage
+                const currentUser = await authService.getCurrentUser();
+
+                console.log(
+                    "Dữ liệu người dùng sau đăng nhập:",
+                    currentUser
+                );
+
+                if (!currentUser || typeof currentUser !== "object") {
+                    throw new Error(
+                        "Không thể lấy đầy đủ thông tin tài khoản."
+                    );
+                }
+
+                // BƯỚC 3: KẾT HỢP DỮ LIỆU
+                // Giữ role từ kết quả đăng nhập nếu API /me không trả về
                 const userData = {
-                    ...result.user,
-                    role: result.user.role || expectedRole
+                    ...currentUser,
+
+                    role:
+                        currentUser.role ||
+                        result.user.role ||
+                        expectedRole
                 };
 
+                // BƯỚC 4: CẬP NHẬT AUTH CONTEXT
                 setUser(userData);
 
+                // BƯỚC 5: LƯU THÔNG TIN NGƯỜI DÙNG
                 localStorage.setItem(
                     "currentUser",
                     JSON.stringify(userData)
+                );
+
+                console.log(
+                    "Thông tin người dùng đã cập nhật:",
+                    userData
                 );
 
                 return {
@@ -129,11 +190,25 @@ export const AuthProvider = ({ children }) => {
                 };
 
             } catch (error) {
+                console.error(
+                    "Lỗi đăng nhập:",
+                    error
+                );
+
+                // Xóa phiên nếu không thể hoàn tất đăng nhập
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("currentUser");
+
+                setUser(null);
+
                 return {
                     success: false,
                     message:
                         error.message || "Đăng nhập thất bại."
                 };
+
+            } finally {
+                setIsLoading(false);
             }
         },
         []
@@ -142,6 +217,7 @@ export const AuthProvider = ({ children }) => {
     // =====================================
     // ĐĂNG XUẤT
     // =====================================
+
     const logout = useCallback(async () => {
         try {
             await authService.logout();
@@ -153,11 +229,9 @@ export const AuthProvider = ({ children }) => {
             );
 
         } finally {
-            // Xóa thông tin phiên đăng nhập
             localStorage.removeItem("accessToken");
             localStorage.removeItem("currentUser");
 
-            // Cập nhật trạng thái người dùng
             setUser(null);
         }
     }, []);
@@ -165,6 +239,7 @@ export const AuthProvider = ({ children }) => {
     // =====================================
     // GIÁ TRỊ CUNG CẤP CHO TOÀN HỆ THỐNG
     // =====================================
+
     const contextValue = {
         user,
         setUser,
@@ -184,6 +259,7 @@ export const AuthProvider = ({ children }) => {
 // =====================================
 // CUSTOM HOOK: USEAUTH
 // =====================================
+
 export const useAuth = () => {
     const context = useContext(AuthContext);
 

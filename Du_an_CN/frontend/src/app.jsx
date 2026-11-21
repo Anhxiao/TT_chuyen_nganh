@@ -13,6 +13,9 @@ import IntroductionKTStudent from "./pages/IntroductionKTStudent.jsx";
 import IntroductionYDStudent from "./pages/IntroductionYDStudent.jsx";
 import StudentActivityHistory from "./pages/StudentActivityHistory.jsx";
 import StudentEvidence from "./pages/StudentEvidence.jsx";
+import IntrodutionKNSStudent from "./pages/IntrodutionKNSStudent.jsx";
+import IntrodutionTTStudent from "./pages/IntrodutionTTStudent.jsx";
+import IntrodutionVHNTStudent from "./pages/IntrodutionVHNTStudent.jsx";
 
 function App() {
     return (
@@ -34,7 +37,9 @@ function App() {
             <Route path="/student/introduction/yd" element={<IntroductionYDStudent />} />
             <Route path="/student/history/activities" element={<StudentActivityHistory />} />
             <Route path="/student/history/evidence" element={<StudentEvidence />} />
-            
+            <Route path="/student/introduction/clb-ky-nang-song" element={<IntrodutionKNSStudent />} />
+            <Route path="/student/introduction/clb-truyen-thong" element={<IntrodutionTTStudent />} />
+            <Route path="/student/introduction/clb-van-hoa-nghe-thuat" element={<IntrodutionVHNTStudent />} />
             {/* Dashboard đơn vị tổ chức */}
             <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
             

@@ -1,7 +1,7 @@
 
 import { useMemo, useState } from "react";
 
-import Header from "../components/Header Student Nontifications.jsx";
+import Header from '../components/Header Student';
 import Footer from "../components/Footer.jsx";
 
 import "../styles/styles-dashboard.css";

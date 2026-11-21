@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom';
+import { NavLink, useLocation } from "react-router-dom";
 
 function App() {
     return (
@@ -106,6 +107,32 @@ function App() {
                                             <a className="dropdown-item" href="#">
                                                 <i className="bi bi-shield-lock me-2"></i>
                                                 Đoàn trường Y Dược
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#"
+                                            className="dropdown-item"
+                                            onClick={(e) => e.preventDefault()}>
+                                                <i className="bi bi-shield-lock me-2"></i>
+                                                CLB Kỹ năng sống
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#"
+                                            className="dropdown-item"
+                                            onClick={(e) => e.preventDefault()}>
+                                                <i className="bi bi-shield-lock me-2"></i>
+                                                CLB Truyền thông TVU
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#"
+                                            className="dropdown-item"
+                                            onClick={(e) => e.preventDefault()}>
+                                                <i className="bi bi-shield-lock me-2"></i>
+                                                CLB Văn hóa Nghệ thuật TVU
                                             </a>
                                         </li>
                                     </ul>

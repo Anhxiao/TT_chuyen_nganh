@@ -2,7 +2,13 @@
 import "../styles/components/header.css";
 import { NavLink } from "react-router-dom";
 
-function Header() {
+function HeaderStudent() {
+    const getNavClass = ({ isActive }) =>
+        `nav-item ${isActive ? "active" : ""}`;
+
+    const getDropdownClass = ({ isActive }) =>
+        `dropdown-item ${isActive ? "active" : ""}`;
+
     return (
         <header className="top-header">
             <div className="container-fluid px-4">
@@ -28,6 +34,7 @@ function Header() {
                             <li>
                                 <NavLink
                                     to="/student/dashboard"
+                                    end
                                     className={({ isActive }) =>
                                         `nav-item ${isActive ? "home-active" : ""}`
                                     }
@@ -41,9 +48,8 @@ function Header() {
                             <li>
                                 <NavLink
                                     to="/student/notifications"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive ? "active" : ""}`
-                                    }
+                                    end
+                                    className={getNavClass}
                                 >
                                     <i className="bi bi-bell"></i>
                                     Thông báo
@@ -54,9 +60,8 @@ function Header() {
                             <li>
                                 <NavLink
                                     to="/activities"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive ? "active" : ""}`
-                                    }
+                                    end
+                                    className={getNavClass}
                                 >
                                     <i className="bi bi-people"></i>
                                     Hoạt động
@@ -77,10 +82,12 @@ function Header() {
                                 </a>
 
                                 <ul className="dropdown-menu">
+
                                     <li>
                                         <NavLink
                                             to="/student/introduction/cntt"
-                                            className="dropdown-item"
+                                            end
+                                            className={getDropdownClass}
                                         >
                                             <i className="bi bi-mortarboard me-2"></i>
                                             Đoàn trường Kỹ thuật và Công nghệ
@@ -90,7 +97,8 @@ function Header() {
                                     <li>
                                         <NavLink
                                             to="/student/introduction/kt"
-                                            className="dropdown-item"
+                                            end
+                                            className={getDropdownClass}
                                         >
                                             <i className="bi bi-person-badge me-2"></i>
                                             Đoàn trường Kinh tế và Luật
@@ -100,12 +108,47 @@ function Header() {
                                     <li>
                                         <NavLink
                                             to="/student/introduction/yd"
-                                            className="dropdown-item"
+                                            end
+                                            className={getDropdownClass}
                                         >
                                             <i className="bi bi-shield-lock me-2"></i>
                                             Đoàn trường Y Dược
                                         </NavLink>
                                     </li>
+
+                                    <li>
+                                        <NavLink
+                                            to="/student/introduction/clb-ky-nang-song"
+                                            end
+                                            className={getDropdownClass}
+                                        >
+                                            <i className="bi bi-lightbulb me-2"></i>
+                                            CLB Kỹ năng sống
+                                        </NavLink>
+                                    </li>
+
+                                    <li>
+                                        <NavLink
+                                            to="/student/introduction/clb-truyen-thong"
+                                            end
+                                            className={getDropdownClass}
+                                        >
+                                            <i className="bi bi-camera-video me-2"></i>
+                                            CLB Truyền thông TVU
+                                        </NavLink>
+                                    </li>
+
+                                    <li>
+                                        <NavLink
+                                            to="/student/introduction/clb-van-hoa-nghe-thuat"
+                                            end
+                                            className={getDropdownClass}
+                                        >
+                                            <i className="bi bi-palette me-2"></i>
+                                            CLB Văn hóa Nghệ thuật TVU
+                                        </NavLink>
+                                    </li>
+
                                 </ul>
                             </li>
 
@@ -123,10 +166,12 @@ function Header() {
                                 </a>
 
                                 <ul className="dropdown-menu">
+
                                     <li>
                                         <NavLink
                                             to="/student/history/activities"
-                                            className="dropdown-item"
+                                            end
+                                            className={getDropdownClass}
                                         >
                                             <i className="bi bi-file-earmark-text me-2"></i>
                                             Các hoạt động đã tham gia
@@ -136,12 +181,14 @@ function Header() {
                                     <li>
                                         <NavLink
                                             to="/student/history/evidence"
-                                            className="dropdown-item"
+                                            end
+                                            className={getDropdownClass}
                                         >
                                             <i className="bi bi-file-earmark-text me-2"></i>
                                             Minh chứng
                                         </NavLink>
                                     </li>
+
                                 </ul>
                             </li>
 
@@ -149,9 +196,8 @@ function Header() {
                             <li>
                                 <NavLink
                                     to="/student/profile"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive ? "active" : ""}`
-                                    }
+                                    end
+                                    className={getNavClass}
                                 >
                                     <i className="bi bi-person-circle"></i>
                                     Thông tin cá nhân
@@ -166,4 +212,4 @@ function Header() {
     );
 }
 
-export default Header;
+export default HeaderStudent;

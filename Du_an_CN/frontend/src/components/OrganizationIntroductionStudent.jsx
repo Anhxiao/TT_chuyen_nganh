@@ -1,5 +1,5 @@
 
-import Header from "./Header Student Introduction.jsx";
+import Header from '../components/Header Student';
 import Footer from "./Footer.jsx";
 import "../styles/styles-organization-introduction-student.css";
 

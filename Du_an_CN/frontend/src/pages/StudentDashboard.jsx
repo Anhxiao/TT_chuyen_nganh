@@ -21,20 +21,35 @@ const StudentDashboard = () => { const { user } = useContext(AuthContext);
                         </span>
 
                         <h2>
-                            Xin chào, {user?.fullName || 'Sinh viên'}!
+                            Xin chào, {user?.fullName || 'Chưa xác định tên sinh viên'}!
                         </h2>
 
                         <p>
-                            Mã sinh viên: {user?.studentCode || 'Chưa cập nhật'}
+                            <i className="bi bi-person-badge me-2"></i>
+                            Mã sinh viên: {user?.student?.studentCode || 'Chưa cập nhật'}
                             <br />
-                            Đơn vị đào tạo: {user?.facultyName || 'Chưa cập nhật'}
+
+                            <i className="bi bi-journal-bookmark me-2"></i>
+                            Mã lớp: {user?.student?.className || 'Chưa cập nhật'}
+                            <br />
+
+                            <i className="bi bi-mortarboard me-2"></i>
+                            Trường đào tạo: {user?.student?.facultyName || 'Chưa cập nhật'}
+                            <br />
+
+                            <i className="bi bi-people me-2"></i>
+                            Câu lạc bộ: {user?.organizations?.length > 0
+                                ? user.organizations.map(org => org.organizationName).join(', ')
+                                : 'Chưa tham gia câu lạc bộ'}
                         </p>
                     </div>
 
-                    <Link to="/activities" className="btn btn-primary">
-                        <i className="bi bi-search me-2"></i>
-                        Tìm hoạt động
-                    </Link>
+                    <div className="d-flex justify-content-end mt-3">
+                        <Link to="/activities" className="btn btn-primary">
+                            <i className="bi bi-search me-2"></i>
+                            Tìm hoạt động
+                        </Link>
+                    </div>
                 </section>
 
                 {/* Thống kê 4 ô */}

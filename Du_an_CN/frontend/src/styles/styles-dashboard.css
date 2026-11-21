@@ -32,14 +32,10 @@ Bootstrap 5 + React
 }
 
 
-/* =========================================================
-2. KHỐI CHÀO MỪNG
-========================================================= */
-
 .dashboard-welcome {
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 24px;
     overflow: hidden;
@@ -52,47 +48,21 @@ Bootstrap 5 + React
     box-shadow: 0 8px 26px rgba(28, 61, 112, 0.06);
 }
 
-.dashboard-welcome::after {
-    content: "";
-    position: absolute;
-    width: 190px;
-    height: 190px;
-    right: -75px;
-    bottom: -115px;
-    border: 24px solid rgba(45, 101, 205, 0.055);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.dashboard-welcome > div,
-.dashboard-welcome > a {
+.dashboard-welcome-content {
     position: relative;
     z-index: 1;
+    flex: 1;
+    min-width: 0;
 }
 
-.dashboard-eyebrow {
-    display: inline-block;
-    margin-bottom: 10px;
-    color: #2857a4;
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 1.15px;
-}
-
-.dashboard-welcome h2 {
-    margin: 0 0 9px;
-    color: #183b78;
-    font-size: clamp(1.45rem, 2.5vw, 2rem);
-    font-weight: 750;
-    line-height: 1.3;
-}
-
-.dashboard-welcome p {
-    max-width: 720px;
-    margin: 0;
-    color: #66758d;
-    font-size: 0.98rem;
-    line-height: 1.65;
+.dashboard-welcome-action {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-shrink: 0;
+    padding-bottom: 2px;
 }
 
 .dashboard-welcome .btn {
@@ -103,12 +73,10 @@ Bootstrap 5 + React
     background: linear-gradient(135deg, #2859b5, #3479df);
     box-shadow: 0 5px 13px rgba(42, 99, 190, 0.2);
     font-weight: 650;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dashboard-welcome .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(42, 99, 190, 0.27);
     background: linear-gradient(135deg, #204b9e, #286bd0);
 }
 
@@ -509,3 +477,178 @@ Bootstrap 5 + React
     }
 }
 
+
+/* =========================================
+   ORGANIZER DASHBOARD - WELCOME
+========================================= */
+
+.organizer-welcome {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    padding: 35px 38px;
+    min-height: 245px;
+    color: #fff;
+    background: linear-gradient(120deg, #064b91, #0879c9);
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0, 75, 145, 0.16);
+}
+
+.organizer-welcome-content {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+}
+
+.organizer-welcome-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 15px;
+    padding: 8px 13px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+}
+
+.organizer-welcome h2 {
+    margin: 0 0 17px;
+    color: #fff;
+    font-size: clamp(23px, 3vw, 32px);
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+.organizer-account-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.organizer-account-info span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.13);
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+.organizer-account-info i {
+    font-size: 15px;
+}
+
+.organizer-account-info .organizer-role {
+    background: rgba(20, 184, 120, 0.25);
+}
+
+.organizer-welcome-content > p {
+    max-width: 680px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.organizer-welcome-icon {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: rgba(255, 255, 255, 0.12);
+    font-size: 150px;
+    pointer-events: none;
+}
+
+.organizer-create-button {
+    position: absolute;
+    right: 35px;
+    bottom: 28px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 17px;
+    color: #07549b;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.organizer-create-button:hover {
+    color: #064078;
+    background: #eaf4ff;
+    transform: translateY(-2px);
+}
+
+.organizer-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 13px;
+    padding: 10px 12px;
+    color: #fff3cd;
+    background: rgba(255, 193, 7, 0.17);
+    border: 1px solid rgba(255, 220, 100, 0.35);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .organizer-welcome {
+        padding: 25px 22px 85px;
+        min-height: auto;
+    }
+
+    .organizer-welcome-icon {
+        top: 15px;
+        right: 15px;
+        font-size: 95px;
+    }
+
+    .organizer-create-button {
+        right: auto;
+        left: 22px;
+        bottom: 20px;
+    }
+
+    .organizer-account-info {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .organizer-account-info span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-welcome {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+        padding: 23px 21px;
+    }
+
+    .dashboard-welcome-action {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

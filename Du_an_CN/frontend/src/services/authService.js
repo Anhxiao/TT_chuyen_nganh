@@ -1,10 +1,9 @@
+
 import api from './api';
 
 const unwrapResponse = (response) => {
     let result = response;
 
-    // Bóc tách dữ liệu nếu Backend trả về dạng:
-    // { success: true, message: "...", data: {...} }
     while (
         result &&
         typeof result === 'object' &&
@@ -18,7 +17,6 @@ const unwrapResponse = (response) => {
 };
 
 const authService = {
-    // Đăng nhập bằng email và mật khẩu
     async login(email, password, role) {
         const response = await api.post('/auth/login', {
             email: email.trim().toLowerCase(),
@@ -34,8 +32,10 @@ const authService = {
             );
         }
 
-        // Lưu JWT để sử dụng cho các API cần xác thực
-        localStorage.setItem('accessToken', result.token);
+        localStorage.setItem(
+            'accessToken',
+            result.token
+        );
 
         return {
             token: result.token,
@@ -43,15 +43,36 @@ const authService = {
         };
     },
 
-    // Lấy thông tin người dùng đang đăng nhập
     async getCurrentUser() {
         const response = await api.get('/auth/me');
+
         const result = unwrapResponse(response);
 
         return result?.user || result;
     },
 
-    // Đăng xuất
+    async updateProfile(profileData) {
+        const response = await api.put(
+            '/auth/profile',
+            profileData
+        );
+
+        const result = unwrapResponse(response);
+
+        return result?.user || result;
+    },
+
+    async updateAvatar(formData) {
+        const response = await api.put(
+            '/auth/avatar',
+            formData
+        );
+
+        const result = unwrapResponse(response);
+
+        return result?.user || result;
+    },
+
     async logout() {
         try {
             await api.post('/auth/logout', {});

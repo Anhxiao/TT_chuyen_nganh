@@ -5,82 +5,99 @@ const bcrypt = require('bcryptjs');
 
 const accounts = [
     // STUDENT
-    // Kỹ thuật & Công nghệ
+    // STUDENT - KỸ THUẬT VÀ CÔNG NGHỆ
     {
         username: 'sv.ktcn',
         email: 'sv.ktcn@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Kỹ thuật và Công nghệ',
+        fullName: 'Nguyễn Minh Anh',
         password: 'Student@123',
         role: 'STUDENT',
-        studentCode: 'SVTEST001',
+        studentCode: '110123047',
+        className: 'DA23TTC',
         faculty: 'Trường Kỹ thuật và Công nghệ'
     },
     {
         username: 'sv.ktcn01',
         email: 'sv.ktcn01@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Kỹ thuật và Công nghệ 01',
+        fullName: 'Trần Quốc Bảo',
         password: 'Student@123',
         role: 'STUDENT',
+        studentCode: '110123286',
+        className: 'DA23KTP',
         faculty: 'Trường Kỹ thuật và Công nghệ'
     },
     {
         username: 'sv.ktcn02',
         email: 'sv.ktcn02@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Kỹ thuật và Công nghệ 02',
+        fullName: 'Lê Hoàng Phúc',
         password: 'Student@123',
         role: 'STUDENT',
+        studentCode: '110123591',
+        className: 'DA23DDE',
         faculty: 'Trường Kỹ thuật và Công nghệ'
     },
-    // Kinh tế luật
+
+    // STUDENT - KINH TẾ VÀ LUẬT
     {
         username: 'sv.ktl',
         email: 'sv.ktl@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Kinh tế và Luật',
+        fullName: 'Phạm Ngọc Hà',
         password: 'Student@123',
         role: 'STUDENT',
-        studentCode: 'SVTEST002',
+        studentCode: '110123103',
+        className: 'DA23QTK',
         faculty: 'Trường Kinh tế và Luật'
     },
     {
         username: 'sv.ktl01',
         email: 'sv.ktl01@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Kinh tế và Luật 01',
+        fullName: 'Võ Thành Đạt',
         password: 'Student@123',
         role: 'STUDENT',
+        studentCode: '110123824',
+        className: 'DA23KTO',
         faculty: 'Trường Kinh tế và Luật'
     },
     {
         username: 'sv.ktl02',
         email: 'sv.ktl02@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Kinh tế và Luật 02',
+        fullName: 'Nguyễn Thảo Vy',
         password: 'Student@123',
         role: 'STUDENT',
+        studentCode: '110123365',
+        className: 'DA23LKT',
         faculty: 'Trường Kinh tế và Luật'
     },
-    // Y dược
+
+    // STUDENT - Y DƯỢC
     {
         username: 'sv.yd',
         email: 'sv.yd@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Y Dược',
+        fullName: 'Trần Minh Khang',
         password: 'Student@123',
         role: 'STUDENT',
-        studentCode: 'SVTEST003',
+        studentCode: '110123719',
+        className: 'DA23YDK',
         faculty: 'Trường Y Dược'
     },
     {
         username: 'sv.yd01',
         email: 'sv.yd01@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Y Dược 01',
+        fullName: 'Lê Ngọc Trâm',
         password: 'Student@123',
         role: 'STUDENT',
+        studentCode: '110123052',
+        className: 'DA23DDU',
         faculty: 'Trường Y Dược'
     },
     {
         username: 'sv.yd02',
         email: 'sv.yd02@st.tvu.edu.vn',
-        fullName: 'Sinh viên kiểm thử Y Dược 02',
+        fullName: 'Phạm Gia Huy',
         password: 'Student@123',
         role: 'STUDENT',
+        studentCode: '110123438',
+        className: 'DA23XNY',
         faculty: 'Trường Y Dược'
     },
     // ORGANIZER - ĐOÀN TRƯỜNG
@@ -141,31 +158,31 @@ function sqlString(value) {
     return `N'${String(value).replace(/'/g, "''")}'`;
 }
 
+
 async function main() {
-    const studentHash = await bcrypt.hash('Student@123', 10);
-    const organizerHash = await bcrypt.hash('Organizer@123', 10);
+    // Tạo hash dựa trên mật khẩu khai báo ở từng tài khoản
+    const rows = await Promise.all(
+        accounts.map(async (account) => {
+            const passwordHash = await bcrypt.hash(account.password, 10);
 
-    const rows = accounts.map(account => {
-        const passwordHash =
-            account.role === 'STUDENT' ? studentHash : organizerHash;
-
-        return `(
-            ${sqlString(account.username)},
-            ${sqlString(account.email)},
-            ${sqlString(passwordHash)},
-            ${sqlString(account.fullName)},
-            ${sqlString(account.role)},
-            ${sqlString(account.studentCode || null)},
-            ${sqlString(account.faculty || null)},
-            ${sqlString(account.organization || null)}
-        )`;
-    }).join(',\n');
+            return `(
+                ${sqlString(account.username)},
+                ${sqlString(account.email)},
+                ${sqlString(passwordHash)},
+                ${sqlString(account.fullName)},
+                ${sqlString(account.role)},
+                ${sqlString(account.studentCode || null)},
+                ${sqlString(account.faculty || null)},
+                ${sqlString(account.organization || null)}
+            )`;
+        })
+    );
 
     const sql = `
 /* =========================================================
 DemoAccounts.sql
 Database: StudentActivityDB
-3 STUDENT + 6 ORGANIZER
+9 STUDENT + 6 ORGANIZER
 Passwords are bcrypt hashed.
 ========================================================= */
 
@@ -191,7 +208,7 @@ INSERT INTO @Accounts (
     role_code, student_code, faculty_name, organization_code
 )
 VALUES
-${rows};
+${rows.join(',\n')};
 
 BEGIN TRY
     BEGIN TRANSACTION;
@@ -229,8 +246,7 @@ BEGIN TRY
     )
         THROW 50003, N'Thiếu hoặc đơn vị tổ chức không hoạt động.', 1;
 
-    -- 4. Chỉ cho phép tài khoản kiểm thử khớp cả username và email.
-    -- Tránh cập nhật nhầm tài khoản có sẵn.
+    -- 4. Kiểm tra username và email
     IF EXISTS (
         SELECT 1
         FROM @Accounts a
@@ -247,7 +263,7 @@ BEGIN TRY
     )
         THROW 50004, N'Username hoặc email đã thuộc tài khoản khác.', 1;
 
-    -- 5. Kiểm tra mã sinh viên không bị tài khoản khác sử dụng
+    -- 5. Kiểm tra mã sinh viên
     IF EXISTS (
         SELECT 1
         FROM @Accounts a
@@ -278,7 +294,7 @@ BEGIN TRY
         OR u.email = a.email
     );
 
-    -- 7. Cập nhật mật khẩu và thông tin cho tài khoản kiểm thử đã tồn tại
+    -- 7. Cập nhật tài khoản đã tồn tại
     UPDATE u
     SET
         u.password_hash = a.password_hash,
@@ -287,9 +303,9 @@ BEGIN TRY
     FROM Users u
     INNER JOIN @Accounts a
         ON a.username = u.username
-    AND a.email = u.email;
+       AND a.email = u.email;
 
-    -- 8. Đồng bộ đúng một vai trò cho từng tài khoản kiểm thử
+    -- 8. Đồng bộ vai trò
     DELETE ur
     FROM UserRoles ur
     INNER JOIN Users u ON u.user_id = ur.user_id
@@ -300,7 +316,7 @@ BEGIN TRY
     FROM @Accounts a
     INNER JOIN Users u
         ON u.username = a.username
-    AND u.email = a.email
+       AND u.email = a.email
     INNER JOIN Roles r
         ON r.role_code = a.role_code;
 
@@ -316,17 +332,17 @@ BEGIN TRY
     FROM @Accounts a
     INNER JOIN Users u
         ON u.username = a.username
-    AND u.email = a.email
+       AND u.email = a.email
     INNER JOIN Faculties f
         ON f.faculty_name = a.faculty_name
     WHERE a.role_code = 'STUDENT'
-    AND NOT EXISTS (
-        SELECT 1
-        FROM Students s
-        WHERE s.user_id = u.user_id
-    );
+      AND NOT EXISTS (
+          SELECT 1
+          FROM Students s
+          WHERE s.user_id = u.user_id
+      );
 
-    -- 10. Đồng bộ khoa/trường của hồ sơ sinh viên
+    -- 10. Cập nhật hồ sơ sinh viên
     UPDATE s
     SET
         s.student_code = a.student_code,
@@ -337,7 +353,7 @@ BEGIN TRY
     INNER JOIN Faculties f ON f.faculty_name = a.faculty_name
     WHERE a.role_code = 'STUDENT';
 
-    -- 11. Mỗi tài khoản ORGANIZER chỉ liên kết đơn vị được chỉ định
+    -- 11. Liên kết đơn vị tổ chức
     DELETE ou
     FROM OrganizationUsers ou
     INNER JOIN Users u ON u.user_id = ou.user_id
@@ -349,14 +365,14 @@ BEGIN TRY
     FROM @Accounts a
     INNER JOIN Users u
         ON u.username = a.username
-    AND u.email = a.email
+       AND u.email = a.email
     INNER JOIN Organizations o
         ON o.organization_code = a.organization_code
     WHERE a.role_code = 'ORGANIZER';
 
     COMMIT TRANSACTION;
 
-    PRINT N'Tạo và cập nhật 9 tài khoản kiểm thử thành công.';
+    PRINT N'Tạo và cập nhật 15 tài khoản kiểm thử thành công.';
 
 END TRY
 BEGIN CATCH
@@ -403,7 +419,8 @@ GO
 
     console.log('Đã tạo file:', outputPath);
     console.log('Tổng số tài khoản:', accounts.length);
-    console.log('Sinh viên: 3 | Đơn vị tổ chức: 6');
+    console.log('Sinh viên:', accounts.filter(a => a.role === 'STUDENT').length);
+    console.log('Đơn vị tổ chức:', accounts.filter(a => a.role === 'ORGANIZER').length);
 }
 
 main().catch(error => {

@@ -334,13 +334,17 @@
         font-size: 1rem;
     }
 }
-
-.nav-item.active {
-    color: #0d6efd;
-    font-weight: 600;
+/* Menu chính đang được chọn */
+.nav-item.active:not(.home-active) {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.28);
+    border-color: white;
+    font-weight: 700;
 }
 
-.dropdown-item.active {
-    color: #fff;
-    background-color: #0d6efd;
+/* Mục con trong dropdown đang được chọn */
+.nav-menu .dropdown-item.active {
+    color: #0d6efd !important;
+    background-color: #eaf2ff !important;
+    font-weight: 700;
 }

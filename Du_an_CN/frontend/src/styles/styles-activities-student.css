@@ -265,3 +265,291 @@
         flex-direction: column;
     }
 }
+
+
+/* =====================================================
+   HỘP THOẠI ĐĂNG KÝ THÀNH VIÊN CLB
+===================================================== */
+
+.club-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 30, 55, 0.58);
+    backdrop-filter: blur(4px);
+}
+
+.club-register-modal {
+    width: 100%;
+    max-width: 510px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    animation: clubModalShow 0.25s ease;
+}
+
+@keyframes clubModalShow {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header modal */
+
+.club-modal-header {
+    position: relative;
+    padding: 28px 30px 22px;
+    text-align: center;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.club-modal-icon {
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: #eaf2ff;
+    color: #1456a0;
+    font-size: 27px;
+}
+
+.club-modal-header h4 {
+    margin: 0 0 7px;
+    color: #183b68;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.club-modal-header p {
+    margin: 0;
+    color: #68778b;
+    font-size: 14px;
+}
+
+.club-modal-close {
+    position: absolute;
+    top: 17px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f1f3f6;
+    color: #637083;
+    transition: 0.2s;
+}
+
+.club-modal-close:hover {
+    background: #e2e7ef;
+    color: #183b68;
+}
+
+/* Nội dung form */
+
+.club-modal-body {
+    padding: 24px 30px 10px;
+}
+
+.club-register-intro {
+    display: flex;
+    gap: 10px;
+    padding: 13px 14px;
+    margin-bottom: 22px;
+    border-radius: 9px;
+    background: #f0f6ff;
+    color: #315b91;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.club-register-intro i {
+    font-size: 17px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.club-modal-body label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34445b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.required-mark {
+    color: #dc3545;
+}
+
+.club-modal-body .form-control,
+.club-modal-body .form-select {
+    min-height: 45px;
+    border: 1px solid #dce3ed;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.club-modal-body .form-control:focus,
+.club-modal-body .form-select:focus {
+    border-color: #3978c7;
+    box-shadow: 0 0 0 3px rgba(57, 120, 199, 0.12);
+}
+
+.club-register-note {
+    margin: 18px 0 8px;
+    color: #778398;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.club-form-error {
+    padding: 10px 12px;
+    border-radius: 7px;
+    background: #fff0f0;
+    color: #c62828;
+    font-size: 13px;
+}
+
+/* Footer modal */
+
+.club-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 30px 25px;
+    border-top: 1px solid #edf0f5;
+}
+
+.btn-club-cancel,
+.btn-club-submit {
+    min-height: 42px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-club-cancel {
+    border: 1px solid #dce3ed;
+    background: #fff;
+    color: #536174;
+}
+
+.btn-club-cancel:hover {
+    background: #f3f5f8;
+}
+
+.btn-club-submit {
+    border: none;
+    background: #1456a0;
+    color: #fff;
+}
+
+.btn-club-submit:hover {
+    background: #0e437f;
+}
+
+/* =====================================================
+   TRẠNG THÁI CHỜ DUYỆT ĐĂNG KÝ CLB
+===================================================== */
+
+.club-request-label {
+    display: block;
+    margin-top: 5px;
+    color: #c08018;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.club-pending-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 24px;
+    margin-top: 25px;
+    border: 1px solid #f1dfb7;
+    border-radius: 12px;
+    background: #fffaf0;
+}
+
+.club-pending-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #fff0cf;
+    color: #b77b18;
+    font-size: 22px;
+}
+
+.club-pending-notice h5 {
+    margin: 2px 0 10px;
+    color: #755015;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.club-pending-notice p {
+    margin: 0 0 14px;
+    color: #78694e;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.club-pending-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #ffedc5;
+    color: #98630e;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Responsive */
+
+@media (max-width: 576px) {
+    .club-modal-overlay {
+        padding: 12px;
+    }
+
+    .club-modal-header {
+        padding: 25px 20px 18px;
+    }
+
+    .club-modal-body {
+        padding: 20px 20px 8px;
+    }
+
+    .club-modal-footer {
+        padding: 16px 20px 20px;
+    }
+
+    .club-pending-notice {
+        padding: 17px;
+        gap: 12px;
+    }
+
+    .club-pending-notice h5 {
+        font-size: 15px;
+    }
+}

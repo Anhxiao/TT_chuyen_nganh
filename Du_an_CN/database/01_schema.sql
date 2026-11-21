@@ -68,6 +68,9 @@ CREATE TABLE Users (
     email            VARCHAR(255) NULL UNIQUE,
     phone            VARCHAR(20)  NULL,
     status           VARCHAR(20)  NOT NULL DEFAULT 'PENDING'
+    date_of_birth DATE NULL,
+    gender        VARCHAR(10) NULL,
+    address       NVARCHAR(255) NULL,
     CHECK (status IN ('PENDING', 'ACTIVE', 'LOCKED')),
     last_login_at    DATETIME     NULL,
     created_at       DATETIME     NOT NULL DEFAULT GETDATE()

@@ -1,47 +1,84 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Header from '../components/Header Organizer';
-import Footer from '../components/Footer';
-import '../styles/styles-dashboard.css';
-import { useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
 
-const OrganizerDashboard = () => {const { user } = useContext(AuthContext);
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+
+import Header from "../components/Header Organizer";
+import Footer from "../components/Footer";
+import { AuthContext } from "../contexts/AuthContext";
+
+import "../styles/styles-dashboard.css";
+
+const OrganizerDashboard = () => {
+    const { user } = useContext(AuthContext);
+
+// Lấy tên đơn vị từ dữ liệu tài khoản
+    const organizationName =
+        user?.organizationName ||
+        user?.organization_name ||
+        user?.organization?.name ||
+        user?.unitName ||
+        user?.username?.replace(/^Tài khoản\s+/i, "") ||
+        "Chưa xác định đơn vị";
+
     return (
         <div className="dashboard-page">
             <Header role="ORGANIZER" />
 
             <main className="dashboard-container container-fluid">
 
-                <section className="dashboard-welcome">
-                    <div>
-                        <span className="dashboard-eyebrow">
-                            HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG
-                        </span>
+                {/* THÔNG TIN ĐƠN VỊ ĐANG ĐĂNG NHẬP */}
+                <section className="organizer-welcome">
 
-                        <h2>
-                            {user?.organizationName || 'Đơn vị tổ chức'}
-                        </h2>
+                    <div className="organizer-welcome-content">
+
+                        <div className="organizer-welcome-label">
+                            <i className="bi bi-building-check"></i>
+                            ĐƠN VỊ ĐANG ĐĂNG NHẬP
+                        </div>
+
+                        <h2>{organizationName}</h2>
+
+                        <div className="organizer-account-info">
+                            <span className="organizer-role">
+                                <i className="bi bi-shield-check"></i>
+                                Tài khoản đơn vị tổ chức
+                            </span>
+                        </div>
 
                         <p>
-                            Tài khoản: {user?.username || ''}
-                            <br />
-                            Quản lý hoạt động, xử lý đăng ký và xác nhận
-                            kết quả tham gia của sinh viên.
+                            Chào mừng đơn vị đến với hệ thống quản lý hoạt động
+                            phục vụ cộng đồng của sinh viên. Tại đây, đơn vị có thể
+                            quản lý hoạt động, xét duyệt đăng ký và xác nhận kết quả
+                            tham gia của sinh viên.
                         </p>
+
+                    </div>
+
+                    <div className="organizer-welcome-icon">
+                        <i className="bi bi-buildings"></i>
                     </div>
 
                     <Link
                         to="/organizer/activities/create"
-                        className="btn btn-primary"
+                        className="organizer-create-button"
                     >
-                        <i className="bi bi-plus-circle me-2"></i>
-                        Tạo hoạt động
+                        <i className="bi bi-plus-circle"></i>
+                        Tạo hoạt động mới
                     </Link>
+
                 </section>
 
-                {/* Thống kê */}
+                {/* THỐNG KÊ */}
                 <section className="dashboard-section">
+                    <div className="dashboard-section-heading">
+                        <div>
+                            <h4>Tổng quan hoạt động</h4>
+                            <p>
+                                Thống kê tình hình quản lý của đơn vị
+                            </p>
+                        </div>
+                    </div>
+
                     <div className="row g-3">
 
                         <div className="col-12 col-sm-6 col-xl-3">
@@ -95,19 +132,23 @@ const OrganizerDashboard = () => {const { user } = useContext(AuthContext);
                     </div>
                 </section>
 
-                {/* Hoạt động của đơn vị */}
+                {/* HOẠT ĐỘNG CỦA ĐƠN VỊ */}
                 <section className="dashboard-section">
                     <div className="dashboard-section-heading">
                         <div>
                             <h4>Hoạt động do đơn vị quản lý</h4>
-                            <p>Theo dõi và quản lý các hoạt động thuộc đơn vị</p>
+                            <p>
+                                Theo dõi và quản lý các hoạt động thuộc đơn vị
+                                đang đăng nhập
+                            </p>
                         </div>
 
                         <Link
                             to="/organizer/activities"
                             className="dashboard-view-all"
                         >
-                            Xem tất cả <i className="bi bi-arrow-right"></i>
+                            Xem tất cả
+                            <i className="bi bi-arrow-right"></i>
                         </Link>
                     </div>
 
@@ -121,19 +162,22 @@ const OrganizerDashboard = () => {const { user } = useContext(AuthContext);
                     </div>
                 </section>
 
-                {/* Đăng ký cần xử lý */}
+                {/* ĐĂNG KÝ CẦN XỬ LÝ */}
                 <section className="dashboard-section">
                     <div className="dashboard-section-heading">
                         <div>
                             <h4>Đăng ký cần xử lý</h4>
-                            <p>Danh sách đăng ký tham gia đang chờ đơn vị xét duyệt</p>
+                            <p>
+                                Danh sách đăng ký tham gia đang chờ đơn vị xét duyệt
+                            </p>
                         </div>
 
                         <Link
                             to="/organizer/registrations"
                             className="dashboard-view-all"
                         >
-                            Quản lý đăng ký <i className="bi bi-arrow-right"></i>
+                            Quản lý đăng ký
+                            <i className="bi bi-arrow-right"></i>
                         </Link>
                     </div>
 
@@ -165,12 +209,14 @@ const OrganizerDashboard = () => {const { user } = useContext(AuthContext);
                     </div>
                 </section>
 
-                {/* Công việc quản lý */}
+                {/* CÔNG VIỆC QUẢN LÝ */}
                 <section className="dashboard-section">
                     <div className="dashboard-section-heading">
                         <div>
                             <h4>Công việc quản lý</h4>
-                            <p>Truy cập nhanh các chức năng dành cho đơn vị tổ chức</p>
+                            <p>
+                                Truy cập nhanh các chức năng dành cho đơn vị tổ chức
+                            </p>
                         </div>
                     </div>
 
