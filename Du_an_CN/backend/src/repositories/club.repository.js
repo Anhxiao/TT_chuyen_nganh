@@ -44,6 +44,7 @@ const clubRepository = {
         return result.recordset;
     },
 
+    
     async createMembershipRequest(userId, data) {
         const pool = await poolPromise;
         const transaction = new sql.Transaction(pool);
@@ -56,9 +57,18 @@ const clubRepository = {
             request.input('userId', sql.BigInt, userId);
             request.input('clubId', sql.BigInt, data.clubId);
             request.input('reason', sql.NVarChar(1000), data.reason);
-            request.input('introduction', sql.NVarChar(2000), data.introduction || null);
-            request.input('skills', sql.NVarChar(1000), data.skills || null);
+            request.input(
+                'introduction',
+                sql.NVarChar(2000),
+                data.introduction || null
+            );
+            request.input(
+                'skills',
+                sql.NVarChar(1000),
+                data.skills || null
+            );
 
+            // 1. Kiểm tra hồ sơ sinh viên
             const studentResult = await request.query(`
                 SELECT TOP 1
                     s.student_id,
@@ -66,9 +76,10 @@ const clubRepository = {
                     s.user_id,
                     u.full_name
                 FROM dbo.Students s
-                INNER JOIN dbo.Users u ON u.user_id = s.user_id
+                INNER JOIN dbo.Users u
+                    ON u.user_id = s.user_id
                 WHERE s.user_id = @userId
-                  AND u.status = 'ACTIVE';
+                AND u.status = 'ACTIVE';
             `);
 
             if (!studentResult.recordset.length) {
@@ -80,12 +91,15 @@ const clubRepository = {
 
             const student = studentResult.recordset[0];
 
+            // 2. Kiểm tra câu lạc bộ
             const clubResult = await request.query(`
-                SELECT organization_id, organization_name
+                SELECT
+                    organization_id,
+                    organization_name
                 FROM dbo.Organizations
                 WHERE organization_id = @clubId
-                  AND organization_type = 'CLUB'
-                  AND status = 'ACTIVE';
+                AND organization_type = 'CLUB'
+                AND status = 'ACTIVE';
             `);
 
             if (!clubResult.recordset.length) {
@@ -99,12 +113,13 @@ const clubRepository = {
 
             request.input('studentId', sql.BigInt, student.student_id);
 
+            // 3. Kiểm tra sinh viên đã là thành viên chưa
             const memberResult = await request.query(`
                 SELECT TOP 1 1 AS is_member
                 FROM dbo.ClubMembers
                 WHERE club_id = @clubId
-                  AND student_id = @studentId
-                  AND status = 'ACTIVE';
+                AND student_id = @studentId
+                AND status = 'ACTIVE';
             `);
 
             if (memberResult.recordset.length) {
@@ -114,12 +129,13 @@ const clubRepository = {
                 );
             }
 
+            // 4. Kiểm tra đơn đang chờ xét duyệt
             const pendingResult = await request.query(`
                 SELECT TOP 1 request_id
                 FROM dbo.ClubMembershipRequests
                 WHERE club_id = @clubId
-                  AND student_id = @studentId
-                  AND status = 'PENDING';
+                AND student_id = @studentId
+                AND status = 'PENDING';
             `);
 
             if (pendingResult.recordset.length) {
@@ -129,20 +145,32 @@ const clubRepository = {
                 );
             }
 
+            // 5. Lưu đơn đăng ký thành viên
             const insertResult = await request.query(`
                 INSERT INTO dbo.ClubMembershipRequests (
-                    club_id, student_id, request_reason,
-                    self_introduction, skills, status, created_at
+                    club_id,
+                    student_id,
+                    request_reason,
+                    self_introduction,
+                    skills,
+                    status,
+                    created_at
                 )
                 OUTPUT INSERTED.request_id
                 VALUES (
-                    @clubId, @studentId, @reason,
-                    @introduction, @skills, 'PENDING', GETDATE()
+                    @clubId,
+                    @studentId,
+                    @reason,
+                    @introduction,
+                    @skills,
+                    'PENDING',
+                    GETDATE()
                 );
             `);
 
             const requestId = insertResult.recordset[0].request_id;
-
+                request.input('requestId', sql.BigInt, requestId);
+            // 6. Tạo thông báo
             request.input(
                 'notificationTitle',
                 sql.NVarChar(255),
@@ -157,46 +185,99 @@ const clubRepository = {
 
             const notificationResult = await request.query(`
                 INSERT INTO dbo.Notifications (
-                    sender_id, title, content, created_at
+                    sender_id,
+                    title,
+                    content,
+                    notification_type,
+                    related_type,
+                    related_id,
+                    created_at
                 )
                 OUTPUT INSERTED.notification_id
                 VALUES (
-                    @userId, @notificationTitle,
-                    @notificationContent, GETDATE()
+                    @userId,
+                    @notificationTitle,
+                    @notificationContent,
+                    'CLUB_MEMBER_REQUEST',
+                    'CLUB_MEMBERSHIP_REQUEST',
+                    @requestId,
+                    GETDATE()
                 );
             `);
 
             const notificationId =
                 notificationResult.recordset[0].notification_id;
 
-            request.input('notificationId', sql.BigInt, notificationId);
+            request.input(
+                'notificationId',
+                sql.BigInt,
+                notificationId
+            );
 
-            await request.query(`
+            // 7. Gửi thông báo đến tài khoản quản lý đúng câu lạc bộ
+            // Sử dụng OrganizationUsers giống cách xác định
+            // tài khoản quản lý trong hàm getClubRequests().
+            const recipientResult = await request.query(`
                 INSERT INTO dbo.NotificationRecipients (
-                    notification_id, user_id, is_read
+                    notification_id,
+                    user_id,
+                    is_read
                 )
-                SELECT
-                    @notificationId, ou.user_id, 0
+                OUTPUT INSERTED.user_id
+                SELECT DISTINCT
+                    @notificationId,
+                    ou.user_id,
+                    0
                 FROM dbo.OrganizationUsers ou
-                INNER JOIN dbo.Users u ON u.user_id = ou.user_id
-                INNER JOIN dbo.UserRoles ur ON ur.user_id = u.user_id
-                INNER JOIN dbo.Roles r ON r.role_id = ur.role_id
+                INNER JOIN dbo.Users u
+                    ON u.user_id = ou.user_id
                 WHERE ou.organization_id = @clubId
-                  AND u.status = 'ACTIVE'
-                  AND r.role_code = 'ORGANIZER';
+                AND u.status = 'ACTIVE';
             `);
 
+            // Không có tài khoản nhận thì rollback toàn bộ giao dịch
+            if (!recipientResult.recordset.length) {
+                throw Object.assign(
+                    new Error(
+                        'Không tìm thấy tài khoản đang hoạt động quản lý câu lạc bộ. Không thể gửi thông báo.'
+                    ),
+                    { statusCode: 404 }
+                );
+            }
+
+            // 8. Hoàn tất giao dịch
             await transaction.commit();
 
             return {
                 requestId,
-                clubName: club.organization_name
+                clubName: club.organization_name,
+                notificationId,
+                recipientCount: recipientResult.recordset.length
             };
+
         } catch (error) {
-            await transaction.rollback();
+            console.error('===== LỖI GỬI YÊU CẦU THÀNH VIÊN CLB =====');
+            console.error('Message:', error.message);
+            console.error('Code:', error.code);
+            console.error('Number:', error.number);
+            console.error('State:', error.state);
+            console.error('Procedure:', error.procName);
+            console.error('Line:', error.lineNumber);
+            console.error('Original Error:', error.originalError);
+
+            if (transaction) {
+                try {
+                    await transaction.rollback();
+                    console.error('Đã ROLLBACK transaction.');
+                } catch (rollbackError) {
+                    console.error('Lỗi ROLLBACK:', rollbackError.message);
+                }
+            }
+
             throw error;
         }
     },
+
 
     async getMyRequests(userId) {
         const pool = await poolPromise;
@@ -381,15 +462,27 @@ const clubRepository = {
             request.input('notificationTitle', sql.NVarChar(255), title);
             request.input('notificationContent', sql.NVarChar(sql.MAX), content);
             request.input('studentUserId', sql.BigInt, item.student_user_id);
-
+            request.input('notificationType', sql.VarChar(50), decision === 'APPROVED' ? 'CLUB_REQUEST_APPROVED' : 'CLUB_REQUEST_REJECTED');
+            
             const notificationResult = await request.query(`
                 INSERT INTO dbo.Notifications (
-                    sender_id, title, content, created_at
+                    sender_id,
+                    title,
+                    content,
+                    notification_type,
+                    related_type,
+                    related_id,
+                    created_at
                 )
                 OUTPUT INSERTED.notification_id
                 VALUES (
-                    @userId, @notificationTitle,
-                    @notificationContent, GETDATE()
+                    @userId,
+                    @notificationTitle,
+                    @notificationContent,
+                    @notificationType,
+                    'CLUB_MEMBERSHIP_REQUEST',
+                    @requestId,
+                    GETDATE()
                 );
             `);
 

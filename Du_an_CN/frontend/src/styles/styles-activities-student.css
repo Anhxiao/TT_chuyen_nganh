@@ -1,4 +1,8 @@
 
+/* =====================================================
+   TRANG HOẠT ĐỘNG SINH VIÊN
+===================================================== */
+
 .student-activities-page {
     min-height: 100vh;
     padding-bottom: 50px;
@@ -26,7 +30,10 @@
     margin-bottom: 0;
 }
 
-/* Khung danh sách đơn vị */
+/* =====================================================
+   KHUNG DANH SÁCH ĐƠN VỊ
+===================================================== */
+
 .organization-box,
 .organization-activities-box {
     height: 100%;
@@ -54,7 +61,10 @@
     font-size: 13px;
 }
 
-/* Danh sách đơn vị */
+/* =====================================================
+   DANH SÁCH ĐƠN VỊ
+===================================================== */
+
 .organization-menu {
     list-style: none;
     padding: 10px;
@@ -76,15 +86,24 @@
     background: transparent;
     text-align: left;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .organization-menu-item:hover {
     background: #f1f6ff;
 }
 
+.organization-menu-item:active {
+    transform: scale(0.99);
+}
+
 .organization-menu-item.active {
     background: #eaf2ff;
+}
+
+.organization-menu-item:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .organization-menu-icon {
@@ -129,7 +148,28 @@
     font-size: 12px;
 }
 
-/* Khu vực hoạt động */
+/* =====================================================
+   TRẠNG THÁI CLB TRONG DANH SÁCH
+===================================================== */
+
+.club-request-label {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 5px;
+    padding: 5px 10px;
+    border: 1px solid #bbf7d0;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* =====================================================
+   KHU VỰC HIỂN THỊ HOẠT ĐỘNG
+===================================================== */
+
 .organization-activities-box {
     min-height: 550px;
     padding: 25px;
@@ -176,7 +216,10 @@
     font-size: 13px;
 }
 
-/* Tiêu đề danh sách hoạt động */
+/* =====================================================
+   TIÊU ĐỀ DANH SÁCH HOẠT ĐỘNG
+===================================================== */
+
 .organization-activities-title {
     display: flex;
     justify-content: space-between;
@@ -205,7 +248,10 @@
     white-space: nowrap;
 }
 
-/* Trạng thái chưa có hoạt động */
+/* =====================================================
+   TRẠNG THÁI CHƯA CÓ HOẠT ĐỘNG
+===================================================== */
+
 .activity-empty-state,
 .organization-welcome {
     display: flex;
@@ -244,28 +290,6 @@
     font-size: 14px;
     line-height: 1.7;
 }
-
-@media (max-width: 991px) {
-    .organization-activities-box {
-        min-height: 450px;
-    }
-}
-
-@media (max-width: 575px) {
-    .organization-activities-box {
-        padding: 17px;
-    }
-
-    .selected-organization-header h4 {
-        font-size: 16px;
-    }
-
-    .organization-activities-title {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-}
-
 
 /* =====================================================
    HỘP THOẠI ĐĂNG KÝ THÀNH VIÊN CLB
@@ -359,6 +383,11 @@
     color: #183b68;
 }
 
+.club-modal-close:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Nội dung form */
 
 .club-modal-body {
@@ -402,6 +431,7 @@
     border-radius: 8px;
     font-size: 14px;
     box-shadow: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .club-modal-body .form-control:focus,
@@ -417,12 +447,17 @@
     line-height: 1.6;
 }
 
+/* Thông báo lỗi */
+
 .club-form-error {
-    padding: 10px 12px;
-    border-radius: 7px;
+    padding: 11px 13px;
+    margin-top: 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
     background: #fff0f0;
     color: #c62828;
     font-size: 13px;
+    line-height: 1.5;
 }
 
 /* Footer modal */
@@ -437,12 +472,15 @@
 
 .btn-club-cancel,
 .btn-club-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 42px;
     padding: 0 20px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
-    transition: 0.2s;
+    transition: background 0.2s, transform 0.2s;
 }
 
 .btn-club-cancel {
@@ -451,7 +489,7 @@
     color: #536174;
 }
 
-.btn-club-cancel:hover {
+.btn-club-cancel:hover:not(:disabled) {
     background: #f3f5f8;
 }
 
@@ -461,21 +499,25 @@
     color: #fff;
 }
 
-.btn-club-submit:hover {
+.btn-club-submit:hover:not(:disabled) {
     background: #0e437f;
 }
 
-/* =====================================================
-   TRẠNG THÁI CHỜ DUYỆT ĐĂNG KÝ CLB
-===================================================== */
-
-.club-request-label {
-    display: block;
-    margin-top: 5px;
-    color: #c08018;
-    font-size: 11px;
-    font-weight: 600;
+.btn-club-submit:active:not(:disabled),
+.btn-club-cancel:active:not(:disabled) {
+    transform: scale(0.98);
 }
+
+.btn-club-submit:disabled,
+.btn-club-cancel:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   TRẠNG THÁI ĐÃ GỬI ĐƠN - ĐANG CHỜ DUYỆT
+   SỬ DỤNG MÀU XANH LÁ
+===================================================== */
 
 .club-pending-notice {
     display: flex;
@@ -483,53 +525,108 @@
     gap: 18px;
     padding: 24px;
     margin-top: 25px;
-    border: 1px solid #f1dfb7;
+    border: 1px solid #a7f3c0;
+    border-left: 5px solid #16a34a;
     border-radius: 12px;
-    background: #fffaf0;
+    background: #f0fdf4;
 }
 
 .club-pending-icon {
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
-    background: #fff0cf;
-    color: #b77b18;
+    background: #dcfce7;
+    color: #16a34a;
     font-size: 22px;
 }
 
 .club-pending-notice h5 {
     margin: 2px 0 10px;
-    color: #755015;
+    color: #15803d;
     font-size: 17px;
     font-weight: 700;
 }
 
 .club-pending-notice p {
     margin: 0 0 14px;
-    color: #78694e;
+    color: #166534;
     font-size: 13px;
     line-height: 1.7;
 }
 
 .club-pending-status {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     padding: 6px 12px;
+    border: 1px solid #86efac;
     border-radius: 20px;
-    background: #ffedc5;
-    color: #98630e;
+    background: #dcfce7;
+    color: #15803d;
     font-size: 12px;
     font-weight: 600;
 }
 
-/* Responsive */
+/* =====================================================
+   TRẠNG THÁI ĐÃ LÀ THÀNH VIÊN
+===================================================== */
 
-@media (max-width: 576px) {
+.organization-activities-box .alert-success {
+    margin-top: 22px;
+    padding: 15px 18px;
+    border: 1px solid #a7f3c0;
+    border-radius: 10px;
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 991px) {
+    .organization-activities-box {
+        min-height: 450px;
+    }
+}
+
+@media (max-width: 575px) {
+    .organization-activities-box {
+        min-height: 400px;
+        padding: 17px;
+    }
+
+    .selected-organization-header {
+        gap: 12px;
+    }
+
+    .selected-organization-icon {
+        width: 52px;
+        height: 52px;
+        font-size: 23px;
+    }
+
+    .selected-organization-header h4 {
+        font-size: 16px;
+    }
+
+    .organization-activities-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .club-modal-overlay {
-        padding: 12px;
+        padding: 10px;
+    }
+
+    .club-register-modal {
+        max-height: 94vh;
+        border-radius: 13px;
     }
 
     .club-modal-header {
@@ -545,11 +642,27 @@
     }
 
     .club-pending-notice {
-        padding: 17px;
         gap: 12px;
+        padding: 17px;
+    }
+
+    .club-pending-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 19px;
     }
 
     .club-pending-notice h5 {
         font-size: 15px;
+    }
+
+    .club-pending-notice p {
+        font-size: 12px;
+    }
+
+    .btn-club-cancel,
+    .btn-club-submit {
+        padding: 0 14px;
+        font-size: 13px;
     }
 }

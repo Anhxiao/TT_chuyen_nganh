@@ -1,8 +1,45 @@
 
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import '../styles/components/header.css';
+import { useEffect, useState } from "react";
+import notificationService from "../services/notificationService";
 
 function Header() {
+    const [unreadCount, setUnreadCount] = useState(0);
+
+        useEffect(() => {
+            let isMounted = true;
+
+            const loadUnreadCount = async () => {
+                try {
+                    const result = await notificationService.getMyNotifications();
+
+                    if (isMounted) {
+                        setUnreadCount(Number(result.unreadCount) || 0);
+                    }
+                } catch (error) {
+                    console.error(
+                        "Không thể lấy số thông báo chưa đọc:",
+                        error
+                    );
+                }
+            };
+
+            loadUnreadCount();
+
+            const interval = setInterval(loadUnreadCount, 15000);
+
+            const handleFocus = () => loadUnreadCount();
+
+            window.addEventListener("focus", handleFocus);
+
+            return () => {
+                isMounted = false;
+                clearInterval(interval);
+                window.removeEventListener("focus", handleFocus);
+            };
+        }, []);
+
     const location = useLocation();
 
     // Kiểm tra trang hiện tại có thuộc nhóm đường dẫn hay không
@@ -55,7 +92,14 @@ function Header() {
                                         `nav-item ${isActive ? 'active' : ''}`
                                     }
                                 >
-                                    <i className="bi bi-bell"></i>
+                                    <span className="notification-nav-icon">
+                                        <i className="bi bi-bell"></i>
+
+                                        {unreadCount > 0 && (
+                                            <span className="notification-red-dot"></span>
+                                        )}
+                                    </span>
+
                                     Thông báo
                                 </NavLink>
                             </li>

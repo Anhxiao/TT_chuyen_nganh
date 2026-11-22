@@ -21,6 +21,13 @@ router.get(
     notificationController.getMyNotifications
 );
 
+// GET /api/notifications/:notificationId/detail
+// Lấy chi tiết thông báo và dữ liệu liên quan.
+router.get(
+    '/:notificationId/detail',
+    notificationController.getNotificationDetail
+);
+
 // PATCH /api/notifications/:notificationId/read
 // Đánh dấu thông báo của chính người dùng đã đọc.
 router.patch(
@@ -35,5 +42,6 @@ router.post(
     authorizePermission('SEND_NOTIFICATION'),
     notificationController.sendNotification
 );
+
 
 module.exports = router;

@@ -21,14 +21,40 @@ const OrganizerDashboard = () => {
         ART_CLUB: "Câu lạc bộ Văn hóa Nghệ thuật TVU"
     };
 
-    // Lấy mã tổ chức từ thông tin tài khoản đăng nhập
+    // Lấy thông tin tổ chức từ tài khoản đang đăng nhập
+    const organizationInfo =
+        user?.organizations?.[0] ||
+        (typeof user?.organization === "object" ? user.organization : null);
+
     const organizationCode =
-        user?.organization ||
+        (typeof user?.organization === "string" ? user.organization : null) ||
         user?.organizationCode ||
         user?.organization_code ||
-        user?.organizations?.[0]?.organizationCode ||
-        user?.organizations?.[0]?.organization_code ||
-        user?.organizations?.[0]?.code;
+        organizationInfo?.organizationCode ||
+        organizationInfo?.organization_code ||
+        organizationInfo?.code;
+
+    // Chỉ câu lạc bộ mới cần duyệt hồ sơ đăng ký thành viên.
+    // Các đơn vị Đoàn trường/Đoàn khoa không cần duyệt tư cách đăng ký.
+    const CLUB_CODES = [
+        "LIFE_SKILL_CLUB",
+        "MEDIA_CLUB",
+        "ART_CLUB"
+    ];
+
+    const organizationType = String(
+        organizationInfo?.organizationType ||
+        organizationInfo?.organization_type ||
+        organizationInfo?.type ||
+        organizationInfo?.category ||
+        user?.organizationType ||
+        user?.organization_type ||
+        ""
+    ).toUpperCase();
+
+    const isClub =
+        CLUB_CODES.includes(String(organizationCode || "").toUpperCase()) ||
+        organizationType === "CLUB";
 
     // Xác định tên đơn vị đang đăng nhập
     const organizationName =
@@ -84,8 +110,11 @@ const OrganizerDashboard = () => {
                             Hệ thống quản lý hoạt động phục vụ cộng đồng của sinh viên
                             Trường Đại học Trà Vinh.
                             Tại đây, đơn vị có thể tạo và quản lý hoạt động,
-                            xét duyệt đăng ký, xác nhận kết quả tham gia
-                            và ghi nhận điểm phục vụ cộng đồng cho sinh viên.
+                            {isClub
+                                ? " xét duyệt đăng ký thành viên câu lạc bộ, "
+                                : " "}
+                            xác nhận kết quả tham gia và ghi nhận điểm phục vụ
+                            cộng đồng cho sinh viên.
                         </p>
 
                     </div>
@@ -118,7 +147,7 @@ const OrganizerDashboard = () => {
 
                     <div className="row g-3">
 
-                        <div className="col-12 col-sm-6 col-xl-3">
+                        <div className={`col-12 col-sm-6 ${isClub ? "col-xl-3" : "col-xl-4"}`}>
                             <div className="dashboard-stat-card">
                                 <div className="stat-icon blue">
                                     <i className="bi bi-calendar-event"></i>
@@ -130,7 +159,7 @@ const OrganizerDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="col-12 col-sm-6 col-xl-3">
+                        <div className={`col-12 col-sm-6 ${isClub ? "col-xl-3" : "col-xl-4"}`}>
                             <div className="dashboard-stat-card">
                                 <div className="stat-icon cyan">
                                     <i className="bi bi-megaphone"></i>
@@ -142,19 +171,21 @@ const OrganizerDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="col-12 col-sm-6 col-xl-3">
-                            <div className="dashboard-stat-card">
-                                <div className="stat-icon orange">
-                                    <i className="bi bi-person-check"></i>
-                                </div>
-                                <div>
-                                    <p>Đăng ký chờ xử lý</p>
-                                    <h3>—</h3>
+                        {isClub && (
+                            <div className="col-12 col-sm-6 col-xl-3">
+                                <div className="dashboard-stat-card">
+                                    <div className="stat-icon orange">
+                                        <i className="bi bi-person-check"></i>
+                                    </div>
+                                    <div>
+                                        <p>Đăng ký thành viên chờ duyệt</p>
+                                        <h3>—</h3>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        <div className="col-12 col-sm-6 col-xl-3">
+                        <div className={`col-12 col-sm-6 ${isClub ? "col-xl-3" : "col-xl-4"}`}>
                             <div className="dashboard-stat-card">
                                 <div className="stat-icon green">
                                     <i className="bi bi-clipboard-check"></i>
@@ -199,13 +230,15 @@ const OrganizerDashboard = () => {
                     </div>
                 </section>
 
-                {/* ĐĂNG KÝ CẦN XỬ LÝ */}
+                {/* CHỈ CÂU LẠC BỘ MỚI CẦN DUYỆT ĐĂNG KÝ THÀNH VIÊN */}
+                {isClub && (
                 <section className="dashboard-section">
                     <div className="dashboard-section-heading">
                         <div>
-                            <h4>Đăng ký cần xử lý</h4>
+                            <h4>Đăng ký thành viên cần xử lý</h4>
                             <p>
-                                Danh sách đăng ký tham gia đang chờ đơn vị xét duyệt
+                                Danh sách sinh viên gửi yêu cầu tham gia câu lạc bộ
+                                đang chờ xét duyệt
                             </p>
                         </div>
 
@@ -245,6 +278,7 @@ const OrganizerDashboard = () => {
                         </div>
                     </div>
                 </section>
+                )}
 
                 {/* CÔNG VIỆC QUẢN LÝ */}
                 <section className="dashboard-section">
@@ -273,19 +307,21 @@ const OrganizerDashboard = () => {
                             </Link>
                         </div>
 
-                        <div className="col-12 col-md-4">
-                            <Link
-                                to="/organizer/registrations"
-                                className="quick-link-card"
-                            >
-                                <i className="bi bi-people"></i>
-                                <div>
-                                    <h6>Quản lý đăng ký</h6>
-                                    <p>Xét duyệt đăng ký sinh viên</p>
-                                </div>
-                                <i className="bi bi-arrow-right"></i>
-                            </Link>
-                        </div>
+                        {isClub && (
+                            <div className="col-12 col-md-4">
+                                <Link
+                                    to="/organizer/registrations"
+                                    className="quick-link-card"
+                                >
+                                    <i className="bi bi-people"></i>
+                                    <div>
+                                        <h6>Duyệt đăng ký thành viên</h6>
+                                        <p>Chấp nhận hoặc từ chối sinh viên đăng ký vào câu lạc bộ</p>
+                                    </div>
+                                    <i className="bi bi-arrow-right"></i>
+                                </Link>
+                            </div>
+                        )}
 
                         <div className="col-12 col-md-4">
                             <Link

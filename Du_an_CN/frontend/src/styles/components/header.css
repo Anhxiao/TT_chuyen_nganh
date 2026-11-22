@@ -348,3 +348,27 @@
     background-color: #eaf2ff !important;
     font-weight: 700;
 }
+
+/* =====================================
+   CHẤM ĐỎ THÔNG BÁO CHƯA ĐỌC
+===================================== */
+
+.notification-nav-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 3px;
+}
+
+.notification-red-dot {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    width: 9px;
+    height: 9px;
+    background-color: #ff3030;
+    border: 1.5px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}

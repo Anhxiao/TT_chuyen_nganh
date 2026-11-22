@@ -27,6 +27,30 @@ async function getMyNotifications(req, res, next) {
 }
 
 /**
+ * GET /api/notifications/:notificationId/detail
+ * Lấy chi tiết thông báo và dữ liệu liên quan.
+ */
+async function getNotificationDetail(req, res, next) {
+    try {
+        const { notificationId } = req.params;
+        const userId = req.user.userId;
+
+        const result = await notificationService.getNotificationDetail({
+            notificationId,
+            userId
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy chi tiết thông báo thành công.',
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
  * PATCH /api/notifications/:notificationId/read
  * Đánh dấu thông báo của chính người dùng là đã đọc.
  */
@@ -53,13 +77,6 @@ async function markAsRead(req, res, next) {
 /**
  * POST /api/notifications
  * Gửi thông báo theo quyền và phạm vi cho phép.
- *
- * Body dự kiến:
- * {
- *   "title": "Thông báo hoạt động",
- *   "content": "Nội dung thông báo",
- *   "recipientUserIds": ["12", "15"]
- * }
  */
 async function sendNotification(req, res, next) {
     try {
@@ -90,6 +107,7 @@ async function sendNotification(req, res, next) {
 
 module.exports = {
     getMyNotifications,
+    getNotificationDetail,
     markAsRead,
     sendNotification
 };

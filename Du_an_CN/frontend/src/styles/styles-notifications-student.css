@@ -608,3 +608,230 @@
         font-size: 11px;
     }
 }
+
+
+/* =====================================
+   BỘ LỌC LOẠI THÔNG BÁO
+===================================== */
+
+.notification-category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 18px 0;
+}
+
+.notification-category-filters button {
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    color: #475569;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.notification-category-filters button:hover {
+    color: #1d4ed8;
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.notification-category-filters button.active {
+    color: #ffffff;
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+}
+
+/* =====================================
+   DANH SÁCH THÔNG BÁO
+===================================== */
+
+.notification-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notification-item {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 18px;
+    border: 1px solid #e8edf5;
+    border-radius: 12px;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.notification-item:hover {
+    border-color: #93c5fd;
+    background: #f8fbff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.06);
+}
+
+.notification-item.unread-item {
+    border-left: 4px solid #2563eb;
+    background: #f8fbff;
+}
+
+.notification-item-icon {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 19px;
+}
+
+.notification-item-icon.blue {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.notification-item-icon.orange {
+    color: #d97706;
+    background: #fff7ed;
+}
+
+.notification-item-icon.red {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.notification-item-icon.green {
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.notification-item-icon.purple {
+    color: #7c3aed;
+    background: #f5f3ff;
+}
+
+.notification-item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-item-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-item-title h6 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.notification-item-body > p {
+    margin: 8px 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.notification-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.notification-item-meta small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.notification-item-arrow {
+    margin-top: 12px;
+    color: #94a3b8;
+}
+
+/* =====================================
+   NHÃN LOẠI THÔNG BÁO
+===================================== */
+
+.notification-category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.notification-category-badge.blue {
+    color: #1d4ed8;
+    background: #eff6ff;
+}
+
+.notification-category-badge.orange {
+    color: #c2410c;
+    background: #fff7ed;
+}
+
+.notification-category-badge.red {
+    color: #b91c1c;
+    background: #fef2f2;
+}
+
+.notification-category-badge.green {
+    color: #15803d;
+    background: #f0fdf4;
+}
+
+.notification-category-badge.purple {
+    color: #6d28d9;
+    background: #f5f3ff;
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 576px) {
+    .notification-category-filters {
+        gap: 7px;
+    }
+
+    .notification-category-filters button {
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+
+    .notification-item {
+        gap: 10px;
+        padding: 13px;
+    }
+
+    .notification-item-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+
+    .notification-item-title h6 {
+        font-size: 13px;
+    }
+
+    .notification-item-body > p {
+        font-size: 12px;
+    }
+}
+

@@ -14,7 +14,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123047',
         className: 'DA23TTC',
-        faculty: 'Trường Kỹ thuật và Công nghệ'
+        faculty: 'Trường Kỹ thuật và Công nghệ',
+        organizationId: 'TECH_UNION'
     },
     {
         username: 'sv.ktcn01',
@@ -24,7 +25,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123286',
         className: 'DA23KTP',
-        faculty: 'Trường Kỹ thuật và Công nghệ'
+        faculty: 'Trường Kỹ thuật và Công nghệ',
+        organizationId: 'TECH_UNION'
     },
     {
         username: 'sv.ktcn02',
@@ -34,7 +36,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123591',
         className: 'DA23DDE',
-        faculty: 'Trường Kỹ thuật và Công nghệ'
+        faculty: 'Trường Kỹ thuật và Công nghệ',
+        organizationId: 'TECH_UNION'
     },
 
     // STUDENT - KINH TẾ VÀ LUẬT
@@ -46,7 +49,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123103',
         className: 'DA23QTK',
-        faculty: 'Trường Kinh tế và Luật'
+        faculty: 'Trường Kinh tế và Luật',
+        organizationId: 'LAW_UNION'
     },
     {
         username: 'sv.ktl01',
@@ -56,7 +60,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123824',
         className: 'DA23KTO',
-        faculty: 'Trường Kinh tế và Luật'
+        faculty: 'Trường Kinh tế và Luật',
+        organizationId: 'LAW_UNION'
     },
     {
         username: 'sv.ktl02',
@@ -66,7 +71,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123365',
         className: 'DA23LKT',
-        faculty: 'Trường Kinh tế và Luật'
+        faculty: 'Trường Kinh tế và Luật',
+        organizationId: 'LAW_UNION'
     },
 
     // STUDENT - Y DƯỢC
@@ -78,7 +84,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123719',
         className: 'DA23YDK',
-        faculty: 'Trường Y Dược'
+        faculty: 'Trường Y Dược',
+        organizationId: 'MED_UNION'
     },
     {
         username: 'sv.yd01',
@@ -88,7 +95,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123052',
         className: 'DA23DDU',
-        faculty: 'Trường Y Dược'
+        faculty: 'Trường Y Dược',
+        organizationId: 'MED_UNION'
     },
     {
         username: 'sv.yd02',
@@ -98,7 +106,8 @@ const accounts = [
         role: 'STUDENT',
         studentCode: '110123438',
         className: 'DA23XNY',
-        faculty: 'Trường Y Dược'
+        faculty: 'Trường Y Dược',
+        organizationId: 'MED_UNION'
     },
     // ORGANIZER - ĐOÀN TRƯỜNG
     {

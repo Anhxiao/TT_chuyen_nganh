@@ -16,6 +16,7 @@ import StudentEvidence from "./pages/StudentEvidence.jsx";
 import IntrodutionKNSStudent from "./pages/IntrodutionKNSStudent.jsx";
 import IntrodutionTTStudent from "./pages/IntrodutionTTStudent.jsx";
 import IntrodutionVHNTStudent from "./pages/IntrodutionVHNTStudent.jsx";
+import NontificationOrganizer from "./pages/NontificationOrganizer";
 
 function App() {
     return (
@@ -42,7 +43,7 @@ function App() {
             <Route path="/student/introduction/clb-van-hoa-nghe-thuat" element={<IntrodutionVHNTStudent />} />
             {/* Dashboard đơn vị tổ chức */}
             <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
-            
+            <Route path="/organizer/notifications" element={<NontificationOrganizer />} />
         </Routes>
     );
 }
