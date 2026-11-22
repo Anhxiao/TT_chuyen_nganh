@@ -1,6 +1,10 @@
 
 import api from './api';
 
+// =====================================
+// XỬ LÝ DỮ LIỆU API
+// =====================================
+
 const unwrapResponse = (response) => {
     let result = response;
 
@@ -16,8 +20,18 @@ const unwrapResponse = (response) => {
     return result;
 };
 
+// =====================================
+// AUTH SERVICE
+// =====================================
+
 const authService = {
+
+    // =====================================
+    // ĐĂNG NHẬP
+    // =====================================
+
     async login(email, password, role) {
+
         const response = await api.post('/auth/login', {
             email: email.trim().toLowerCase(),
             password,
@@ -32,7 +46,8 @@ const authService = {
             );
         }
 
-        localStorage.setItem(
+        // Lưu JWT riêng cho tab hiện tại
+        sessionStorage.setItem(
             'accessToken',
             result.token
         );
@@ -43,15 +58,33 @@ const authService = {
         };
     },
 
+    // =====================================
+    // LẤY THÔNG TIN NGƯỜI DÙNG HIỆN TẠI
+    // =====================================
+
     async getCurrentUser() {
+
         const response = await api.get('/auth/me');
 
         const result = unwrapResponse(response);
 
-        return result?.user || result;
+        const user = result?.user || result;
+
+        if (!user || typeof user !== 'object') {
+            throw new Error(
+                'Không thể lấy thông tin người dùng.'
+            );
+        }
+
+        return user;
     },
 
+    // =====================================
+    // CẬP NHẬT THÔNG TIN CÁ NHÂN
+    // =====================================
+
     async updateProfile(profileData) {
+
         const response = await api.put(
             '/auth/profile',
             profileData
@@ -62,7 +95,12 @@ const authService = {
         return result?.user || result;
     },
 
+    // =====================================
+    // CẬP NHẬT ẢNH ĐẠI DIỆN
+    // =====================================
+
     async updateAvatar(formData) {
+
         const response = await api.put(
             '/auth/avatar',
             formData
@@ -73,12 +111,23 @@ const authService = {
         return result?.user || result;
     },
 
+    // =====================================
+    // ĐĂNG XUẤT
+    // =====================================
+
     async logout() {
+
         try {
+
+            // Gửi yêu cầu đăng xuất lên Backend
             await api.post('/auth/logout', {});
+
         } finally {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('currentUser');
+
+            // Chỉ xóa phiên đăng nhập của tab hiện tại
+            sessionStorage.removeItem('accessToken');
+
+            sessionStorage.removeItem('currentUser');
         }
     }
 };

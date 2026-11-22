@@ -1,123 +1,139 @@
+
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import '../styles/components/header.css';
 
 function Header() {
+    const location = useLocation();
+
+    // Kiểm tra trang hiện tại có thuộc nhóm đường dẫn hay không
+    const isActivePath = (paths) => {
+        return paths.some(path =>
+            location.pathname === path ||
+            location.pathname.startsWith(`${path}/`)
+        );
+    };
+
     return (
-        <header className="top-header">
-        <div className="container-fluid px-4">
-        <div className="header-inner">
-            {/* Logo */}
-            <div className="logo-section">
-            <div className="logo-img">
-                <img
-                src="\public\assets\Logo-DH-Tra-Vinh-TVU.webp"
-                alt="TVU Logo"
-                />
+        <header className="top-header organizer-header">
+            <div className="container-fluid px-4">
+                <div className="header-inner">
+
+                    {/* Logo */}
+                    <div className="logo-section">
+                        <div className="logo-img">
+                            <Link to="/organizer/dashboard">
+                                <img
+                                    src="/assets/Logo-DH-Tra-Vinh-TVU.webp"
+                                    alt="TVU Logo"
+                                />
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Menu */}
+                    <nav>
+                        <ul className="nav-menu">
+
+                            {/* Trang chủ */}
+                            <li>
+                                <NavLink
+                                    to="/organizer/dashboard"
+                                    className={({ isActive }) =>
+                                        `nav-item ${isActive ? 'home-active active' : ''}`
+                                    }
+                                >
+                                    <i className="bi bi-house"></i>
+                                    Trang chủ
+                                </NavLink>
+                            </li>
+
+                            {/* Thông báo */}
+                            <li>
+                                <NavLink
+                                    to="/organizer/notifications"
+                                    className={({ isActive }) =>
+                                        `nav-item ${isActive ? 'active' : ''}`
+                                    }
+                                >
+                                    <i className="bi bi-bell"></i>
+                                    Thông báo
+                                </NavLink>
+                            </li>
+
+                            {/* Hoạt động */}
+                            <li>
+                                <NavLink
+                                    to="/organizer/activities"
+                                    className={({ isActive }) =>
+                                        `nav-item ${isActive || isActivePath([
+                                            '/organizer/activities'
+                                        ]) ? 'active' : ''}`
+                                    }
+                                >
+                                    <i className="bi bi-people"></i>
+                                    Hoạt động
+                                </NavLink>
+                            </li>
+
+                            {/* Lịch sử */}
+                            <li className="dropdown">
+                                <a
+                                    href="#"
+                                    className={`nav-item dropdown-toggle ${
+                                        isActivePath([
+                                            '/organizer/history',
+                                            '/organizer/evidence'
+                                        ]) ? 'active' : ''
+                                    }`}
+                                    data-bs-toggle="dropdown"
+                                    onClick={(e) => e.preventDefault()}
+                                >
+                                    <i className="bi bi-clock-fill"></i>
+                                    Lịch sử
+                                </a>
+
+                                <ul className="dropdown-menu">
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/organizer/history"
+                                        >
+                                            <i className="bi bi-file-earmark-text me-2"></i>
+                                            Các hoạt động đã tạo
+                                        </Link>
+                                    </li>
+
+                                    <li>
+                                        <Link
+                                            className="dropdown-item"
+                                            to="/organizer/evidence"
+                                        >
+                                            <i className="bi bi-file-earmark-text me-2"></i>
+                                            Minh chứng
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            {/* Thông tin đơn vị */}
+                            <li>
+                                <NavLink
+                                    to="/organizer/organization"
+                                    className={({ isActive }) =>
+                                        `nav-item ${isActive ? 'active' : ''}`
+                                    }
+                                >
+                                    <i className="bi bi-building"></i>
+                                    Thông tin đơn vị
+                                </NavLink>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                </div>
             </div>
-            </div>
-
-            {/* Menu */}
-            <nav>
-            <ul className="nav-menu">
-                <li>
-                <a href="" className="nav-item home-active">
-                    <i className="bi bi-house"></i>
-                    Trang chủ
-                </a>
-                </li>
-
-                <li className="nav-menu">
-                <a
-                    href="#"
-                    className="nav-item"
-                >
-                    <i className="bi bi-bell"></i>
-                    Thông báo
-                </a>
-                </li>
-
-                <li className="nav-menu">
-                <a
-                    href="#"
-                    className="nav-item"
-                    data-bs-toggle="dropdown"
-                >
-                    <i className="bi bi-people"></i>
-                    Hoạt động
-                </a>
-                </li>
-
-                <li className="dropdown">
-                <a
-                    href="#"
-                    className="nav-item dropdown-toggle"
-                    data-bs-toggle="dropdown"
-                >
-                    <i className="bi bi-info-circle"></i>
-                    Giới thiệu
-                </a>
-                <ul className="dropdown-menu">
-                    <li>
-                    <a className="dropdown-item" href="#">
-                        <i className="bi bi-mortarboard me-2"></i>
-                        Đoàn trường Kỹ thuật và Công nghệ
-                    </a>
-                    </li>
-                    <li>
-                    <a className="dropdown-item" href="#">
-                        <i className="bi bi-person-badge me-2"></i>
-                        Đoàn trường Kinh tế luật
-                    </a>
-                    </li>
-                    <li>
-                    <a className="dropdown-item" href="#">
-                        <i className="bi bi-shield-lock me-2"></i>
-                        Đoàn trường y dược
-                    </a>
-                    </li>
-                </ul>
-                </li>
-
-                <li className="dropdown">
-                <a
-                    href="#"
-                    className="nav-item dropdown-toggle"
-                    data-bs-toggle="dropdown"
-                >
-                    <i className="bi bi-clock-fill"></i>
-                    Lịch sử
-                </a>
-                <ul className="dropdown-menu">
-                    <li>
-                    <a className="dropdown-item" href="#">
-                        <i className="bi bi-file-earmark-text me-2"></i>
-                        Các Hoạt động đã tham gia
-                    </a>
-                    </li>
-                    <li>
-                    <a className="dropdown-item" href="#">
-                        <i className="bi bi-file-earmark-text me-2"></i>
-                        Minh chứng
-                    </a>
-                    </li>
-                </ul>
-                </li>
-
-                <li className="nav-menu">
-                <a
-                    href="#"
-                    className="nav-item"
-                    data-bs-toggle="dropdown"
-                >
-                    <i className="bi bi-people"></i>
-                    Thông tin đơn vị
-                </a>
-                </li>
-
-            </ul>
-            </nav>
-        </div>
-        </div>
-    </header>
+        </header>
     );
 }
 

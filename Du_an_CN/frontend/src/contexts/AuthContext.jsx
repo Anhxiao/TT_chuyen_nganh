@@ -27,14 +27,14 @@ export const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(() => {
         try {
-            const savedUser = localStorage.getItem("currentUser");
+            const savedUser = sessionStorage.getItem("currentUser");
 
             return savedUser ? JSON.parse(savedUser) : null;
 
         } catch (error) {
             console.error("Lỗi đọc thông tin người dùng:", error);
 
-            localStorage.removeItem("currentUser");
+            sessionStorage.removeItem("currentUser");
 
             return null;
         }
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
     // Trạng thái tải phiên đăng nhập
     const [isLoading, setIsLoading] = useState(
-        () => !!localStorage.getItem("accessToken")
+        () => !!sessionStorage.getItem("accessToken")
     );
 
     // =====================================
@@ -53,8 +53,10 @@ export const AuthProvider = ({ children }) => {
         let isMounted = true;
 
         const verifySession = async () => {
-            const token = localStorage.getItem("accessToken");
 
+            const token = sessionStorage.getItem("accessToken");
+
+            // Không có token thì chưa đăng nhập
             if (!token) {
                 if (isMounted) {
                     setUser(null);
@@ -65,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                // Lấy thông tin đầy đủ từ Backend
+                // Lấy thông tin người dùng từ Backend
                 const currentUser = await authService.getCurrentUser();
 
                 console.log(
@@ -73,17 +75,22 @@ export const AuthProvider = ({ children }) => {
                     currentUser
                 );
 
-                if (!currentUser || typeof currentUser !== "object") {
+                if (
+                    !currentUser ||
+                    typeof currentUser !== "object" ||
+                    !currentUser.userId
+                ) {
                     throw new Error(
-                        "Không lấy được thông tin tài khoản."
+                        "Không lấy được thông tin tài khoản hợp lệ."
                     );
                 }
 
                 if (!isMounted) return;
 
+                // Cập nhật thông tin người dùng
                 setUser(currentUser);
 
-                localStorage.setItem(
+                sessionStorage.setItem(
                     "currentUser",
                     JSON.stringify(currentUser)
                 );
@@ -94,8 +101,8 @@ export const AuthProvider = ({ children }) => {
                     error
                 );
 
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("currentUser");
+                sessionStorage.removeItem("accessToken");
+                sessionStorage.removeItem("currentUser");
 
                 if (isMounted) {
                     setUser(null);
@@ -126,6 +133,12 @@ export const AuthProvider = ({ children }) => {
             try {
                 setIsLoading(true);
 
+                // Xóa thông tin phiên cũ của tab hiện tại
+                sessionStorage.removeItem("accessToken");
+                sessionStorage.removeItem("currentUser");
+
+                setUser(null);
+
                 // BƯỚC 1: GỬI YÊU CẦU ĐĂNG NHẬP
                 const result = await authService.login(
                     email,
@@ -138,14 +151,18 @@ export const AuthProvider = ({ children }) => {
                     result
                 );
 
-                if (!result || !result.token || !result.user) {
+                if (
+                    !result ||
+                    !result.token ||
+                    !result.user
+                ) {
                     throw new Error(
                         "Thông tin đăng nhập không hợp lệ."
                     );
                 }
 
                 // BƯỚC 2: LẤY ĐẦY ĐỦ THÔNG TIN TÀI KHOẢN
-                // Token đã được authService lưu vào localStorage
+                // Token được authService lưu vào sessionStorage
                 const currentUser = await authService.getCurrentUser();
 
                 console.log(
@@ -153,14 +170,17 @@ export const AuthProvider = ({ children }) => {
                     currentUser
                 );
 
-                if (!currentUser || typeof currentUser !== "object") {
+                if (
+                    !currentUser ||
+                    typeof currentUser !== "object" ||
+                    !currentUser.userId
+                ) {
                     throw new Error(
                         "Không thể lấy đầy đủ thông tin tài khoản."
                     );
                 }
 
                 // BƯỚC 3: KẾT HỢP DỮ LIỆU
-                // Giữ role từ kết quả đăng nhập nếu API /me không trả về
                 const userData = {
                     ...currentUser,
 
@@ -170,11 +190,21 @@ export const AuthProvider = ({ children }) => {
                         expectedRole
                 };
 
+                // Kiểm tra vai trò tài khoản
+                if (
+                    expectedRole &&
+                    userData.role !== expectedRole
+                ) {
+                    throw new Error(
+                        "Vai trò tài khoản không khớp."
+                    );
+                }
+
                 // BƯỚC 4: CẬP NHẬT AUTH CONTEXT
                 setUser(userData);
 
                 // BƯỚC 5: LƯU THÔNG TIN NGƯỜI DÙNG
-                localStorage.setItem(
+                sessionStorage.setItem(
                     "currentUser",
                     JSON.stringify(userData)
                 );
@@ -195,9 +225,9 @@ export const AuthProvider = ({ children }) => {
                     error
                 );
 
-                // Xóa phiên nếu không thể hoàn tất đăng nhập
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("currentUser");
+                // Xóa phiên nếu đăng nhập thất bại
+                sessionStorage.removeItem("accessToken");
+                sessionStorage.removeItem("currentUser");
 
                 setUser(null);
 
@@ -219,6 +249,7 @@ export const AuthProvider = ({ children }) => {
     // =====================================
 
     const logout = useCallback(async () => {
+
         try {
             await authService.logout();
 
@@ -229,11 +260,32 @@ export const AuthProvider = ({ children }) => {
             );
 
         } finally {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("currentUser");
+            // Chỉ xóa phiên của tab hiện tại
+            sessionStorage.removeItem("accessToken");
+            sessionStorage.removeItem("currentUser");
 
             setUser(null);
         }
+
+    }, []);
+
+    // =====================================
+    // CẬP NHẬT THÔNG TIN USER
+    // =====================================
+
+    const updateUser = useCallback((userData) => {
+
+        if (!userData || typeof userData !== "object") {
+            return;
+        }
+
+        setUser(userData);
+
+        sessionStorage.setItem(
+            "currentUser",
+            JSON.stringify(userData)
+        );
+
     }, []);
 
     // =====================================
@@ -243,6 +295,7 @@ export const AuthProvider = ({ children }) => {
     const contextValue = {
         user,
         setUser,
+        updateUser,
         login,
         logout,
         isAuthenticated: !!user,
@@ -261,6 +314,7 @@ export const AuthProvider = ({ children }) => {
 // =====================================
 
 export const useAuth = () => {
+
     const context = useContext(AuthContext);
 
     if (!context) {

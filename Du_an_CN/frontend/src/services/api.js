@@ -1,13 +1,32 @@
 
+// =====================================
+// CẤU HÌNH API
+// =====================================
+
 const API_URL = (
     import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 ).replace(/\/+$/, '');
 
-const getToken = () => localStorage.getItem('accessToken');
+
+// =====================================
+// LẤY TOKEN ĐĂNG NHẬP
+// =====================================
+
+const getToken = () => {
+    return sessionStorage.getItem('accessToken');
+};
+
+
+// =====================================
+// HÀM GỬI REQUEST ĐẾN BACKEND
+// =====================================
 
 const request = async (endpoint, options = {}) => {
+
+    // Lấy JWT của tab hiện tại
     const token = getToken();
 
+    // Khởi tạo headers
     const headers = {
         ...options.headers
     };
@@ -20,23 +39,28 @@ const request = async (endpoint, options = {}) => {
         headers['Content-Type'] = 'application/json';
     }
 
-    // Gửi JWT
+    // Gửi JWT lên Backend
     if (token) {
         headers.Authorization = `Bearer ${token}`;
     }
 
+    // Gửi request
     const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers
     });
 
+    // Kiểm tra kiểu dữ liệu phản hồi
     const contentType = response.headers.get('content-type') || '';
 
+    // Đọc dữ liệu trả về
     const result = contentType.includes('application/json')
         ? await response.json()
         : await response.text();
 
+    // Xử lý lỗi HTTP
     if (!response.ok) {
+
         const error = new Error(
             result?.message ||
             result?.error ||
@@ -44,6 +68,7 @@ const request = async (endpoint, options = {}) => {
         );
 
         error.status = response.status;
+
         error.response = {
             status: response.status,
             data: result
@@ -55,9 +80,17 @@ const request = async (endpoint, options = {}) => {
     return result;
 };
 
+
+// =====================================
+// API METHODS
+// =====================================
+
 const api = {
+
+    // GET
     get: (endpoint) => request(endpoint),
 
+    // POST
     post: (endpoint, data) => request(endpoint, {
         method: 'POST',
         body: data instanceof FormData
@@ -65,6 +98,7 @@ const api = {
             : JSON.stringify(data)
     }),
 
+    // PUT
     put: (endpoint, data) => request(endpoint, {
         method: 'PUT',
         body: data instanceof FormData
@@ -72,6 +106,7 @@ const api = {
             : JSON.stringify(data)
     }),
 
+    // PATCH
     patch: (endpoint, data) => request(endpoint, {
         method: 'PATCH',
         body: data instanceof FormData
@@ -79,6 +114,7 @@ const api = {
             : JSON.stringify(data)
     }),
 
+    // DELETE
     delete: (endpoint) => request(endpoint, {
         method: 'DELETE'
     })

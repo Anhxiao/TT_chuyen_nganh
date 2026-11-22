@@ -2,8 +2,8 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
-import Header from "../components/Header Organizer";
-import Footer from "../components/Footer";
+import Header from "../components/Header Organizer.jsx";
+import Footer from "../components/Footer.jsx";
 import { AuthContext } from "../contexts/AuthContext";
 
 import "../styles/styles-dashboard.css";
@@ -11,13 +11,34 @@ import "../styles/styles-dashboard.css";
 const OrganizerDashboard = () => {
     const { user } = useContext(AuthContext);
 
-// Lấy tên đơn vị từ dữ liệu tài khoản
+// Danh sách tên đơn vị tương ứng với mã tổ chức
+    const ORGANIZATION_NAMES = {
+        TECH_UNION: "Đoàn Trường Kỹ thuật và Công nghệ",
+        LAW_UNION: "Đoàn Trường Kinh tế và Luật",
+        MED_UNION: "Đoàn Trường Y Dược",
+        LIFE_SKILL_CLUB: "Câu lạc bộ Kỹ năng sống",
+        MEDIA_CLUB: "Câu lạc bộ Truyền thông TVU",
+        ART_CLUB: "Câu lạc bộ Văn hóa Nghệ thuật TVU"
+    };
+
+    // Lấy mã tổ chức từ thông tin tài khoản đăng nhập
+    const organizationCode =
+        user?.organization ||
+        user?.organizationCode ||
+        user?.organization_code ||
+        user?.organizations?.[0]?.organizationCode ||
+        user?.organizations?.[0]?.organization_code ||
+        user?.organizations?.[0]?.code;
+
+    // Xác định tên đơn vị đang đăng nhập
     const organizationName =
         user?.organizationName ||
         user?.organization_name ||
         user?.organization?.name ||
-        user?.unitName ||
-        user?.username?.replace(/^Tài khoản\s+/i, "") ||
+        user?.organizations?.[0]?.organizationName ||
+        user?.organizations?.[0]?.organization_name ||
+        ORGANIZATION_NAMES[organizationCode] ||
+        user?.fullName?.replace(/^Tài khoản\s+/i, "") ||
         "Chưa xác định đơn vị";
 
     return (
@@ -27,29 +48,44 @@ const OrganizerDashboard = () => {
             <main className="dashboard-container container-fluid">
 
                 {/* THÔNG TIN ĐƠN VỊ ĐANG ĐĂNG NHẬP */}
+                
+                {/* CHÀO MỪNG ĐƠN VỊ TỔ CHỨC ĐANG ĐĂNG NHẬP */}
                 <section className="organizer-welcome">
 
                     <div className="organizer-welcome-content">
 
                         <div className="organizer-welcome-label">
                             <i className="bi bi-building-check"></i>
-                            ĐƠN VỊ ĐANG ĐĂNG NHẬP
+                            HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG TVU
                         </div>
 
-                        <h2>{organizationName}</h2>
+                        <h2>
+                            Xin chào,
+                            <br />
+                            <span>{organizationName}</span>
+                        </h2>
 
                         <div className="organizer-account-info">
                             <span className="organizer-role">
                                 <i className="bi bi-shield-check"></i>
                                 Tài khoản đơn vị tổ chức
                             </span>
+
+                            {user?.username && (
+                                <span className="organizer-username">
+                                    <i className="bi bi-person-circle"></i>
+                                    {user.username}
+                                </span>
+                            )}
                         </div>
 
                         <p>
-                            Chào mừng đơn vị đến với hệ thống quản lý hoạt động
-                            phục vụ cộng đồng của sinh viên. Tại đây, đơn vị có thể
-                            quản lý hoạt động, xét duyệt đăng ký và xác nhận kết quả
-                            tham gia của sinh viên.
+                            Chào mừng <strong>{organizationName}</strong> đến với
+                            Hệ thống quản lý hoạt động phục vụ cộng đồng của sinh viên
+                            Trường Đại học Trà Vinh.
+                            Tại đây, đơn vị có thể tạo và quản lý hoạt động,
+                            xét duyệt đăng ký, xác nhận kết quả tham gia
+                            và ghi nhận điểm phục vụ cộng đồng cho sinh viên.
                         </p>
 
                     </div>
@@ -67,6 +103,7 @@ const OrganizerDashboard = () => {
                     </Link>
 
                 </section>
+
 
                 {/* THỐNG KÊ */}
                 <section className="dashboard-section">
