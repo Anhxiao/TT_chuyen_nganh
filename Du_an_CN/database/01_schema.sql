@@ -216,6 +216,7 @@ CREATE TABLE Activities (
     activity_start        DATETIME NULL,
     activity_end          DATETIME NULL,
     max_participants      INT NULL,
+    expected_points       INT NOT NULL DEFAULT 0 CHECK (expected_points >= 0),
     current_participants  INT NOT NULL DEFAULT 0,
 
     registration_mode     VARCHAR(20) NOT NULL DEFAULT 'OPEN'

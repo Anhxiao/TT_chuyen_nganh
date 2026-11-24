@@ -17,6 +17,11 @@ import IntrodutionKNSStudent from "./pages/IntrodutionKNSStudent.jsx";
 import IntrodutionTTStudent from "./pages/IntrodutionTTStudent.jsx";
 import IntrodutionVHNTStudent from "./pages/IntrodutionVHNTStudent.jsx";
 import NontificationOrganizer from "./pages/NontificationOrganizer";
+import CreateActivity from "./pages/CreateActivity";
+import OrganizerActivityHistory from "./pages/OrganizerActivityHistory";
+import OrganizerActivityDetail from "./pages/OrganizerActivityDetail";
+import OrganizerOrganizationIntroduction from "./pages/OrganizerOrganizationIntroduction";
+import ActivityDetail from "./pages/ActivityDetail";
 
 function App() {
     return (
@@ -31,6 +36,7 @@ function App() {
             {/* Dashboard sinh viên */}
             <Route path="/student/dashboard" element={<StudentDashboard />} />
             <Route path="/activities" element={<ActivitiesStudent />} />
+            <Route path="/activities/:activityId" element={<ActivityDetail />} />
             <Route path="/student/notifications" element={<Notifications />} />
             <Route path="/student/profile" element={<StudentProfile />} />
             <Route path="/student/introduction/cntt" element={<IntroductionCNTTStudent />} />
@@ -44,6 +50,10 @@ function App() {
             {/* Dashboard đơn vị tổ chức */}
             <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
             <Route path="/organizer/notifications" element={<NontificationOrganizer />} />
+            <Route path="/organizer/activities/create" element={<CreateActivity />} />
+            <Route path="/organizer/history" element={<OrganizerActivityHistory />} />
+            <Route path="/organizer/activities/:activityId" element={<OrganizerActivityDetail />} />
+            <Route path="/organizer/introduction" element={<OrganizerOrganizationIntroduction />} />
         </Routes>
     );
 }

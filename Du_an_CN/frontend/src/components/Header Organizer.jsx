@@ -1,61 +1,105 @@
 
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import '../styles/components/header.css';
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+
+import "../styles/components/header.css";
 import notificationService from "../services/notificationService";
 
 function Header() {
     const [unreadCount, setUnreadCount] = useState(0);
 
-        useEffect(() => {
-            let isMounted = true;
+    const location = useLocation();
 
-            const loadUnreadCount = async () => {
-                try {
-                    const result = await notificationService.getMyNotifications();
+    // Kiểm tra đường dẫn hiện tại có thuộc một nhóm trang hay không
+    const isActivePath = useCallback((paths) => {
+        return paths.some(path =>
+            location.pathname === path ||
+            location.pathname.startsWith(`${path}/`)
+        );
+    }, [location.pathname]);
 
-                    if (isMounted) {
-                        setUnreadCount(Number(result.unreadCount) || 0);
-                    }
-                } catch (error) {
+    // Tải số lượng thông báo chưa đọc
+    const loadUnreadCount = useCallback(async () => {
+        try {
+            const result = await notificationService.getMyNotifications();
+
+            const count = Number(result?.unreadCount);
+
+            setUnreadCount(
+                Number.isFinite(count) && count > 0 ? count : 0
+            );
+        } catch (error) {
+            console.error(
+                "Không thể lấy số thông báo chưa đọc:",
+                error
+            );
+        }
+    }, []);
+
+    // Tải thông báo khi mở trang và cập nhật định kỳ
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadNotifications = async () => {
+            try {
+                const result = await notificationService.getMyNotifications();
+
+                if (!isMounted) return;
+
+                const count = Number(result?.unreadCount);
+
+                setUnreadCount(
+                    Number.isFinite(count) && count > 0 ? count : 0
+                );
+            } catch (error) {
+                if (isMounted) {
                     console.error(
                         "Không thể lấy số thông báo chưa đọc:",
                         error
                     );
                 }
-            };
+            }
+        };
 
-            loadUnreadCount();
+        loadNotifications();
 
-            const interval = setInterval(loadUnreadCount, 15000);
+        const interval = setInterval(loadNotifications, 15000);
 
-            const handleFocus = () => loadUnreadCount();
+        const handleFocus = () => {
+            loadNotifications();
+        };
 
-            window.addEventListener("focus", handleFocus);
+        window.addEventListener("focus", handleFocus);
 
-            return () => {
-                isMounted = false;
-                clearInterval(interval);
-                window.removeEventListener("focus", handleFocus);
-            };
-        }, []);
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+            window.removeEventListener("focus", handleFocus);
+        };
+    }, []);
 
-    const location = useLocation();
+    // Tạo class active cho menu
+    const getNavClass = ({ isActive }) =>
+        `nav-item ${isActive ? "active" : ""}`;
 
-    // Kiểm tra trang hiện tại có thuộc nhóm đường dẫn hay không
-    const isActivePath = (paths) => {
-        return paths.some(path =>
-            location.pathname === path ||
-            location.pathname.startsWith(`${path}/`)
-        );
-    };
+    const activityActive = isActivePath([
+        "/organizer/activities"
+    ]);
+
+    const historyActive = isActivePath([
+        "/organizer/history"
+    ]);
+
+    const organizationActive = isActivePath([
+        "/organizer/organization"
+    ]);
 
     return (
         <header className="top-header organizer-header">
             <div className="container-fluid px-4">
                 <div className="header-inner">
 
-                    {/* Logo */}
+                    {/* LOGO */}
                     <div className="logo-section">
                         <div className="logo-img">
                             <Link to="/organizer/dashboard">
@@ -67,30 +111,27 @@ function Header() {
                         </div>
                     </div>
 
-                    {/* Menu */}
-                    <nav>
+                    {/* MENU ĐƠN VỊ TỔ CHỨC */}
+                    <nav aria-label="Menu đơn vị tổ chức">
                         <ul className="nav-menu">
 
-                            {/* Trang chủ */}
+                            {/* TRANG CHỦ */}
                             <li>
                                 <NavLink
                                     to="/organizer/dashboard"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive ? 'home-active active' : ''}`
-                                    }
+                                    end
+                                    className={getNavClass}
                                 >
                                     <i className="bi bi-house"></i>
-                                    Trang chủ
+                                    <span>Trang chủ</span>
                                 </NavLink>
                             </li>
 
-                            {/* Thông báo */}
+                            {/* THÔNG BÁO */}
                             <li>
                                 <NavLink
                                     to="/organizer/notifications"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive ? 'active' : ''}`
-                                    }
+                                    className={getNavClass}
                                 >
                                     <span className="notification-nav-icon">
                                         <i className="bi bi-bell"></i>
@@ -100,75 +141,52 @@ function Header() {
                                         )}
                                     </span>
 
-                                    Thông báo
+                                    <span>Thông báo</span>
                                 </NavLink>
                             </li>
 
-                            {/* Hoạt động */}
+                            {/* HOẠT ĐỘNG */}
                             <li>
                                 <NavLink
-                                    to="/organizer/activities"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive || isActivePath([
-                                            '/organizer/activities'
-                                        ]) ? 'active' : ''}`
+                                    to="/organizer/activities/create"
+                                    className={() =>
+                                        `nav-item ${
+                                            activityActive ? "active" : ""
+                                        }`
                                     }
                                 >
                                     <i className="bi bi-people"></i>
-                                    Hoạt động
+                                    <span>Hoạt động</span>
                                 </NavLink>
                             </li>
 
-                            {/* Lịch sử */}
-                            <li className="dropdown">
-                                <a
-                                    href="#"
-                                    className={`nav-item dropdown-toggle ${
-                                        isActivePath([
-                                            '/organizer/history',
-                                            '/organizer/evidence'
-                                        ]) ? 'active' : ''
-                                    }`}
-                                    data-bs-toggle="dropdown"
-                                    onClick={(e) => e.preventDefault()}
-                                >
-                                    <i className="bi bi-clock-fill"></i>
-                                    Lịch sử
-                                </a>
-
-                                <ul className="dropdown-menu">
-                                    <li>
-                                        <Link
-                                            className="dropdown-item"
-                                            to="/organizer/history"
-                                        >
-                                            <i className="bi bi-file-earmark-text me-2"></i>
-                                            Các hoạt động đã tạo
-                                        </Link>
-                                    </li>
-
-                                    <li>
-                                        <Link
-                                            className="dropdown-item"
-                                            to="/organizer/evidence"
-                                        >
-                                            <i className="bi bi-file-earmark-text me-2"></i>
-                                            Minh chứng
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            {/* Thông tin đơn vị */}
+                            {/* LỊCH SỬ */}
                             <li>
                                 <NavLink
-                                    to="/organizer/organization"
-                                    className={({ isActive }) =>
-                                        `nav-item ${isActive ? 'active' : ''}`
+                                    to="/organizer/history"
+                                    className={() =>
+                                        `nav-item ${
+                                            historyActive ? "active" : ""
+                                        }`
+                                    }
+                                >
+                                    <i className="bi bi-clock-fill"></i>
+                                    <span>Lịch sử</span>
+                                </NavLink>
+                            </li>
+
+                            {/* THÔNG TIN ĐƠN VỊ */}
+                            <li>
+                                <NavLink
+                                    to="/organizer/introduction"
+                                    className={() =>
+                                        `nav-item ${
+                                            organizationActive ? "active" : ""
+                                        }`
                                     }
                                 >
                                     <i className="bi bi-building"></i>
-                                    Thông tin đơn vị
+                                    <span>Thông tin đơn vị</span>
                                 </NavLink>
                             </li>
 

@@ -1,0 +1,624 @@
+
+.org-intro-page {
+    min-height: 80vh;
+    padding: 35px 20px 65px;
+    background: #f4f7fc;
+}
+
+.org-intro-container {
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+.org-intro-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.org-intro-eyebrow {
+    color: #2454b8;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.org-intro-heading h1 {
+    margin: 8px 0;
+    color: #172b4d;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.org-intro-heading p {
+    margin: 0;
+    color: #718096;
+    font-size: 14px;
+}
+
+.org-logout-btn,
+.org-add-member-btn,
+.org-save-btn,
+.org-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.org-logout-btn {
+    padding: 11px 17px;
+    color: #c0392b;
+    background: #fff0ee;
+}
+
+.org-logout-btn:hover {
+    background: #ffe1dc;
+}
+
+.org-intro-section {
+    margin-bottom: 25px;
+    padding: 27px;
+    border: 1px solid #e8edf5;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(31, 55, 90, 0.04);
+}
+
+.org-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.org-section-heading h2 {
+    margin: 0 0 7px;
+    color: #203653;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.org-section-heading p {
+    margin: 0;
+    color: #8491a5;
+    font-size: 13px;
+}
+
+.org-section-icon {
+    display: flex;
+    width: 43px;
+    height: 43px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: #2454b8;
+    background: #edf3ff;
+    font-size: 20px;
+}
+
+.org-general-layout {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 35px;
+}
+
+.org-logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.org-logo-preview {
+    display: flex;
+    width: 145px;
+    height: 145px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px dashed #cbd6e7;
+    border-radius: 18px;
+    color: #a4b1c3;
+    background: #f8faff;
+    font-size: 42px;
+}
+
+.org-logo-preview img,
+.org-member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.org-upload-btn {
+    padding: 9px 15px;
+    color: #2454b8;
+    background: #edf3ff;
+    font-size: 12px;
+}
+
+.org-upload-btn:hover {
+    background: #dfeaff;
+}
+
+.org-upload-note {
+    color: #9aa6b6;
+    font-size: 11px;
+}
+
+.org-general-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.org-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.org-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.org-form-group label {
+    color: #42536b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.org-form-group input,
+.org-form-group select,
+.org-form-group textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #dce3ed;
+    border-radius: 8px;
+    outline: none;
+    color: #263b57;
+    background: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.org-form-group input:focus,
+.org-form-group select:focus,
+.org-form-group textarea:focus {
+    border-color: #4778d1;
+    box-shadow: 0 0 0 3px rgba(71, 120, 209, 0.1);
+}
+
+.org-form-group textarea {
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.org-member-count {
+    padding: 7px 12px;
+    border-radius: 20px;
+    color: #2454b8;
+    background: #edf3ff;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.org-member-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.org-member-description {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #77869a;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.org-member-description i {
+    color: #4778d1;
+    font-size: 15px;
+}
+
+.org-add-member-btn {
+    flex-shrink: 0;
+    padding: 11px 16px;
+    color: #fff;
+    background: #2454b8;
+    font-size: 12px;
+}
+
+.org-add-member-btn:hover,
+.org-save-btn:hover {
+    background: #193f91;
+}
+
+.org-member-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 45px 20px;
+    border: 1px dashed #d7e0ec;
+    border-radius: 12px;
+    background: #fafcff;
+    text-align: center;
+}
+
+.org-empty-icon {
+    display: flex;
+    width: 65px;
+    height: 65px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #8da2c3;
+    background: #edf3ff;
+    font-size: 27px;
+}
+
+.org-member-empty h3 {
+    margin: 16px 0 7px;
+    color: #344761;
+    font-size: 16px;
+}
+
+.org-member-empty p {
+    margin: 0 0 18px;
+    color: #8794a7;
+    font-size: 13px;
+}
+
+.org-member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.org-member-card {
+    padding: 20px;
+    border: 1px solid #e5ebf3;
+    border-radius: 12px;
+    background: #fcfdff;
+}
+
+.org-member-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 17px;
+}
+
+.org-member-number {
+    color: #8291a6;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.org-remove-member-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    color: #d34b4b;
+    background: #fff0f0;
+    cursor: pointer;
+}
+
+.org-remove-member-btn:hover {
+    background: #ffe0e0;
+}
+
+.org-member-main {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 25px;
+}
+
+.org-member-avatar-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.org-member-avatar {
+    display: flex;
+    width: 105px;
+    height: 105px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px dashed #d0dbea;
+    border-radius: 50%;
+    color: #9eacc0;
+    background: #f1f5fa;
+    font-size: 34px;
+}
+
+.org-avatar-upload {
+    border: none;
+    color: #4778d1;
+    background: transparent;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.org-member-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.org-intro-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.org-cancel-btn,
+.org-save-btn {
+    min-width: 135px;
+    padding: 12px 20px;
+    font-size: 13px;
+}
+
+.org-cancel-btn {
+    border: 1px solid #d9e1ed;
+    color: #607087;
+    background: #fff;
+    cursor: pointer;
+}
+
+.org-cancel-btn:hover {
+    background: #f1f4f8;
+}
+
+.org-save-btn {
+    color: #fff;
+    background: #2454b8;
+}
+
+.org-intro-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    border: 1px solid #cfe5d7;
+    border-radius: 9px;
+    color: #287346;
+    background: #f0faf3;
+    font-size: 13px;
+}
+
+.org-intro-message button {
+    border: none;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+}
+
+.org-confirm-overlay {
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 28, 48, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.org-confirm-dialog {
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.18);
+    text-align: center;
+    animation: orgDialogIn 0.2s ease;
+}
+
+@keyframes orgDialogIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.org-confirm-icon {
+    display: flex;
+    width: 58px;
+    height: 58px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 17px;
+    border-radius: 50%;
+    color: #2454b8;
+    background: #edf3ff;
+    font-size: 25px;
+}
+
+.org-confirm-dialog h3 {
+    margin-bottom: 10px;
+    color: #203653;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.org-confirm-dialog p {
+    margin-bottom: 25px;
+    color: #7c899b;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.org-confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.org-confirm-actions button {
+    min-width: 115px;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.org-confirm-cancel {
+    color: #607087;
+    background: #eef1f5;
+}
+
+.org-confirm-accept {
+    color: #fff;
+    background: #2454b8;
+}
+
+.org-confirm-accept:hover {
+    background: #193f91;
+}
+
+@media (max-width: 768px) {
+    .org-general-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .org-member-main {
+        grid-template-columns: 1fr;
+    }
+
+    .org-member-avatar-area {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    .org-member-avatar {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 576px) {
+    .org-intro-page {
+        padding: 25px 12px 45px;
+    }
+
+    .org-intro-heading {
+        align-items: flex-start;
+    }
+
+    .org-intro-heading h1 {
+        font-size: 23px;
+    }
+
+    .org-logout-btn {
+        padding: 9px 11px;
+        font-size: 11px;
+    }
+
+    .org-intro-section {
+        padding: 18px 14px;
+    }
+
+    .org-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .org-member-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .org-add-member-btn {
+        width: 100%;
+    }
+
+    .org-intro-actions {
+        flex-direction: column-reverse;
+    }
+
+    .org-intro-actions button {
+        width: 100%;
+    }
+}
+
+/* Trường thông tin được lấy tự động từ tài khoản */
+.org-readonly-input {
+    background: #f1f4f8 !important;
+    color: #64748b !important;
+    border-color: #e0e6ef !important;
+    cursor: not-allowed;
+}
+
+/* Cảnh báo khi tài khoản chưa được gán đơn vị */
+.org-intro-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    margin-bottom: 22px;
+    padding: 16px 18px;
+    border: 1px solid #f0d89b;
+    border-radius: 10px;
+    color: #87651c;
+    background: #fff9e9;
+}
+
+.org-intro-warning > i {
+    font-size: 21px;
+}
+
+.org-intro-warning strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.org-intro-warning p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Trạng thái nút bị vô hiệu hóa */
+.org-intro-page button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.org-intro-page button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}

@@ -1,3 +1,6 @@
+import {
+    getActivitiesByOrganization
+} from "../services/activitystudent";
 
 import {
     useState,
@@ -7,6 +10,7 @@ import {
     useRef
 } from "react";
 
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header Student";
 import Footer from "../components/Footer";
 import { useAuth } from "../contexts/AuthContext";
@@ -221,12 +225,47 @@ const extractResponseData = (response) =>
 function ActivitiesStudent() {
     const { user } = useAuth();
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const studentOrganizationId =
         getStudentOrganizationId(user);
 
     const [selectedOrganization, setSelectedOrganization] =
         useState(null);
+    // =====================================
+    // KHÔI PHỤC ĐƠN VỊ KHI QUAY LẠI TỪ CHI TIẾT
+    // =====================================
 
+    useEffect(() => {
+        const organizationCode =
+            location.state?.organizationCode;
+
+        if (!organizationCode) {
+            return;
+        }
+
+        const organization = organizations.find(
+            (item) => item.id === organizationCode
+        );
+
+        if (!organization) {
+            return;
+        }
+
+        // Đoàn Trường chỉ được khôi phục nếu thuộc trường sinh viên.
+        if (
+            !isClub(organization) &&
+            organization.id !== studentOrganizationId
+        ) {
+            return;
+        }
+
+        setSelectedOrganization(organization);
+    }, [
+        location.state?.organizationCode,
+        studentOrganizationId
+    ]);
     const [showRegisterModal, setShowRegisterModal] =
         useState(false);
 
@@ -256,7 +295,16 @@ function ActivitiesStudent() {
 
     const [memberNoticeMessage, setMemberNoticeMessage] =
         useState("");
+    // =====================================
+    // QUẢN LÝ DANH SÁCH HOẠT ĐỘNG
+    // =====================================
 
+    const [activities, setActivities] = useState([]);
+
+    const [isLoadingActivities, setIsLoadingActivities] =
+        useState(false);
+
+    const [activityError, setActivityError] = useState("");
     // Lưu trạng thái CLB trước lần tải dữ liệu tiếp theo.
     const previousClubStatesRef = useRef(null);
 
@@ -266,7 +314,7 @@ function ActivitiesStudent() {
 
     // Quản lý thời gian tự ẩn thông báo.
     const memberNoticeTimerRef = useRef(null);
-
+    
     // =====================================
     // TẠO KHÓA LƯU TRẠNG THÁI THÔNG BÁO
     // =====================================
@@ -397,7 +445,21 @@ function ActivitiesStudent() {
         },
         [user?.userId]
     );
+    const extractActivityList = (response) => {
+        if (Array.isArray(response)) {
+            return response;
+        }
 
+        if (Array.isArray(response?.data)) {
+            return response.data;
+        }
+
+        if (Array.isArray(response?.data?.data)) {
+            return response.data.data;
+        }
+
+        return [];
+    };
     // =====================================
     // TẢI DỮ LIỆU BAN ĐẦU
     // =====================================
@@ -587,7 +649,23 @@ function ActivitiesStudent() {
         },
         [clubs]
     );
+    const formatActivityDate = (value) => {
+        if (!value) return "Chưa cập nhật";
 
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "Chưa cập nhật";
+        }
+
+        return date.toLocaleString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+    };
     // =====================================
     // ĐỒNG BỘ TRẠNG THÁI SAU KHI GỬI ĐƠN
     // =====================================
@@ -886,7 +964,80 @@ function ActivitiesStudent() {
     const isRejected =
         isClub(selectedOrganization) &&
         currentClubState === "REJECTED";
+// =====================================
+// TẢI HOẠT ĐỘNG THEO ĐƠN VỊ ĐƯỢC CHỌN
+// =====================================
 
+    useEffect(() => {
+        if (!selectedOrganization) {
+            setActivities([]);
+            setActivityError("");
+            setIsLoadingActivities(false);
+            return;
+        }
+
+        // CLB chỉ được xem hoạt động khi đã là thành viên.
+        if (
+            isClub(selectedOrganization) &&
+            !isMember
+        ) {
+            setActivities([]);
+            setActivityError("");
+            setIsLoadingActivities(false);
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const loadActivities = async () => {
+            try {
+                setIsLoadingActivities(true);
+                setActivityError("");
+                setActivities([]);
+
+                const response = await getActivitiesByOrganization(
+                    selectedOrganization.id,
+                    controller.signal
+                );
+
+                const activityList = extractActivityList(response);
+
+                setActivities(activityList);
+
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    return;
+                }
+
+                console.error(
+                    "Lỗi tải danh sách hoạt động:",
+                    error
+                );
+
+                setActivityError(
+                    error.message ||
+                    "Không thể tải danh sách hoạt động."
+                );
+
+                setActivities([]);
+
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoadingActivities(false);
+                }
+            }
+        };
+
+        loadActivities();
+
+        return () => {
+            controller.abort();
+        };
+
+    }, [
+        selectedOrganization?.id,
+        isMember
+    ]);
     // =====================================
     // GIAO DIỆN
     // =====================================
@@ -1115,24 +1266,172 @@ function ActivitiesStudent() {
                                                     </div>
 
                                                     <span className="activity-total">
-                                                        0 hoạt động
+                                                        {activities.length} hoạt động
                                                     </span>
                                                 </div>
 
-                                                <div className="activity-empty-state">
-                                                    <div className="activity-empty-icon">
-                                                        <i className="bi bi-calendar2-event"></i>
+                                                {isLoadingActivities ? (
+                                                    <div className="text-center py-5">
+                                                        <div
+                                                            className="spinner-border text-primary"
+                                                            role="status"
+                                                        ></div>
+
+                                                        <p className="mt-2">
+                                                            Đang tải danh sách hoạt động...
+                                                        </p>
                                                     </div>
+                                                ) : activityError ? (
+                                                    <div className="alert alert-danger">
+                                                        <i className="bi bi-exclamation-circle me-2"></i>
+                                                        {activityError}
 
-                                                    <h5>
-                                                        Chưa có hoạt động được đăng tải
-                                                    </h5>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-danger ms-3"
+                                                            onClick={() => {
+                                                                setSelectedOrganization(null);
+                                                                setTimeout(() => {
+                                                                    setSelectedOrganization(
+                                                                        selectedOrganization
+                                                                    );
+                                                                }, 0);
+                                                            }}
+                                                        >
+                                                            Thử lại
+                                                        </button>
+                                                    </div>
+                                                ) : activities.length === 0 ? (
+                                                    <div className="activity-empty-state">
+                                                        <div className="activity-empty-icon">
+                                                            <i className="bi bi-calendar2-event"></i>
+                                                        </div>
 
-                                                    <p>
-                                                        Hoạt động của đơn vị sẽ được hiển thị
-                                                        tại khu vực này khi có dữ liệu.
-                                                    </p>
-                                                </div>
+                                                        <h5>Chưa có hoạt động được đăng tải</h5>
+
+                                                        <p>
+                                                            Hoạt động của đơn vị sẽ được hiển thị
+                                                            tại khu vực này khi có dữ liệu.
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="row g-3">
+                                                        {activities.map((activity) => (
+                                                            <div
+                                                                className="col-12"
+                                                                key={activity.activity_id}
+                                                            >
+                                                                <div className="card shadow-sm h-100">
+                                                                    <div className="card-body">
+                                                                        <div className="d-flex justify-content-between align-items-start gap-2">
+                                                                            <div>
+                                                                                <h5 className="card-title mb-2">
+                                                                                    {activity.activity_name}
+                                                                                </h5>
+
+                                                                                <span className="badge bg-success">
+                                                                                    Đang công bố
+                                                                                </span>
+                                                                            </div>
+
+                                                                            <span className="badge bg-primary">
+                                                                                {activity.registration_mode === "OPEN"
+                                                                                    ? "Đăng ký trực tiếp"
+                                                                                    : "Chờ xét duyệt"}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <p className="text-muted mt-3 mb-2">
+                                                                            <i className="bi bi-building me-2"></i>
+                                                                            {activity.organization_name}
+                                                                        </p>
+
+                                                                        <p className="mb-2">
+                                                                            <i className="bi bi-geo-alt me-2"></i>
+                                                                            {activity.location || "Chưa cập nhật địa điểm"}
+                                                                        </p>
+
+                                                                        <p className="mb-2">
+                                                                            <i className="bi bi-calendar-event me-2"></i>
+                                                                            Bắt đầu: {formatActivityDate(
+                                                                                activity.activity_start
+                                                                            )}
+                                                                        </p>
+
+                                                                        <p className="mb-2">
+                                                                            <i className="bi bi-calendar-check me-2"></i>
+                                                                            Hạn đăng ký: {formatActivityDate(
+                                                                                activity.registration_end
+                                                                            )}
+                                                                        </p>
+
+                                                                        <p className="mb-0">
+                                                                            <i className="bi bi-people me-2"></i>
+                                                                            Đã đăng ký: {activity.current_participants ?? 0}
+                                                                            {activity.max_participants
+                                                                                ? ` / ${activity.max_participants}`
+                                                                                : " / Không giới hạn"}
+                                                                        </p>
+
+                                                                        {activity.description && (
+                                                                            <p className="card-text mt-3">
+                                                                                {activity.description}
+                                                                            </p>
+                                                                        )}
+
+                                                                        {/* CÁC NÚT THAO TÁC */}
+                                                                        <div className="d-flex flex-wrap gap-2 mt-4">
+
+                                                                            {/* XEM CHI TIẾT */}
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn btn-outline-primary"
+                                                                                onClick={() =>
+                                                                                    navigate(`/activities/${activity.activity_id}`, {
+                                                                                        state: {
+                                                                                            from:
+                                                                                                location.pathname +
+                                                                                                location.search +
+                                                                                                location.hash,
+
+                                                                                            organizationCode: selectedOrganization.id
+                                                                                        }
+                                                                                    })
+                                                                                }
+                                                                            >
+                                                                                <i className="bi bi-eye me-2"></i>
+                                                                                Xem chi tiết
+                                                                            </button>
+
+                                                                            {/* ĐĂNG KÝ HOẠT ĐỘNG */}
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn btn-primary"
+                                                                                onClick={() =>
+                                                                                    navigate(`/activities/${activity.activity_id}`, {
+                                                                                        state: {
+                                                                                            from:
+                                                                                                location.pathname +
+                                                                                                location.search +
+                                                                                                location.hash,
+
+                                                                                            organizationCode: selectedOrganization.id
+                                                                                        }
+                                                                                    })
+                                                                                }
+                                                                            >
+                                                                                <i className="bi bi-person-plus me-2"></i>
+                                                                                Đăng ký
+                                                                            </button>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
                                             </>
                                         )}
                                     </>

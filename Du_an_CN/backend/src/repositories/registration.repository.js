@@ -1,6 +1,16 @@
 
 const { sql, poolPromise } = require('../config/database');
 
+function createError(message, statusCode = 400) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    return error;
+}
+
+// =========================================================
+// STUDENT
+// =========================================================
+
 async function findStudentByUserId(userId) {
     const pool = await poolPromise;
 
@@ -15,12 +25,16 @@ async function findStudentByUserId(userId) {
     return result.recordset[0] || null;
 }
 
+// =========================================================
+// REGISTRATION LOOKUP
+// =========================================================
+
 async function findRegistration(activityId, studentId) {
     const pool = await poolPromise;
 
     const result = await pool.request()
-        .input('activityId', sql.Int, activityId)
-        .input('studentId', sql.Int, studentId)
+        .input('activityId', sql.BigInt, activityId)
+        .input('studentId', sql.BigInt, studentId)
         .query(`
             SELECT
                 r.*,
@@ -35,57 +49,263 @@ async function findRegistration(activityId, studentId) {
             INNER JOIN dbo.Activities AS a
                 ON a.activity_id = r.activity_id
             WHERE r.activity_id = @activityId
-            AND r.student_id = @studentId;
+              AND r.student_id = @studentId;
         `);
 
     return result.recordset[0] || null;
 }
 
+// =========================================================
+// CREATE OR REACTIVATE REGISTRATION
+// current_participants chỉ đếm APPROVED
+// =========================================================
+
 async function createRegistration(activityId, studentId, status) {
     const pool = await poolPromise;
+    const transaction = new sql.Transaction(pool);
 
-    const result = await pool.request()
-        .input('activityId', sql.Int, activityId)
-        .input('studentId', sql.Int, studentId)
-        .input('status', sql.VarChar(20), status)
-        .query(`
-            INSERT INTO dbo.Registrations (
-                activity_id,
-                student_id,
-                registered_at,
-                status
-            )
-            OUTPUT INSERTED.registration_id, INSERTED.status,
-                INSERTED.registered_at
-            VALUES (
-                @activityId,
-                @studentId,
-                SYSDATETIME(),
-                @status
+    try {
+        await transaction.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
+
+        const activityResult = await new sql.Request(transaction)
+            .input('activityId', sql.BigInt, activityId)
+            .query(`
+                SELECT
+                    activity_id,
+                    status,
+                    registration_start,
+                    registration_end,
+                    registration_mode,
+                    max_participants,
+                    current_participants
+                FROM dbo.Activities WITH (UPDLOCK, HOLDLOCK)
+                WHERE activity_id = @activityId;
+            `);
+
+        const activity = activityResult.recordset[0];
+
+        if (!activity) {
+            throw createError('Không tìm thấy hoạt động.', 404);
+        }
+
+        if (!['PUBLISHED', 'REGISTERING'].includes(activity.status)) {
+            throw createError('Hoạt động hiện không mở đăng ký.', 409);
+        }
+
+        if (
+            !activity.registration_start ||
+            !activity.registration_end ||
+            new Date() < new Date(activity.registration_start) ||
+            new Date() > new Date(activity.registration_end)
+        ) {
+            throw createError(
+                'Hoạt động chưa mở hoặc đã đóng đăng ký.',
+                409
             );
-        `);
+        }
 
-    return result.recordset[0];
+        const expectedStatus =
+            activity.registration_mode === 'APPROVAL'
+                ? 'PENDING'
+                : 'APPROVED';
+
+        if (status !== expectedStatus) {
+            throw createError('Trạng thái đăng ký không hợp lệ.', 400);
+        }
+
+        const existingResult = await new sql.Request(transaction)
+            .input('activityId', sql.BigInt, activityId)
+            .input('studentId', sql.BigInt, studentId)
+            .query(`
+                SELECT registration_id, status
+                FROM dbo.Registrations WITH (UPDLOCK, HOLDLOCK)
+                WHERE activity_id = @activityId
+                  AND student_id = @studentId;
+            `);
+
+        const existing = existingResult.recordset[0];
+
+        if (existing && existing.status !== 'CANCELLED') {
+            throw createError('Bạn đã đăng ký hoạt động này.', 409);
+        }
+
+        // Chỉ kiểm tra sức chứa khi đăng ký được duyệt ngay.
+        if (
+            status === 'APPROVED' &&
+            activity.max_participants !== null &&
+            activity.current_participants >= activity.max_participants
+        ) {
+            throw createError('Hoạt động đã đủ số lượng đăng ký.', 409);
+        }
+
+        let result;
+
+        if (existing) {
+            // Đăng ký lại: cập nhật bản ghi cũ vì có UNIQUE constraint.
+            result = await new sql.Request(transaction)
+                .input('registrationId', sql.BigInt, existing.registration_id)
+                .input('status', sql.VarChar(20), status)
+                .query(`
+                    UPDATE dbo.Registrations
+                    SET
+                        status = @status,
+                        registered_at = GETDATE(),
+                        approval_note = NULL,
+                        approved_by = NULL,
+                        approved_at = NULL
+                    OUTPUT
+                        INSERTED.registration_id,
+                        INSERTED.status,
+                        INSERTED.registered_at
+                    WHERE registration_id = @registrationId;
+                `);
+        } else {
+            result = await new sql.Request(transaction)
+                .input('activityId', sql.BigInt, activityId)
+                .input('studentId', sql.BigInt, studentId)
+                .input('status', sql.VarChar(20), status)
+                .query(`
+                    INSERT INTO dbo.Registrations (
+                        activity_id,
+                        student_id,
+                        registered_at,
+                        status
+                    )
+                    OUTPUT
+                        INSERTED.registration_id,
+                        INSERTED.status,
+                        INSERTED.registered_at
+                    VALUES (
+                        @activityId,
+                        @studentId,
+                        GETDATE(),
+                        @status
+                    );
+                `);
+        }
+
+        if (status === 'APPROVED') {
+            await new sql.Request(transaction)
+                .input('activityId', sql.BigInt, activityId)
+                .query(`
+                    UPDATE dbo.Activities
+                    SET
+                        current_participants = current_participants + 1,
+                        updated_at = GETDATE()
+                    WHERE activity_id = @activityId;
+                `);
+        }
+
+        await transaction.commit();
+        return result.recordset[0];
+    } catch (error) {
+        try {
+            await transaction.rollback();
+        } catch (_) {
+            // Transaction có thể đã rollback hoặc kết thúc.
+        }
+
+        throw error;
+    }
 }
+
+// =========================================================
+// CANCEL REGISTRATION
+// =========================================================
 
 async function cancelRegistration(activityId, studentId) {
     const pool = await poolPromise;
+    const transaction = new sql.Transaction(pool);
 
-    const result = await pool.request()
-        .input('activityId', sql.Int, activityId)
-        .input('studentId', sql.Int, studentId)
-        .query(`
-            UPDATE dbo.Registrations
-            SET status = 'CANCELLED'
-            WHERE activity_id = @activityId
-            AND student_id = @studentId
-            AND status IN ('PENDING', 'APPROVED');
+    try {
+        await transaction.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
 
-            SELECT @@ROWCOUNT AS affected_rows;
-        `);
+        const activityResult = await new sql.Request(transaction)
+            .input('activityId', sql.BigInt, activityId)
+            .query(`
+                SELECT activity_id, activity_start
+                FROM dbo.Activities WITH (UPDLOCK, HOLDLOCK)
+                WHERE activity_id = @activityId;
+            `);
 
-    return result.recordset[0].affected_rows > 0;
+        const activity = activityResult.recordset[0];
+
+        if (!activity) {
+            throw createError('Không tìm thấy hoạt động.', 404);
+        }
+
+        if (
+            activity.activity_start &&
+            new Date() >= new Date(activity.activity_start)
+        ) {
+            throw createError(
+                'Không thể hủy đăng ký sau khi hoạt động đã bắt đầu.',
+                409
+            );
+        }
+
+        const registrationResult = await new sql.Request(transaction)
+            .input('activityId', sql.BigInt, activityId)
+            .input('studentId', sql.BigInt, studentId)
+            .query(`
+                SELECT registration_id, status
+                FROM dbo.Registrations WITH (UPDLOCK, HOLDLOCK)
+                WHERE activity_id = @activityId
+                  AND student_id = @studentId;
+            `);
+
+        const registration = registrationResult.recordset[0];
+
+        if (!registration) {
+            throw createError('Bạn chưa đăng ký hoạt động này.', 404);
+        }
+
+        if (!['PENDING', 'APPROVED'].includes(registration.status)) {
+            throw createError(
+                'Trạng thái đăng ký hiện tại không thể hủy.',
+                409
+            );
+        }
+
+        await new sql.Request(transaction)
+            .input('registrationId', sql.BigInt, registration.registration_id)
+            .query(`
+                UPDATE dbo.Registrations
+                SET status = 'CANCELLED'
+                WHERE registration_id = @registrationId;
+            `);
+
+        if (registration.status === 'APPROVED') {
+            await new sql.Request(transaction)
+                .input('activityId', sql.BigInt, activityId)
+                .query(`
+                    UPDATE dbo.Activities
+                    SET
+                        current_participants =
+                            CASE
+                                WHEN current_participants > 0
+                                THEN current_participants - 1
+                                ELSE 0
+                            END,
+                        updated_at = GETDATE()
+                    WHERE activity_id = @activityId;
+                `);
+        }
+
+        await transaction.commit();
+        return true;
+    } catch (error) {
+        try {
+            await transaction.rollback();
+        } catch (_) {}
+
+        throw error;
+    }
 }
+
+// =========================================================
+// STUDENT REGISTRATION HISTORY
+// =========================================================
 
 async function getMyRegistrations({
     studentId,
@@ -102,7 +322,7 @@ async function getMyRegistrations({
     );
 
     const request = pool.request()
-        .input('studentId', sql.Int, studentId)
+        .input('studentId', sql.BigInt, studentId)
         .input('offset', sql.Int, (safePage - 1) * safeLimit)
         .input('limit', sql.Int, safeLimit);
 
@@ -125,6 +345,8 @@ async function getMyRegistrations({
             a.location,
             a.activity_start,
             a.activity_end,
+            a.current_participants,
+            a.max_participants,
             o.organization_name,
             ap.attendance_status,
             ap.activity_point
@@ -145,6 +367,10 @@ async function getMyRegistrations({
     return result.recordset;
 }
 
+// =========================================================
+// ORGANIZER REGISTRATION LIST
+// =========================================================
+
 async function getActivityRegistrations({
     activityId,
     status,
@@ -160,7 +386,7 @@ async function getActivityRegistrations({
     );
 
     const request = pool.request()
-        .input('activityId', sql.Int, activityId)
+        .input('activityId', sql.BigInt, activityId)
         .input('offset', sql.Int, (safePage - 1) * safeLimit)
         .input('limit', sql.Int, safeLimit);
 
@@ -198,11 +424,15 @@ async function getActivityRegistrations({
     return result.recordset;
 }
 
+// =========================================================
+// REGISTRATION DETAIL
+// =========================================================
+
 async function findById(registrationId) {
     const pool = await poolPromise;
 
     const result = await pool.request()
-        .input('registrationId', sql.Int, registrationId)
+        .input('registrationId', sql.BigInt, registrationId)
         .query(`
             SELECT
                 r.*,
@@ -211,6 +441,8 @@ async function findById(registrationId) {
                 a.status AS activity_status,
                 a.activity_start,
                 a.activity_end,
+                a.max_participants,
+                a.current_participants,
                 s.user_id
             FROM dbo.Registrations AS r
             INNER JOIN dbo.Activities AS a
@@ -223,6 +455,10 @@ async function findById(registrationId) {
     return result.recordset[0] || null;
 }
 
+// =========================================================
+// APPROVE / REJECT REGISTRATION
+// =========================================================
+
 async function updateRegistrationStatus(
     registrationId,
     status,
@@ -230,26 +466,125 @@ async function updateRegistrationStatus(
     note = null
 ) {
     const pool = await poolPromise;
+    const transaction = new sql.Transaction(pool);
 
-    const result = await pool.request()
-        .input('registrationId', sql.Int, registrationId)
-        .input('status', sql.VarChar(20), status)
-        .input('actorId', sql.BigInt, actorId)
-        .input('note', sql.NVarChar(1000), note)
-        .query(`
-            UPDATE dbo.Registrations
-            SET
-                status = @status,
-                approved_by = @actorId,
-                approved_at = SYSDATETIME(),
-                approval_note = @note
-            WHERE registration_id = @registrationId
-            AND status = 'PENDING';
+    try {
+        await transaction.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
 
-            SELECT @@ROWCOUNT AS affected_rows;
-        `);
+        const registrationResult = await new sql.Request(transaction)
+            .input('registrationId', sql.BigInt, registrationId)
+            .query(`
+                SELECT
+                    r.registration_id,
+                    r.activity_id,
+                    r.status
+                FROM dbo.Registrations AS r
+                WHERE r.registration_id = @registrationId;
+            `);
 
-    return result.recordset[0].affected_rows > 0;
+        const registration = registrationResult.recordset[0];
+
+        if (!registration) {
+            throw createError('Không tìm thấy đăng ký.', 404);
+        }
+
+        const activityResult = await new sql.Request(transaction)
+            .input('activityId', sql.BigInt, registration.activity_id)
+            .query(`
+                SELECT
+                    activity_id,
+                    max_participants,
+                    current_participants
+                FROM dbo.Activities WITH (UPDLOCK, HOLDLOCK)
+                WHERE activity_id = @activityId;
+            `);
+
+        const activity = activityResult.recordset[0];
+
+        if (!activity) {
+            throw createError('Không tìm thấy hoạt động.', 404);
+        }
+
+        const currentResult = await new sql.Request(transaction)
+            .input('registrationId', sql.BigInt, registrationId)
+            .query(`
+                SELECT status
+                FROM dbo.Registrations WITH (UPDLOCK, HOLDLOCK)
+                WHERE registration_id = @registrationId;
+            `);
+
+        const current = currentResult.recordset[0];
+
+        if (!current || current.status !== 'PENDING') {
+            throw createError(
+                'Chỉ có thể xử lý đăng ký đang chờ duyệt.',
+                409
+            );
+        }
+
+        if (status === 'APPROVED') {
+            if (
+                activity.max_participants !== null &&
+                activity.current_participants >= activity.max_participants
+            ) {
+                throw createError(
+                    'Hoạt động đã đủ số lượng người tham gia.',
+                    409
+                );
+            }
+        } else if (status !== 'REJECTED') {
+            throw createError('Trạng thái xử lý không hợp lệ.', 400);
+        }
+
+        const result = await new sql.Request(transaction)
+            .input('registrationId', sql.BigInt, registrationId)
+            .input('status', sql.VarChar(20), status)
+            .input('actorId', sql.BigInt, actorId)
+            .input('note', sql.NVarChar(sql.MAX), note)
+            .query(`
+                UPDATE dbo.Registrations
+                SET
+                    status = @status,
+                    approved_by = @actorId,
+                    approved_at = GETDATE(),
+                    approval_note = @note
+                OUTPUT
+                    INSERTED.registration_id,
+                    INSERTED.status,
+                    INSERTED.approved_by,
+                    INSERTED.approved_at
+                WHERE registration_id = @registrationId
+                  AND status = 'PENDING';
+            `);
+
+        if (result.recordset.length === 0) {
+            throw createError(
+                'Đăng ký đã được xử lý bởi một yêu cầu khác.',
+                409
+            );
+        }
+
+        if (status === 'APPROVED') {
+            await new sql.Request(transaction)
+                .input('activityId', sql.BigInt, registration.activity_id)
+                .query(`
+                    UPDATE dbo.Activities
+                    SET
+                        current_participants = current_participants + 1,
+                        updated_at = GETDATE()
+                    WHERE activity_id = @activityId;
+                `);
+        }
+
+        await transaction.commit();
+        return result.recordset[0];
+    } catch (error) {
+        try {
+            await transaction.rollback();
+        } catch (_) {}
+
+        throw error;
+    }
 }
 
 module.exports = {

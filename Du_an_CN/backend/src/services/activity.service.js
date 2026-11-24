@@ -1,9 +1,26 @@
+const crypto = require('crypto');
 const activityRepository = require('../repositories/activity.repository');
 
 function createError(message, statusCode = 400) {
     const error = new Error(message);
     error.statusCode = statusCode;
     return error;
+}
+
+function generateActivityCode() {
+    const date = new Date();
+    const datePart = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+    ].join('');
+
+    const randomPart = crypto
+        .randomBytes(3)
+        .toString('hex')
+        .toUpperCase();
+
+    return `ACT-${datePart}-${randomPart}`;
 }
 
 function validateActivityData(data, isUpdate = false) {
@@ -117,7 +134,7 @@ async function createActivity({ data, actorId }) {
 
     const organizationId = Number(data.organizationId);
 
-    if (!Number.isInteger(organizationId) || organizationId <= 0) {
+    if (!Number.isSafeInteger(organizationId) || organizationId <= 0) {
         throw createError('Đơn vị tổ chức không hợp lệ.');
     }
 
@@ -127,24 +144,26 @@ async function createActivity({ data, actorId }) {
     );
 
     if (!isMember) {
-        throw createError('Bạn không thuộc đơn vị tổ chức này.', 403);
+        throw createError(
+            'Bạn không thuộc đơn vị tổ chức này.',
+            403
+        );
     }
 
-    const activity = await activityRepository.createActivity(
-        {
-            activityName: data.activityName.trim(),
-            description: data.description || null,
-            location: data.location.trim(),
-            organizationId,
-            registrationStart: data.registrationStart,
-            registrationEnd: data.registrationEnd,
-            activityStart: data.activityStart,
-            activityEnd: data.activityEnd,
-            maxParticipants: data.maxParticipants ?? null,
-            registrationMode: data.registrationMode || 'OPEN'
-        },
-        actorId
-    );
+    const activity = await activityRepository.createActivity({
+        activityCode: generateActivityCode(),
+        organizationId,
+        activityName: data.activityName.trim(),
+        description: data.description?.trim() || null,
+        location: data.location.trim(),
+        registrationStart: data.registrationStart,
+        registrationEnd: data.registrationEnd,
+        activityStart: data.activityStart,
+        activityEnd: data.activityEnd,
+        maxParticipants: data.maxParticipants ?? null,
+        registrationMode: data.registrationMode || 'OPEN',
+        createdBy: actorId
+    });
 
     return activity;
 }
@@ -169,22 +188,54 @@ async function updateActivity({ activityId, data, actorId }) {
     );
 
     if (!isMember) {
-        throw createError('Bạn không có quyền chỉnh sửa hoạt động này.', 403);
+        throw createError(
+            'Bạn không có quyền chỉnh sửa hoạt động này.',
+            403
+        );
     }
 
-    validateActivityData(data, true);
+    // Kết hợp dữ liệu mới với dữ liệu hiện có để kiểm tra đầy đủ.
+    const mergedData = {
+        activityName: data.activityName ?? existing.activity_name,
+        organizationId: existing.organization_id,
+        location: data.location ?? existing.location,
+        registrationStart:
+            data.registrationStart ?? existing.registration_start,
+        registrationEnd:
+            data.registrationEnd ?? existing.registration_end,
+        activityStart:
+            data.activityStart ?? existing.activity_start,
+        activityEnd:
+            data.activityEnd ?? existing.activity_end,
+        maxParticipants:
+            data.maxParticipants ?? existing.max_participants,
+        registrationMode:
+            data.registrationMode ?? existing.registration_mode
+    };
 
-    await activityRepository.updateActivity(activityId, {
-        activityName: data.activityName,
-        description: data.description,
-        location: data.location,
-        registrationStart: data.registrationStart,
-        registrationEnd: data.registrationEnd,
-        activityStart: data.activityStart,
-        activityEnd: data.activityEnd,
-        maxParticipants: data.maxParticipants,
-        registrationMode: data.registrationMode
-    });
+    validateActivityData(mergedData);
+
+    const updated = await activityRepository.updateActivity(
+        activityId,
+        {
+            activityName: data.activityName,
+            description: data.description,
+            location: data.location,
+            registrationStart: data.registrationStart,
+            registrationEnd: data.registrationEnd,
+            activityStart: data.activityStart,
+            activityEnd: data.activityEnd,
+            maxParticipants: data.maxParticipants,
+            registrationMode: data.registrationMode
+        }
+    );
+
+    if (!updated) {
+        throw createError(
+            'Không thể cập nhật hoạt động. Vui lòng tải lại dữ liệu.',
+            409
+        );
+    }
 
     return activityRepository.findById(activityId);
 }

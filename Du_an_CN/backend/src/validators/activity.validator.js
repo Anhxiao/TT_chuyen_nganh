@@ -43,7 +43,10 @@ function validateActivity(req, res, next) {
     if (data.organizationId !== undefined) {
         const organizationId = Number(data.organizationId);
 
-        if (!Number.isInteger(organizationId) || organizationId <= 0) {
+        if (
+            !Number.isSafeInteger(organizationId) ||
+            organizationId <= 0
+        ) {
             errors.organizationId = 'Mã đơn vị tổ chức không hợp lệ.';
         }
     }

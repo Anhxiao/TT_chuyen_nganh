@@ -1,19 +1,54 @@
+
 /* =========================================================
-styles-dashboard.css
-Giao diện Dashboard Sinh viên và Đơn vị tổ chức
-Bootstrap 5 + React
+   styles-dashboard.css
+   DASHBOARD SINH VIÊN VÀ ĐƠN VỊ TỔ CHỨC
+   Bootstrap 5 + React
+   MÀU CHỦ ĐẠO: XANH DƯƠNG TVU
 ========================================================= */
 
 /* =========================================================
-1. NỀN VÀ BỐ CỤC CHUNG
+   0. BẢNG MÀU CHUNG
+========================================================= */
+
+:root {
+    --dashboard-primary: #0d6efd;
+    --dashboard-primary-dark: #084298;
+    --dashboard-primary-deep: #073b7a;
+    --dashboard-primary-light: #eaf2ff;
+    --dashboard-primary-soft: #f3f7ff;
+
+    --dashboard-background: #f4f7fc;
+    --dashboard-surface: #ffffff;
+
+    --dashboard-text: #263445;
+    --dashboard-heading: #123f78;
+    --dashboard-muted: #6c7a90;
+
+    --dashboard-border: #dfe7f2;
+
+    --dashboard-success: #198754;
+    --dashboard-success-light: #e8f6ee;
+
+    --dashboard-warning: #d58a16;
+    --dashboard-warning-light: #fff5df;
+
+    --dashboard-info: #0b83a5;
+    --dashboard-info-light: #e6f7fb;
+
+    --dashboard-shadow: 0 5px 18px rgba(25, 65, 120, 0.055);
+    --dashboard-shadow-hover: 0 10px 25px rgba(25, 65, 120, 0.11);
+}
+
+/* =========================================================
+   1. NỀN VÀ BỐ CỤC CHUNG
 ========================================================= */
 
 .dashboard-page {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #f4f7fc;
-    color: #24324a;
+    background: var(--dashboard-background);
+    color: var(--dashboard-text);
 }
 
 .dashboard-page > main {
@@ -31,6 +66,9 @@ Bootstrap 5 + React
     margin-top: 30px;
 }
 
+/* =========================================================
+   2. KHU VỰC CHÀO MỪNG SINH VIÊN
+========================================================= */
 
 .dashboard-welcome {
     position: relative;
@@ -40,12 +78,16 @@ Bootstrap 5 + React
     gap: 24px;
     overflow: hidden;
     padding: 30px 34px;
-    border: 1px solid #e2eaf7;
+    border: 1px solid #d9e7fb;
     border-radius: 20px;
     background:
-        radial-gradient(circle at 90% 10%, rgba(91, 146, 255, 0.15), transparent 30%),
-        linear-gradient(115deg, #ffffff 0%, #f7faff 100%);
-    box-shadow: 0 8px 26px rgba(28, 61, 112, 0.06);
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(13, 110, 253, 0.13),
+            transparent 30%
+        ),
+        linear-gradient(115deg, #ffffff 0%, #f1f6ff 100%);
+    box-shadow: var(--dashboard-shadow);
 }
 
 .dashboard-welcome-content {
@@ -70,19 +112,30 @@ Bootstrap 5 + React
     padding: 12px 21px;
     border: 0;
     border-radius: 11px;
-    background: linear-gradient(135deg, #2859b5, #3479df);
-    box-shadow: 0 5px 13px rgba(42, 99, 190, 0.2);
+    color: #ffffff;
+    background: linear-gradient(
+        135deg,
+        var(--dashboard-primary-dark),
+        var(--dashboard-primary)
+    );
+    box-shadow: 0 5px 13px rgba(13, 110, 253, 0.2);
     font-weight: 650;
+    transition: all 0.2s ease;
 }
 
 .dashboard-welcome .btn:hover {
     transform: translateY(-2px);
-    background: linear-gradient(135deg, #204b9e, #286bd0);
+    color: #ffffff;
+    background: linear-gradient(
+        135deg,
+        #06377d,
+        #0b5ed7
+    );
+    box-shadow: 0 7px 17px rgba(13, 110, 253, 0.25);
 }
 
-
 /* =========================================================
-3. THẺ THỐNG KÊ
+   3. THẺ THỐNG KÊ
 ========================================================= */
 
 .dashboard-stat-card {
@@ -92,16 +145,16 @@ Bootstrap 5 + React
     height: 100%;
     min-height: 118px;
     padding: 22px 21px;
-    border: 1px solid #e7edf6;
+    border: 1px solid var(--dashboard-border);
     border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 0 5px 18px rgba(35, 64, 105, 0.045);
+    background: var(--dashboard-surface);
+    box-shadow: var(--dashboard-shadow);
     transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 .dashboard-stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(35, 64, 105, 0.09);
+    box-shadow: var(--dashboard-shadow-hover);
 }
 
 .stat-icon {
@@ -116,28 +169,28 @@ Bootstrap 5 + React
 }
 
 .stat-icon.blue {
-    color: #2860bd;
-    background: #e9f1ff;
+    color: var(--dashboard-primary);
+    background: var(--dashboard-primary-light);
 }
 
 .stat-icon.cyan {
-    color: #0786a5;
-    background: #e4f8fc;
+    color: var(--dashboard-info);
+    background: var(--dashboard-info-light);
 }
 
 .stat-icon.green {
-    color: #168653;
-    background: #e6f7ee;
+    color: var(--dashboard-success);
+    background: var(--dashboard-success-light);
 }
 
 .stat-icon.orange {
-    color: #c87913;
-    background: #fff3df;
+    color: var(--dashboard-warning);
+    background: var(--dashboard-warning-light);
 }
 
 .dashboard-stat-card p {
     margin: 0 0 7px;
-    color: #718096;
+    color: var(--dashboard-muted);
     font-size: 0.88rem;
     font-weight: 550;
     line-height: 1.4;
@@ -145,15 +198,14 @@ Bootstrap 5 + React
 
 .dashboard-stat-card h3 {
     margin: 0;
-    color: #1c3768;
+    color: var(--dashboard-heading);
     font-size: 1.8rem;
     font-weight: 750;
     line-height: 1.1;
 }
 
-
 /* =========================================================
-4. TIÊU ĐỀ CÁC KHU VỰC
+   4. TIÊU ĐỀ CÁC KHU VỰC
 ========================================================= */
 
 .dashboard-section-heading {
@@ -166,14 +218,14 @@ Bootstrap 5 + React
 
 .dashboard-section-heading h4 {
     margin: 0 0 5px;
-    color: #203d70;
+    color: var(--dashboard-heading);
     font-size: 1.15rem;
     font-weight: 750;
 }
 
 .dashboard-section-heading p {
     margin: 0;
-    color: #7b8799;
+    color: var(--dashboard-muted);
     font-size: 0.88rem;
     line-height: 1.5;
 }
@@ -183,7 +235,7 @@ Bootstrap 5 + React
     align-items: center;
     gap: 7px;
     flex-shrink: 0;
-    color: #2862bd;
+    color: var(--dashboard-primary);
     font-size: 0.9rem;
     font-weight: 650;
     text-decoration: none;
@@ -192,20 +244,19 @@ Bootstrap 5 + React
 
 .dashboard-view-all:hover {
     gap: 11px;
-    color: #153f8c;
+    color: var(--dashboard-primary-dark);
 }
 
-
 /* =========================================================
-5. THẺ NỘI DUNG VÀ TRẠNG THÁI TRỐNG
+   5. THẺ NỘI DUNG VÀ TRẠNG THÁI TRỐNG
 ========================================================= */
 
 .dashboard-content-card {
     overflow: hidden;
-    border: 1px solid #e6ecf5;
+    border: 1px solid var(--dashboard-border);
     border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 0 5px 18px rgba(35, 64, 105, 0.045);
+    background: var(--dashboard-surface);
+    box-shadow: var(--dashboard-shadow);
 }
 
 .dashboard-content-card.empty-state {
@@ -226,14 +277,14 @@ Bootstrap 5 + React
     height: 62px;
     margin-bottom: 15px;
     border-radius: 18px;
-    background: #edf3ff;
-    color: #4775bd;
+    background: var(--dashboard-primary-light);
+    color: var(--dashboard-primary);
     font-size: 1.8rem;
 }
 
 .dashboard-content-card.empty-state h5 {
     margin: 0 0 7px;
-    color: #30476d;
+    color: var(--dashboard-heading);
     font-size: 1.02rem;
     font-weight: 700;
 }
@@ -241,14 +292,13 @@ Bootstrap 5 + React
 .dashboard-content-card.empty-state p {
     max-width: 520px;
     margin: 0;
-    color: #8490a2;
+    color: var(--dashboard-muted);
     font-size: 0.9rem;
     line-height: 1.65;
 }
 
-
 /* =========================================================
-6. BẢNG DỮ LIỆU DASHBOARD
+   6. BẢNG DỮ LIỆU DASHBOARD
 ========================================================= */
 
 .dashboard-table {
@@ -259,9 +309,9 @@ Bootstrap 5 + React
 
 .dashboard-table thead th {
     padding: 15px 18px;
-    border-bottom: 1px solid #e7edf5;
-    background: #f7f9fd;
-    color: #53647f;
+    border-bottom: 1px solid var(--dashboard-border);
+    background: var(--dashboard-primary-soft);
+    color: var(--dashboard-primary-dark);
     font-size: 0.82rem;
     font-weight: 750;
     white-space: nowrap;
@@ -278,7 +328,7 @@ Bootstrap 5 + React
 }
 
 .dashboard-table tbody tr:hover {
-    background: #fafcff;
+    background: #f5f9ff;
 }
 
 .empty-table-icon {
@@ -287,13 +337,12 @@ Bootstrap 5 + React
 }
 
 .dashboard-table tbody td p {
-    color: #8390a3;
+    color: var(--dashboard-muted);
     font-size: 0.9rem;
 }
 
-
 /* =========================================================
-7. CÁC LIÊN KẾT TRUY CẬP NHANH
+   7. CÁC LIÊN KẾT TRUY CẬP NHANH
 ========================================================= */
 
 .quick-link-card {
@@ -303,12 +352,12 @@ Bootstrap 5 + React
     min-height: 105px;
     height: 100%;
     padding: 19px 20px;
-    border: 1px solid #e5ebf4;
+    border: 1px solid var(--dashboard-border);
     border-radius: 15px;
-    background: #ffffff;
+    background: var(--dashboard-surface);
     color: inherit;
     text-decoration: none;
-    box-shadow: 0 5px 18px rgba(35, 64, 105, 0.04);
+    box-shadow: var(--dashboard-shadow);
     transition:
         transform 0.22s ease,
         border-color 0.22s ease,
@@ -317,8 +366,8 @@ Bootstrap 5 + React
 
 .quick-link-card:hover {
     transform: translateY(-3px);
-    border-color: #c8d9f5;
-    box-shadow: 0 10px 23px rgba(35, 64, 105, 0.09);
+    border-color: #b7d1f7;
+    box-shadow: var(--dashboard-shadow-hover);
 }
 
 .quick-link-card > i:first-child {
@@ -329,8 +378,8 @@ Bootstrap 5 + React
     width: 48px;
     height: 48px;
     border-radius: 13px;
-    background: #edf3ff;
-    color: #2c61b7;
+    background: var(--dashboard-primary-light);
+    color: var(--dashboard-primary);
     font-size: 1.4rem;
 }
 
@@ -341,14 +390,14 @@ Bootstrap 5 + React
 
 .quick-link-card h6 {
     margin: 0 0 5px;
-    color: #2b4269;
+    color: var(--dashboard-heading);
     font-size: 0.95rem;
     font-weight: 750;
 }
 
 .quick-link-card p {
     margin: 0;
-    color: #8490a2;
+    color: var(--dashboard-muted);
     font-size: 0.82rem;
     line-height: 1.45;
 }
@@ -361,12 +410,248 @@ Bootstrap 5 + React
 
 .quick-link-card:hover > i:last-child {
     transform: translateX(4px);
-    color: #2862bd;
+    color: var(--dashboard-primary);
 }
 
+/* =========================================================
+   8. ORGANIZER DASHBOARD - WELCOME
+========================================================= */
+
+.organizer-welcome {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    padding: 35px 38px;
+    min-height: 245px;
+    color: #ffffff;
+    background: linear-gradient(
+        120deg,
+        var(--dashboard-primary-dark),
+        var(--dashboard-primary)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(13, 75, 145, 0.16);
+}
+
+.organizer-welcome-content {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+}
+
+.organizer-welcome-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 15px;
+    padding: 8px 13px;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+}
+
+.organizer-welcome h2 {
+    margin: 0 0 17px;
+    color: #ffffff;
+    font-size: clamp(23px, 3vw, 32px);
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+.organizer-account-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.organizer-account-info span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.13);
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+.organizer-account-info i {
+    font-size: 15px;
+}
+
+.organizer-account-info .organizer-role {
+    background: rgba(25, 135, 84, 0.3);
+}
+
+.organizer-welcome-content > p {
+    max-width: 680px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.organizer-welcome-icon {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: rgba(255, 255, 255, 0.12);
+    font-size: 150px;
+    pointer-events: none;
+}
+
+.organizer-create-button {
+    position: absolute;
+    right: 35px;
+    bottom: 28px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 17px;
+    color: var(--dashboard-primary-dark);
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.organizer-create-button:hover {
+    color: var(--dashboard-primary-deep);
+    background: #eaf2ff;
+    transform: translateY(-2px);
+}
+
+.organizer-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 13px;
+    padding: 10px 12px;
+    color: #fff3cd;
+    background: rgba(255, 193, 7, 0.17);
+    border: 1px solid rgba(255, 220, 100, 0.35);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
 
 /* =========================================================
-8. RESPONSIVE
+   9. THU GỌN DANH SÁCH VÀ THANH CUỘN ĐỘC LẬP
+========================================================= */
+
+.dashboard-section {
+    margin-bottom: 0;
+}
+
+.dashboard-section-heading {
+    margin-bottom: 10px;
+}
+
+.dashboard-section-heading h4 {
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+
+.dashboard-section-heading p {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+/* Danh sách hoạt động phù hợp */
+
+.dashboard-activity-list {
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 7px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #a9bfdc #f1f5fb;
+}
+
+.dashboard-activity-item {
+    padding: 10px 0;
+}
+
+.dashboard-activity-content h5 {
+    font-size: 15px;
+    margin-bottom: 7px;
+}
+
+.dashboard-activity-content p {
+    font-size: 13px;
+    margin-bottom: 5px;
+    line-height: 1.45;
+}
+
+/* Danh sách đăng ký gần đây */
+
+.dashboard-registration-list {
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 7px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #a9bfdc #f1f5fb;
+}
+
+.dashboard-registration-item {
+    padding: 9px 0;
+}
+
+.dashboard-registration-item h6 {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.dashboard-registration-item p {
+    font-size: 12px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+/* Thanh cuộn */
+
+.dashboard-activity-list::-webkit-scrollbar,
+.dashboard-registration-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dashboard-activity-list::-webkit-scrollbar-track,
+.dashboard-registration-list::-webkit-scrollbar-track {
+    background: #f1f5fb;
+    border-radius: 10px;
+}
+
+.dashboard-activity-list::-webkit-scrollbar-thumb,
+.dashboard-registration-list::-webkit-scrollbar-thumb {
+    background: #a9bfdc;
+    border-radius: 10px;
+}
+
+.dashboard-activity-list::-webkit-scrollbar-thumb:hover,
+.dashboard-registration-list::-webkit-scrollbar-thumb:hover {
+    background: var(--dashboard-primary);
+}
+
+/* =========================================================
+   10. RESPONSIVE
 ========================================================= */
 
 @media (max-width: 992px) {
@@ -388,8 +673,13 @@ Bootstrap 5 + React
     .dashboard-welcome {
         align-items: flex-start;
         flex-direction: column;
-        gap: 20px;
+        gap: 18px;
         padding: 23px 21px;
+    }
+
+    .dashboard-welcome-action {
+        width: 100%;
+        justify-content: flex-end;
     }
 
     .dashboard-welcome .btn {
@@ -420,6 +710,38 @@ Bootstrap 5 + React
 
     .quick-link-card {
         min-height: 92px;
+    }
+
+    .organizer-welcome {
+        padding: 25px 22px 85px;
+        min-height: auto;
+    }
+
+    .organizer-welcome-icon {
+        top: 15px;
+        right: 15px;
+        font-size: 95px;
+    }
+
+    .organizer-create-button {
+        right: auto;
+        left: 22px;
+        bottom: 20px;
+    }
+
+    .organizer-account-info {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .organizer-account-info span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .dashboard-activity-list,
+    .dashboard-registration-list {
+        max-height: 320px;
     }
 }
 
@@ -456,11 +778,11 @@ Bootstrap 5 + React
     }
 
     .dashboard-section-heading h4 {
-        font-size: 1.04rem;
+        font-size: 16px;
     }
 
     .dashboard-section-heading p {
-        font-size: 0.82rem;
+        font-size: 12px;
     }
 
     .dashboard-content-card.empty-state {
@@ -475,180 +797,343 @@ Bootstrap 5 + React
     .quick-link-card {
         padding: 16px;
     }
+
+    .dashboard-activity-list,
+    .dashboard-registration-list {
+        max-height: 280px;
+    }
 }
 
+/* =========================================================
+   NÂNG CẤP GIAO DIỆN HOẠT ĐỘNG PHÙ HỢP
+========================================================= */
 
-/* =========================================
-   ORGANIZER DASHBOARD - WELCOME
-========================================= */
-
-.organizer-welcome {
-    position: relative;
+/* Khung danh sách */
+.dashboard-activity-list {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 25px;
-    overflow: hidden;
-    margin-bottom: 30px;
-    padding: 35px 38px;
-    min-height: 245px;
-    color: #fff;
-    background: linear-gradient(120deg, #064b91, #0879c9);
-    border-radius: 18px;
-    box-shadow: 0 8px 25px rgba(0, 75, 145, 0.16);
+    flex-direction: column;
+    gap: 12px;
+    max-height: 390px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 5px 9px 5px 5px;
+    scrollbar-width: thin;
+    scrollbar-color: #a9bfdc #f1f5fb;
 }
 
-.organizer-welcome-content {
+/* Từng hoạt động */
+.dashboard-activity-item {
     position: relative;
-    z-index: 2;
-    max-width: 780px;
+    padding: 17px 19px;
+    border: 1px solid #e2eaf5;
+    border-left: 4px solid #0d6efd;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(25, 65, 120, 0.035);
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
 }
 
-.organizer-welcome-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 15px;
-    padding: 8px 13px;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.7px;
-}
-
-.organizer-welcome h2 {
-    margin: 0 0 17px;
-    color: #fff;
-    font-size: clamp(23px, 3vw, 32px);
-    font-weight: 750;
-    line-height: 1.35;
-}
-
-.organizer-account-info {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.organizer-account-info span {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 11px;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.13);
-    border-radius: 7px;
-    font-size: 13px;
-}
-
-.organizer-account-info i {
-    font-size: 15px;
-}
-
-.organizer-account-info .organizer-role {
-    background: rgba(20, 184, 120, 0.25);
-}
-
-.organizer-welcome-content > p {
-    max-width: 680px;
-    margin: 0;
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 14px;
-    line-height: 1.7;
-}
-
-.organizer-welcome-icon {
-    position: absolute;
-    top: 20px;
-    right: 35px;
-    color: rgba(255, 255, 255, 0.12);
-    font-size: 150px;
-    pointer-events: none;
-}
-
-.organizer-create-button {
-    position: absolute;
-    right: 35px;
-    bottom: 28px;
-    z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 11px 17px;
-    color: #07549b;
-    background: #fff;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.organizer-create-button:hover {
-    color: #064078;
-    background: #eaf4ff;
+/* Hiệu ứng khi rê chuột */
+.dashboard-activity-item:hover {
     transform: translateY(-2px);
+    border-color: #b9d2f5;
+    border-left-color: #084298;
+    background: #fbfdff;
+    box-shadow: 0 7px 18px rgba(13, 75, 145, 0.09);
 }
 
-.organizer-warning {
+/* Nội dung hoạt động */
+.dashboard-activity-content {
+    min-width: 0;
+}
+
+/* Tên hoạt động */
+.dashboard-activity-content h5 {
+    margin: 0 0 11px;
+    color: #123f78;
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    transition: color 0.2s ease;
+}
+
+.dashboard-activity-item:hover .dashboard-activity-content h5 {
+    color: #0d6efd;
+}
+
+/* Thông tin mô tả */
+.dashboard-activity-content p {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    margin-bottom: 13px;
-    padding: 10px 12px;
-    color: #fff3cd;
-    background: rgba(255, 193, 7, 0.17);
-    border: 1px solid rgba(255, 220, 100, 0.35);
-    border-radius: 8px;
+    margin: 6px 0;
+    color: #66758a;
+    font-size: 12.5px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+/* Biểu tượng thông tin nếu có */
+.dashboard-activity-content p i {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #0d6efd;
     font-size: 13px;
-    line-height: 1.5;
+}
+
+/* Nhãn trạng thái */
+.dashboard-activity-item .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+/* Nút xem chi tiết */
+.dashboard-activity-item .btn {
+    padding: 7px 13px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 650;
+    transition: all 0.2s ease;
+}
+
+.dashboard-activity-item .btn-primary {
+    border-color: #0d6efd;
+    background: #0d6efd;
+}
+
+.dashboard-activity-item .btn-primary:hover {
+    border-color: #084298;
+    background: #084298;
+    box-shadow: 0 3px 9px rgba(13, 110, 253, 0.2);
+}
+
+/* Đường phân cách nếu danh sách sử dụng các phần tử con */
+.dashboard-activity-item hr {
+    margin: 12px 0;
+    border-color: #e9eff7;
+    opacity: 1;
+}
+
+/* Thanh cuộn */
+.dashboard-activity-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dashboard-activity-list::-webkit-scrollbar-track {
+    background: #f1f5fb;
+    border-radius: 10px;
+}
+
+.dashboard-activity-list::-webkit-scrollbar-thumb {
+    background: #a9bfdc;
+    border-radius: 10px;
+}
+
+.dashboard-activity-list::-webkit-scrollbar-thumb:hover {
+    background: #0d6efd;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .organizer-welcome {
-        padding: 25px 22px 85px;
-        min-height: auto;
+    .dashboard-activity-list {
+        max-height: 350px;
+        gap: 10px;
+        padding-right: 6px;
     }
 
-    .organizer-welcome-icon {
-        top: 15px;
-        right: 15px;
-        font-size: 95px;
-    }
-
-    .organizer-create-button {
-        right: auto;
-        left: 22px;
-        bottom: 20px;
-    }
-
-    .organizer-account-info {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .organizer-account-info span {
-        max-width: 100%;
-        overflow-wrap: anywhere;
+    .dashboard-activity-item {
+        padding: 14px 15px;
     }
 }
 
-@media (max-width: 768px) {
-    .dashboard-welcome {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 18px;
-        padding: 23px 21px;
+@media (max-width: 576px) {
+    .dashboard-activity-list {
+        max-height: 300px;
+        gap: 9px;
     }
 
-    .dashboard-welcome-action {
-        width: 100%;
-        justify-content: flex-end;
+    .dashboard-activity-item {
+        padding: 13px;
+        border-radius: 10px;
+    }
+
+    .dashboard-activity-content h5 {
+        font-size: 14px;
+    }
+
+    .dashboard-activity-content p {
+        font-size: 12px;
+    }
+}
+
+/* =========================================================
+   NÂNG CẤP GIAO DIỆN ĐĂNG KÝ GẦN ĐÂY
+========================================================= */
+
+/* Khung danh sách đăng ký */
+.dashboard-registration-list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    max-height: 390px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 5px 9px 5px 5px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #a9bfdc #f1f5fb;
+}
+
+/* Từng đăng ký */
+.dashboard-registration-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 15px 17px;
+    border: 1px solid #e2eaf5;
+    border-left: 4px solid #0d6efd;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(25, 65, 120, 0.035);
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
+}
+
+/* Hiệu ứng hover */
+.dashboard-registration-item:hover {
+    transform: translateY(-2px);
+    border-color: #b9d2f5;
+    border-left-color: #084298;
+    background: #fbfdff;
+    box-shadow: 0 7px 18px rgba(13, 75, 145, 0.09);
+}
+
+/* Tên hoạt động */
+.dashboard-registration-item h6 {
+    margin: 0;
+    color: #123f78;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* Thông tin đăng ký */
+.dashboard-registration-item p {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    color: #66758a;
+    font-size: 12px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+/* Biểu tượng thông tin */
+.dashboard-registration-item p i {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #0d6efd;
+    font-size: 13px;
+}
+
+/* Trạng thái đăng ký */
+.dashboard-registration-item .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 650;
+    white-space: normal;
+}
+
+/* Liên kết hoặc nút thao tác nếu có */
+.dashboard-registration-item a {
+    color: #0d6efd;
+    font-size: 12px;
+    font-weight: 650;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.dashboard-registration-item a:hover {
+    color: #084298;
+    text-decoration: underline;
+}
+
+/* Đường phân cách */
+.dashboard-registration-item hr {
+    margin: 4px 0;
+    border-color: #e9eff7;
+    opacity: 1;
+}
+
+/* Thanh cuộn */
+.dashboard-registration-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dashboard-registration-list::-webkit-scrollbar-track {
+    background: #f1f5fb;
+    border-radius: 10px;
+}
+
+.dashboard-registration-list::-webkit-scrollbar-thumb {
+    background: #a9bfdc;
+    border-radius: 10px;
+}
+
+.dashboard-registration-list::-webkit-scrollbar-thumb:hover {
+    background: #0d6efd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-registration-list {
+        max-height: 350px;
+        gap: 10px;
+        padding-right: 6px;
+    }
+
+    .dashboard-registration-item {
+        padding: 14px 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-registration-list {
+        max-height: 300px;
+        gap: 9px;
+    }
+
+    .dashboard-registration-item {
+        padding: 13px;
+        border-radius: 10px;
+    }
+
+    .dashboard-registration-item h6 {
+        font-size: 13px;
+    }
+
+    .dashboard-registration-item p {
+        font-size: 11.5px;
     }
 }
