@@ -1,20 +1,31 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
 export default defineConfig({
-plugins: [react()],
+    plugins: [react()],
 
-// Nếu bạn muốn chạy ở port cố định
-server: {
-    port: 5173,
-    open: true, // tự mở trình duyệt khi chạy
-},
+    server: {
+        port: 5173,
+        open: true,
 
-// Nếu có alias path (tùy chọn)
-resolve: {
-    alias: {
-    '@': '/src',
+        proxy: {
+            '/api': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/uploads': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+                secure: false,
+            },
+        },
     },
-},
-})
+
+    resolve: {
+        alias: {
+            '@': '/src',
+        },
+    },
+});

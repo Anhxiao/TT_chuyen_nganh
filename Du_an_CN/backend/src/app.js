@@ -10,7 +10,7 @@ const registrationRoutes = require('./routes/registration.routes');
 const participationRoutes = require('./routes/participation.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const clubRoutes = require('./routes/club.routes');
-
+const attendanceRoutes = require('./routes/attendance.routes');
 // Middleware xử lý lỗi
 const { errorHandler } = require('./middlewares/error.middleware');
 
@@ -40,6 +40,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Danh sách CLB và đăng ký thành viên CLB.
 app.use('/api/clubs', clubRoutes);
+
+// Điểm danh QR
+app.use('/api/attendance', attendanceRoutes);
 
 // ==========================================
 // 2. API kiểm tra trạng thái Backend
