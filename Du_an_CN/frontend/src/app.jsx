@@ -22,6 +22,7 @@ import OrganizerActivityHistory from "./pages/OrganizerActivityHistory";
 import OrganizerActivityDetail from "./pages/OrganizerActivityDetail";
 import OrganizerOrganizationIntroduction from "./pages/OrganizerOrganizationIntroduction";
 import ActivityDetail from "./pages/ActivityDetail";
+import StudentAttendance from "./pages/StudentAttendance";
 
 function App() {
     return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/student/introduction/clb-ky-nang-song" element={<IntrodutionKNSStudent />} />
             <Route path="/student/introduction/clb-truyen-thong" element={<IntrodutionTTStudent />} />
             <Route path="/student/introduction/clb-van-hoa-nghe-thuat" element={<IntrodutionVHNTStudent />} />
+            <Route path="/student/attendance" element={<StudentAttendance />} />
             {/* Dashboard đơn vị tổ chức */}
             <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
             <Route path="/organizer/notifications" element={<NontificationOrganizer />} />

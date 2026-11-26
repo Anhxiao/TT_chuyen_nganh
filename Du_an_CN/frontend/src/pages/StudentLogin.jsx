@@ -1,11 +1,21 @@
 
 import { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {
+    Link,
+    useNavigate,
+    useSearchParams
+} from 'react-router-dom';
+
 import { AuthContext } from '../contexts/AuthContext';
 
 function StudentLogin() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
     const { login } = useContext(AuthContext);
+
+    // Lấy đường dẫn cần quay lại sau khi đăng nhập
+    const redirect = searchParams.get('redirect');
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,15 +42,30 @@ function StudentLogin() {
             );
 
             if (!result.success) {
-                setError(result.message);
+                setError(
+                    result.message || 'Thông tin đăng nhập không chính xác.'
+                );
                 return;
             }
 
-            navigate('/student/dashboard', {
+            // Nếu đăng nhập từ trang điểm danh thì quay lại trang đó.
+            // Nếu đăng nhập thông thường thì vào Dashboard.
+            const redirectPath =
+                redirect &&
+                redirect.startsWith('/student/') &&
+                !redirect.startsWith('//')
+                    ? redirect
+                    : '/student/dashboard';
+
+            navigate(redirectPath, {
                 replace: true
             });
+
         } catch (error) {
-            setError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.');
+            setError(
+                error.message ||
+                'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.'
+            );
         } finally {
             setLoading(false);
         }

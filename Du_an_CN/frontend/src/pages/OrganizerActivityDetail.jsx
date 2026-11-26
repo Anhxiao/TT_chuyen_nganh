@@ -232,6 +232,10 @@ function OrganizerActivityDetail() {
     const [attendanceSessionToken, setAttendanceSessionToken] =
         useState("");
 
+    const attendancePageUrl = attendanceSessionToken
+    ? `http://192.168.2.13:5173/student/attendance?token=${encodeURIComponent(attendanceSessionToken)}`
+    : "";
+
     const [attendanceSessionLoading, setAttendanceSessionLoading] =
         useState(false);
 
@@ -1516,10 +1520,9 @@ function OrganizerActivityDetail() {
                             >
                                 <QRCodeCanvas
                                     ref={qrCanvasRef}
-                                    value={attendanceSessionToken}
+                                    value={attendancePageUrl}
                                     size={256}
                                     level="H"
-                                    includeMargin
                                 />
                             </div>
 
