@@ -45,7 +45,7 @@ const attendanceRepository = {
 
             const insertResult = await new sql.Request(transaction)
                 .input("activityId", sql.BigInt, activityId)
-                .input("tokenHash", sql.VarChar(32), tokenHash)
+                .input("tokenHash", sql.VarBinary(32), tokenHash)
                 .input("expiresAt", sql.DateTime2, expiresAt)
                 .input("organizerId", sql.BigInt, organizerId)
                 .query(`
@@ -128,7 +128,7 @@ const attendanceRepository = {
 
         const result = await pool.request()
             .input("sessionId", sql.BigInt, sessionId)
-            .input("tokenHash", sql.VarChar(64), tokenHash)
+            .input("tokenHash", sql.VarBinary(32), tokenHash)
             .query(`
                 UPDATE dbo.ActivityAttendanceSessions
                 SET token_hash = @tokenHash
@@ -173,7 +173,7 @@ const attendanceRepository = {
 
         try {
             const sessionResult = await new sql.Request(transaction)
-                .input("tokenHash", sql.VarChar(64), tokenHash)
+                .input("tokenHash", sql.VarBinary(32), tokenHash)
                 .query(`
                     SELECT TOP 1
                         session_id,

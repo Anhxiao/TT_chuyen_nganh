@@ -7,8 +7,8 @@ function generateSessionToken() {
 function hashSessionToken(token) {
     return crypto
         .createHash("sha256")
-        .update(token)
-        .digest("hex");
+        .update(token, "utf8")
+        .digest();
 }
 
 module.exports = {
