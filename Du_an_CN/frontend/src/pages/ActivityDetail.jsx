@@ -754,23 +754,22 @@ function ActivityDetail() {
                                 </div>
 
                                 {/* ĐIỂM PHỤC VỤ CỘNG ĐỒNG */}
-                                <div className="activity-point-information">
-                                    <div className="activity-point-icon">
-                                        <i className="bi bi-award-fill"></i>
-                                    </div>
+                                <div className="activity-point-content">
+                                    <span>Điểm cộng khi hoàn thành hoạt động</span>
 
-                                    <div className="activity-point-content">
-                                        <span>Điểm phục vụ cộng đồng</span>
+                                    <strong>
+                                        {Number(
+                                            activity.expected_points ??
+                                            activity.expectedPoints ??
+                                            0
+                                        )} điểm
+                                    </strong>
 
-                                        <strong>
-                                            {Number(activity.expected_points ?? activity.expectedPoints ?? 0)} điểm
-                                        </strong>
-
-                                        <small>
-                                            Được cộng sau khi bạn hoàn thành hoạt động
-                                            và được đơn vị tổ chức xác nhận.
-                                        </small>
-                                    </div>
+                                    <small>
+                                        Số điểm này sẽ được cộng vào tài khoản sau khi bạn
+                                        hoàn thành hoạt động và được đơn vị tổ chức xác nhận.
+                                        Không cộng điểm khi chỉ đăng ký hoặc được duyệt tham gia.
+                                    </small>
                                 </div>
 
                                 <hr />

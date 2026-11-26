@@ -1137,3 +1137,423 @@
         font-size: 11.5px;
     }
 }
+/* =====================================================
+   DASHBOARD - DANH SÁCH HOẠT ĐỘNG
+===================================================== */
+
+/* Khu vực danh sách */
+.organizer-activity-panel {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+/* Thanh cuộn dọc riêng cho danh sách hoạt động */
+.organizer-activity-scroll {
+    max-height: 480px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 18px;
+    scrollbar-width: thin;
+    scrollbar-color: #9bb5d5 #edf2f8;
+}
+
+.organizer-activity-scroll::-webkit-scrollbar {
+    width: 9px;
+}
+
+.organizer-activity-scroll::-webkit-scrollbar-track {
+    background: #edf2f8;
+    border-radius: 10px;
+}
+
+.organizer-activity-scroll::-webkit-scrollbar-thumb {
+    background: #9bb5d5;
+    border: 2px solid #edf2f8;
+    border-radius: 10px;
+}
+
+.organizer-activity-scroll::-webkit-scrollbar-thumb:hover {
+    background: #668bb8;
+}
+
+/* Danh sách */
+.organizer-activity-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Từng hoạt động */
+.organizer-activity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 17px 8px;
+    border-bottom: 1px solid #e8edf3;
+    transition: background-color 0.2s ease;
+}
+
+.organizer-activity-item:last-child {
+    border-bottom: none;
+}
+
+.organizer-activity-item:hover {
+    background: #f7faff;
+}
+
+.organizer-activity-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+    flex: 1;
+}
+
+.organizer-activity-icon {
+    width: 43px;
+    height: 43px;
+    min-width: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #eaf2ff;
+    color: #2364b5;
+    font-size: 20px;
+}
+
+.organizer-activity-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.organizer-activity-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 9px;
+}
+
+.organizer-activity-title-row h5 {
+    margin: 0;
+    color: #203047;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.activity-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.activity-status-badge.draft {
+    background: #eef0f3;
+    color: #596273;
+}
+
+.activity-status-badge.published {
+    background: #e5efff;
+    color: #245ba8;
+}
+
+.activity-status-badge.registering {
+    background: #e3f5ff;
+    color: #08749c;
+}
+
+.activity-status-badge.ongoing {
+    background: #e2f6eb;
+    color: #16834b;
+}
+
+.activity-status-badge.completed {
+    background: #eee9ff;
+    color: #6946a8;
+}
+
+.activity-status-badge.cancelled {
+    background: #ffebeb;
+    color: #bd3c3c;
+}
+
+/* Thông tin phụ */
+.organizer-activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 18px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.organizer-activity-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.organizer-activity-meta i {
+    color: #8195ad;
+    font-size: 14px;
+}
+
+.organizer-activity-actions {
+    flex-shrink: 0;
+}
+
+.organizer-activity-actions .btn {
+    min-width: 94px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Trạng thái tải dữ liệu, lỗi và danh sách trống */
+.dashboard-activity-message {
+    min-height: 220px;
+    padding: 35px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    color: #64748b;
+}
+
+.dashboard-activity-message > i {
+    font-size: 38px;
+    color: #91a4bb;
+}
+
+.dashboard-activity-message h5 {
+    margin: 0;
+    color: #26384d;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.dashboard-activity-message p {
+    max-width: 460px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.dashboard-activity-error > i {
+    color: #dc5555;
+}
+
+.dashboard-activity-error span {
+    max-width: 600px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+/* Phần cuối danh sách */
+.organizer-activity-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    padding: 13px 8px 10px;
+    border-top: 1px solid #e8edf3;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+}
+
+.organizer-activity-footer a {
+    color: #2364b5;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.organizer-activity-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Nút làm mới */
+.dashboard-refresh-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border: 1px solid #d5dfeb;
+    border-radius: 8px;
+    background: #fff;
+    color: #315b8d;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.dashboard-refresh-button:hover:not(:disabled) {
+    background: #edf5ff;
+    border-color: #9dbce0;
+}
+
+.dashboard-refresh-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.dashboard-spin {
+    animation: dashboard-spin-animation 1s linear infinite;
+}
+
+@keyframes dashboard-spin-animation {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =====================================================
+   DASHBOARD - TỐI ƯU KÍCH THƯỚC VÀ THANH CUỘN TRANG
+===================================================== */
+
+.dashboard-page {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 24px 28px 40px;
+}
+
+.dashboard-section {
+    margin-bottom: 25px;
+}
+
+.dashboard-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 13px;
+}
+
+.dashboard-section-heading h4 {
+    margin-bottom: 4px;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.dashboard-section-heading p {
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #718096;
+}
+
+.dashboard-stat-card {
+    min-height: 100px;
+    padding: 17px;
+    gap: 13px;
+}
+
+.dashboard-stat-card p {
+    margin-bottom: 5px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.dashboard-stat-card h3 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 750;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 18px 14px 30px;
+    }
+
+    .organizer-activity-scroll {
+        max-height: 430px;
+        padding: 5px 12px;
+    }
+
+    .organizer-activity-item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px 5px;
+    }
+
+    .organizer-activity-main {
+        width: 100%;
+        gap: 10px;
+    }
+
+    .organizer-activity-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        font-size: 17px;
+    }
+
+    .organizer-activity-title-row h5 {
+        font-size: 15px;
+    }
+
+    .organizer-activity-meta {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+    }
+
+    .organizer-activity-actions {
+        width: 100%;
+        padding-left: 48px;
+    }
+
+    .organizer-activity-actions .btn {
+        width: 100%;
+    }
+
+    .dashboard-stat-card {
+        min-height: 90px;
+        padding: 12px;
+    }
+
+    .dashboard-stat-card h3 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 420px) {
+    .dashboard-container {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .organizer-activity-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dashboard-refresh-button {
+        padding: 7px 10px;
+    }
+}

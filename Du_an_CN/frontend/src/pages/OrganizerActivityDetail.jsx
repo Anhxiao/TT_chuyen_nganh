@@ -388,7 +388,7 @@ function OrganizerActivityDetail() {
         "Hoạt động chưa có mô tả.";
     
         // Điểm phục vụ cộng đồng dự kiến của hoạt động
-    const expectedPoints = Number(
+    const activityPoints = Number(
         activity?.expected_points ??
         activity?.expectedPoints ??
         0
@@ -587,8 +587,8 @@ function OrganizerActivityDetail() {
                     </div>
 
                     <div className="activity-stat-item">
-                        <span>Điểm phục vụ cộng đồng dự kiến</span>
-                        <strong>{expectedPoints} điểm</strong>
+                        <span>Điểm cộng khi hoàn thành hoạt động</span>
+                        <strong>{activityPoints} điểm</strong>
                     </div>
 
                     <div className="activity-stat-item">
@@ -631,10 +631,11 @@ function OrganizerActivityDetail() {
                     <div className="activity-stat-note">
                         <i className="bi bi-info-circle"></i>
 
-                        Điểm phục vụ cộng đồng ở trên là mức điểm dự kiến của hoạt động.
-                        Điểm thực tế của từng sinh viên chỉ được ghi nhận sau khi đơn vị
-                        tổ chức xác nhận kết quả tham gia. Dữ liệu điểm danh và minh chứng
-                        sẽ được cập nhật khi tích hợp các chức năng tương ứng.
+                        Số điểm trên là mức điểm được đơn vị tổ chức thiết lập
+                        cho sinh viên khi hoàn thành hoạt động. Sinh viên chỉ
+                        được ghi nhận điểm sau khi tham gia và được đơn vị tổ
+                        chức xác nhận hoàn thành. Hệ thống không cộng điểm khi
+                        sinh viên chỉ đăng ký hoặc được duyệt đăng ký.
                     </div>
                 </aside>
             </div>
