@@ -13,7 +13,24 @@ function createError(message, statusCode = 400) {
 }
 
 // ======================================================
-// 2. TẠO MÃ HOẠT ĐỘNG
+// 2. KIỂM TRA MÃ HOẠT ĐỘNG
+// ======================================================
+
+function validateActivityId(activityId) {
+    const id = Number(activityId);
+
+    if (
+        !Number.isSafeInteger(id) ||
+        id <= 0
+    ) {
+        throw createError('Mã hoạt động không hợp lệ.', 400);
+    }
+
+    return id;
+}
+
+// ======================================================
+// 3. TẠO MÃ HOẠT ĐỘNG
 // ======================================================
 
 function generateActivityCode() {
@@ -34,11 +51,15 @@ function generateActivityCode() {
 }
 
 // ======================================================
-// 3. KIỂM TRA DỮ LIỆU HOẠT ĐỘNG
+// 4. KIỂM TRA DỮ LIỆU HOẠT ĐỘNG
 // ======================================================
 
 function validateActivityData(data, isUpdate = false) {
-    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    if (
+        !data ||
+        typeof data !== 'object' ||
+        Array.isArray(data)
+    ) {
         throw createError('Dữ liệu hoạt động không hợp lệ.');
     }
 
@@ -53,7 +74,7 @@ function validateActivityData(data, isUpdate = false) {
     ];
 
     // --------------------------------------------------
-    // 3.1. Kiểm tra các trường bắt buộc khi tạo mới
+    // 4.1. Kiểm tra trường bắt buộc khi tạo mới
     // --------------------------------------------------
 
     if (!isUpdate) {
@@ -71,7 +92,69 @@ function validateActivityData(data, isUpdate = false) {
     }
 
     // --------------------------------------------------
-    // 3.2. Kiểm tra số lượng người tham gia tối đa
+    // 4.2. Kiểm tra tên hoạt động
+    // --------------------------------------------------
+
+    if (
+        data.activityName !== undefined &&
+        (
+            typeof data.activityName !== 'string' ||
+            !data.activityName.trim()
+        )
+    ) {
+        throw createError('Tên hoạt động không được để trống.');
+    }
+
+    if (
+        typeof data.activityName === 'string' &&
+        data.activityName.trim().length > 255
+    ) {
+        throw createError('Tên hoạt động không được vượt quá 255 ký tự.');
+    }
+
+    // --------------------------------------------------
+    // 4.3. Kiểm tra đơn vị tổ chức
+    // --------------------------------------------------
+
+    if (data.organizationId !== undefined) {
+        const organizationId = Number(data.organizationId);
+
+        if (
+            !Number.isSafeInteger(organizationId) ||
+            organizationId <= 0
+        ) {
+            throw createError('Đơn vị tổ chức không hợp lệ.');
+        }
+    }
+
+    // --------------------------------------------------
+    // 4.4. Kiểm tra địa điểm
+    // --------------------------------------------------
+
+    if (
+        data.location !== undefined &&
+        (
+            typeof data.location !== 'string' ||
+            !data.location.trim()
+        )
+    ) {
+        throw createError('Địa điểm tổ chức không được để trống.');
+    }
+
+    // --------------------------------------------------
+    // 4.5. Kiểm tra mô tả
+    // --------------------------------------------------
+
+    if (
+        data.description !== undefined &&
+        data.description !== null &&
+        typeof data.description !== 'string'
+    ) {
+        throw createError('Mô tả hoạt động không hợp lệ.');
+    }
+
+    // --------------------------------------------------
+    // 4.6. Kiểm tra số lượng người tham gia tối đa
     // --------------------------------------------------
 
     if (
@@ -92,16 +175,14 @@ function validateActivityData(data, isUpdate = false) {
     }
 
     // --------------------------------------------------
-    // 3.3. Kiểm tra điểm cộng khi hoàn thành hoạt động
+    // 4.7. Kiểm tra điểm hoạt động
     // --------------------------------------------------
 
     if (
         data.expectedPoints !== undefined &&
         data.expectedPoints !== null
     ) {
-        if (
-            String(data.expectedPoints).trim() === ''
-        ) {
+        if (String(data.expectedPoints).trim() === '') {
             throw createError(
                 'Điểm cộng khi hoàn thành hoạt động không được để trống.'
             );
@@ -121,37 +202,56 @@ function validateActivityData(data, isUpdate = false) {
     }
 
     // --------------------------------------------------
-    // 3.4. Kiểm tra định dạng ngày giờ
+    // 4.8. Kiểm tra ngày giờ
     // --------------------------------------------------
 
-    const dates = [
-        data.registrationStart,
-        data.registrationEnd,
-        data.activityStart,
-        data.activityEnd
+    const dateFields = [
+        'registrationStart',
+        'registrationEnd',
+        'activityStart',
+        'activityEnd'
     ];
 
-    const suppliedDates = dates.filter(
-        value => value !== undefined && value !== null
-    );
+    for (const field of dateFields) {
+        const value = data[field];
 
-    for (const value of suppliedDates) {
-        if (Number.isNaN(Date.parse(value))) {
+        if (value === undefined || value === null) {
+            continue;
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
             throw createError(
-                'Ngày hoặc giờ hoạt động không hợp lệ.'
+                `Thời gian ${field} không hợp lệ.`
             );
         }
     }
 
+    const registrationStart = data.registrationStart
+        ? new Date(data.registrationStart)
+        : null;
+
+    const registrationEnd = data.registrationEnd
+        ? new Date(data.registrationEnd)
+        : null;
+
+    const activityStart = data.activityStart
+        ? new Date(data.activityStart)
+        : null;
+
+    const activityEnd = data.activityEnd
+        ? new Date(data.activityEnd)
+        : null;
+
     // --------------------------------------------------
-    // 3.5. Kiểm tra thời gian đăng ký
+    // 4.9. Kiểm tra thời gian đăng ký
     // --------------------------------------------------
 
     if (
-        data.registrationStart &&
-        data.registrationEnd &&
-        new Date(data.registrationStart) >=
-        new Date(data.registrationEnd)
+        registrationStart &&
+        registrationEnd &&
+        registrationStart >= registrationEnd
     ) {
         throw createError(
             'Thời gian kết thúc đăng ký phải sau thời gian bắt đầu.'
@@ -159,14 +259,13 @@ function validateActivityData(data, isUpdate = false) {
     }
 
     // --------------------------------------------------
-    // 3.6. Kiểm tra thời gian diễn ra hoạt động
+    // 4.10. Kiểm tra thời gian diễn ra hoạt động
     // --------------------------------------------------
 
     if (
-        data.activityStart &&
-        data.activityEnd &&
-        new Date(data.activityStart) >=
-        new Date(data.activityEnd)
+        activityStart &&
+        activityEnd &&
+        activityStart >= activityEnd
     ) {
         throw createError(
             'Thời gian kết thúc hoạt động phải sau thời gian bắt đầu.'
@@ -174,14 +273,13 @@ function validateActivityData(data, isUpdate = false) {
     }
 
     // --------------------------------------------------
-    // 3.7. Kiểm tra thời gian đăng ký và thời gian hoạt động
+    // 4.11. Kiểm tra thời gian đăng ký và hoạt động
     // --------------------------------------------------
 
     if (
-        data.registrationEnd &&
-        data.activityStart &&
-        new Date(data.registrationEnd) >
-        new Date(data.activityStart)
+        registrationEnd &&
+        activityStart &&
+        registrationEnd > activityStart
     ) {
         throw createError(
             'Thời gian đăng ký không được kết thúc sau khi hoạt động bắt đầu.'
@@ -189,21 +287,19 @@ function validateActivityData(data, isUpdate = false) {
     }
 
     // --------------------------------------------------
-    // 3.8. Kiểm tra hình thức đăng ký
+    // 4.12. Kiểm tra hình thức đăng ký
     // --------------------------------------------------
 
     if (
-        data.registrationMode &&
+        data.registrationMode !== undefined &&
         !['OPEN', 'APPROVAL'].includes(data.registrationMode)
     ) {
-        throw createError(
-            'Hình thức đăng ký không hợp lệ.'
-        );
+        throw createError('Hình thức đăng ký không hợp lệ.');
     }
 }
 
 // ======================================================
-// 4. LẤY DANH SÁCH HOẠT ĐỘNG
+// 5. LẤY DANH SÁCH HOẠT ĐỘNG
 // ======================================================
 
 async function getActivities({
@@ -224,15 +320,13 @@ async function getActivities({
         limit < 1 ||
         limit > 100
     ) {
-        throw createError(
-            'Thông tin phân trang không hợp lệ.'
-        );
+        throw createError('Thông tin phân trang không hợp lệ.');
     }
 
     // Người chưa đăng nhập chỉ được xem hoạt động đã công bố.
     const effectiveStatus = currentUser
         ? status
-        : (status || 'PUBLISHED');
+        : 'PUBLISHED';
 
     return activityRepository.getActivities({
         keyword,
@@ -244,22 +338,19 @@ async function getActivities({
 }
 
 // ======================================================
-// 5. LẤY CHI TIẾT HOẠT ĐỘNG
+// 6. LẤY CHI TIẾT HOẠT ĐỘNG
 // ======================================================
 
 async function getActivityById({
     activityId,
     currentUser
 }) {
-    const activity = await activityRepository.findById(
-        activityId
-    );
+    const id = validateActivityId(activityId);
+
+    const activity = await activityRepository.findById(id);
 
     if (!activity) {
-        throw createError(
-            'Không tìm thấy hoạt động.',
-            404
-        );
+        throw createError('Không tìm thấy hoạt động.', 404);
     }
 
     // Người chưa đăng nhập không được xem hoạt động chưa công bố.
@@ -267,9 +358,60 @@ async function getActivityById({
         !currentUser &&
         activity.status !== 'PUBLISHED'
     ) {
+        throw createError('Không tìm thấy hoạt động.', 404);
+    }
+
+    return activity;
+}
+
+// ======================================================
+// 7. LẤY THÔNG TIN BẢN NHÁP ĐỂ CHỈNH SỬA
+// ======================================================
+
+async function getActivityForEdit({
+    activityId,
+    actorId
+}) {
+    const id = validateActivityId(activityId);
+
+    if (!actorId) {
+        throw createError('Không xác định được tài khoản đăng nhập.', 401);
+    }
+
+    // --------------------------------------------------
+    // 7.1. Kiểm tra hoạt động tồn tại
+    // --------------------------------------------------
+
+    const activity = await activityRepository.findById(id);
+
+    if (!activity) {
+        throw createError('Không tìm thấy hoạt động.', 404);
+    }
+
+    // --------------------------------------------------
+    // 7.2. Chỉ cho phép lấy thông tin bản nháp
+    // --------------------------------------------------
+
+    if (activity.status !== 'DRAFT') {
         throw createError(
-            'Không tìm thấy hoạt động.',
-            404
+            'Chỉ được chỉnh sửa hoạt động ở trạng thái bản nháp.',
+            409
+        );
+    }
+
+    // --------------------------------------------------
+    // 7.3. Kiểm tra thành viên đơn vị tổ chức
+    // --------------------------------------------------
+
+    const isMember = await activityRepository.isOrganizationMember(
+        actorId,
+        activity.organization_id
+    );
+
+    if (!isMember) {
+        throw createError(
+            'Bạn không có quyền chỉnh sửa hoạt động này.',
+            403
         );
     }
 
@@ -277,7 +419,7 @@ async function getActivityById({
 }
 
 // ======================================================
-// 6. TẠO HOẠT ĐỘNG
+// 8. TẠO HOẠT ĐỘNG
 // ======================================================
 
 async function createActivity({
@@ -286,8 +428,12 @@ async function createActivity({
 }) {
     validateActivityData(data);
 
+    if (!actorId) {
+        throw createError('Không xác định được tài khoản đăng nhập.', 401);
+    }
+
     // --------------------------------------------------
-    // 6.1. Kiểm tra đơn vị tổ chức
+    // 8.1. Kiểm tra đơn vị tổ chức
     // --------------------------------------------------
 
     const organizationId = Number(data.organizationId);
@@ -296,13 +442,11 @@ async function createActivity({
         !Number.isSafeInteger(organizationId) ||
         organizationId <= 0
     ) {
-        throw createError(
-            'Đơn vị tổ chức không hợp lệ.'
-        );
+        throw createError('Đơn vị tổ chức không hợp lệ.');
     }
 
     // --------------------------------------------------
-    // 6.2. Kiểm tra quyền thành viên đơn vị
+    // 8.2. Kiểm tra thành viên đơn vị
     // --------------------------------------------------
 
     const isMember = await activityRepository.isOrganizationMember(
@@ -318,44 +462,31 @@ async function createActivity({
     }
 
     // --------------------------------------------------
-    // 6.3. Chuẩn hóa điểm hoạt động
+    // 8.3. Chuẩn hóa dữ liệu
     // --------------------------------------------------
 
-    const expectedPoints = Number(
-        data.expectedPoints ?? 0
-    );
+    const expectedPoints = Number(data.expectedPoints ?? 0);
 
     // --------------------------------------------------
-    // 6.4. Lưu hoạt động vào database
+    // 8.4. Lưu hoạt động
     // --------------------------------------------------
 
     const activity = await activityRepository.createActivity({
         activityCode: generateActivityCode(),
-
         organizationId,
-
         activityName: data.activityName.trim(),
-
-        description: data.description?.trim() || null,
-
+        description:
+            typeof data.description === 'string'
+                ? data.description.trim() || null
+                : null,
         location: data.location.trim(),
-
         registrationStart: data.registrationStart,
-
         registrationEnd: data.registrationEnd,
-
         activityStart: data.activityStart,
-
         activityEnd: data.activityEnd,
-
         maxParticipants: data.maxParticipants ?? null,
-
-        // Điểm được đơn vị tổ chức thiết lập
-        // và chỉ cộng sau khi sinh viên hoàn thành hoạt động.
         expectedPoints,
-
         registrationMode: data.registrationMode || 'OPEN',
-
         createdBy: actorId
     });
 
@@ -363,7 +494,7 @@ async function createActivity({
 }
 
 // ======================================================
-// 7. CẬP NHẬT HOẠT ĐỘNG
+// 9. CẬP NHẬT HOẠT ĐỘNG
 // ======================================================
 
 async function updateActivity({
@@ -371,23 +502,28 @@ async function updateActivity({
     data,
     actorId
 }) {
-    // --------------------------------------------------
-    // 7.1. Kiểm tra hoạt động tồn tại
-    // --------------------------------------------------
+    const id = validateActivityId(activityId);
 
-    const existing = await activityRepository.findById(
-        activityId
-    );
+    if (!actorId) {
+        throw createError('Không xác định được tài khoản đăng nhập.', 401);
+    }
 
-    if (!existing) {
-        throw createError(
-            'Không tìm thấy hoạt động.',
-            404
-        );
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        throw createError('Dữ liệu cập nhật không hợp lệ.');
     }
 
     // --------------------------------------------------
-    // 7.2. Chỉ cho phép chỉnh sửa bản nháp
+    // 9.1. Kiểm tra hoạt động tồn tại
+    // --------------------------------------------------
+
+    const existing = await activityRepository.findById(id);
+
+    if (!existing) {
+        throw createError('Không tìm thấy hoạt động.', 404);
+    }
+
+    // --------------------------------------------------
+    // 9.2. Chỉ cho phép cập nhật bản nháp
     // --------------------------------------------------
 
     if (existing.status !== 'DRAFT') {
@@ -398,7 +534,7 @@ async function updateActivity({
     }
 
     // --------------------------------------------------
-    // 7.3. Kiểm tra quyền của đơn vị tổ chức
+    // 9.3. Kiểm tra quyền thành viên đơn vị tổ chức
     // --------------------------------------------------
 
     const isMember = await activityRepository.isOrganizationMember(
@@ -414,83 +550,101 @@ async function updateActivity({
     }
 
     // --------------------------------------------------
-    // 7.4. Kết hợp dữ liệu mới với dữ liệu hiện tại
+    // 9.4. Kiểm tra trường nào được gửi lên
+    // --------------------------------------------------
+
+    const hasField = (field) =>
+        Object.prototype.hasOwnProperty.call(data, field);
+
+    // --------------------------------------------------
+    // 9.5. Kết hợp dữ liệu mới với dữ liệu hiện tại
     // --------------------------------------------------
 
     const mergedData = {
-        activityName:
-            data.activityName ?? existing.activity_name,
+        activityName: hasField('activityName')
+            ? data.activityName
+            : existing.activity_name,
 
-        organizationId:
-            existing.organization_id,
+        // Không cho phép thay đổi đơn vị sở hữu hoạt động.
+        organizationId: existing.organization_id,
 
-        location:
-            data.location ?? existing.location,
+        location: hasField('location')
+            ? data.location
+            : existing.location,
 
-        registrationStart:
-            data.registrationStart ?? existing.registration_start,
+        registrationStart: hasField('registrationStart')
+            ? data.registrationStart
+            : existing.registration_start,
 
-        registrationEnd:
-            data.registrationEnd ?? existing.registration_end,
+        registrationEnd: hasField('registrationEnd')
+            ? data.registrationEnd
+            : existing.registration_end,
 
-        activityStart:
-            data.activityStart ?? existing.activity_start,
+        activityStart: hasField('activityStart')
+            ? data.activityStart
+            : existing.activity_start,
 
-        activityEnd:
-            data.activityEnd ?? existing.activity_end,
+        activityEnd: hasField('activityEnd')
+            ? data.activityEnd
+            : existing.activity_end,
 
-        maxParticipants:
-            data.maxParticipants ?? existing.max_participants,
+        maxParticipants: hasField('maxParticipants')
+            ? data.maxParticipants
+            : existing.max_participants,
 
-        expectedPoints:
-            data.expectedPoints ?? existing.expected_points,
+        expectedPoints: hasField('expectedPoints')
+            ? data.expectedPoints
+            : existing.expected_points,
 
-        registrationMode:
-            data.registrationMode ?? existing.registration_mode
+        registrationMode: hasField('registrationMode')
+            ? data.registrationMode
+            : existing.registration_mode
     };
 
-    // Kiểm tra dữ liệu sau khi kết hợp.
+    // --------------------------------------------------
+    // 9.6. Kiểm tra dữ liệu sau khi kết hợp
+    // --------------------------------------------------
+
     validateActivityData(mergedData, true);
 
     // --------------------------------------------------
-    // 7.5. Chuẩn hóa dữ liệu điểm
+    // 9.7. Chuẩn hóa dữ liệu cập nhật
     // --------------------------------------------------
 
-    const expectedPoints =
-        data.expectedPoints === undefined ||
-        data.expectedPoints === null
-            ? undefined
-            : Number(data.expectedPoints);
+    const updateData = {
+        activityName: mergedData.activityName.trim(),
+
+        // Cho phép xóa nội dung mô tả bằng cách gửi null.
+        description: hasField('description')
+            ? (
+                typeof data.description === 'string'
+                    ? data.description.trim() || null
+                    : data.description
+            )
+            : existing.description,
+
+        location: mergedData.location.trim(),
+
+        registrationStart: mergedData.registrationStart,
+        registrationEnd: mergedData.registrationEnd,
+        activityStart: mergedData.activityStart,
+        activityEnd: mergedData.activityEnd,
+
+        // Cho phép bỏ giới hạn số lượng khi gửi null.
+        maxParticipants: mergedData.maxParticipants,
+
+        expectedPoints: Number(mergedData.expectedPoints ?? 0),
+
+        registrationMode: mergedData.registrationMode
+    };
 
     // --------------------------------------------------
-    // 7.6. Cập nhật database
+    // 9.8. Cập nhật database
     // --------------------------------------------------
 
     const updated = await activityRepository.updateActivity(
-        activityId,
-        {
-            activityName: data.activityName,
-
-            description: data.description,
-
-            location: data.location,
-
-            registrationStart: data.registrationStart,
-
-            registrationEnd: data.registrationEnd,
-
-            activityStart: data.activityStart,
-
-            activityEnd: data.activityEnd,
-
-            maxParticipants: data.maxParticipants,
-
-            // Không gửi trường này nếu người dùng không cập nhật điểm.
-            // Repository sẽ giữ nguyên giá trị hiện tại.
-            expectedPoints,
-
-            registrationMode: data.registrationMode
-        }
+        id,
+        updateData
     );
 
     if (!updated) {
@@ -500,35 +654,39 @@ async function updateActivity({
         );
     }
 
-    // Trả về dữ liệu mới nhất sau khi cập nhật.
-    return activityRepository.findById(activityId);
+    // --------------------------------------------------
+    // 9.9. Trả về dữ liệu sau khi cập nhật
+    // --------------------------------------------------
+
+    return activityRepository.findById(id);
 }
 
 // ======================================================
-// 8. CÔNG BỐ HOẠT ĐỘNG
+// 10. CÔNG BỐ HOẠT ĐỘNG
 // ======================================================
 
 async function publishActivity({
     activityId,
     actorId
 }) {
-    // --------------------------------------------------
-    // 8.1. Kiểm tra hoạt động tồn tại
-    // --------------------------------------------------
+    const id = validateActivityId(activityId);
 
-    const existing = await activityRepository.findById(
-        activityId
-    );
-
-    if (!existing) {
-        throw createError(
-            'Không tìm thấy hoạt động.',
-            404
-        );
+    if (!actorId) {
+        throw createError('Không xác định được tài khoản đăng nhập.', 401);
     }
 
     // --------------------------------------------------
-    // 8.2. Chỉ cho phép công bố bản nháp
+    // 10.1. Kiểm tra hoạt động tồn tại
+    // --------------------------------------------------
+
+    const existing = await activityRepository.findById(id);
+
+    if (!existing) {
+        throw createError('Không tìm thấy hoạt động.', 404);
+    }
+
+    // --------------------------------------------------
+    // 10.2. Chỉ cho phép công bố bản nháp
     // --------------------------------------------------
 
     if (existing.status !== 'DRAFT') {
@@ -539,7 +697,7 @@ async function publishActivity({
     }
 
     // --------------------------------------------------
-    // 8.3. Kiểm tra quyền đơn vị tổ chức
+    // 10.3. Kiểm tra thành viên đơn vị tổ chức
     // --------------------------------------------------
 
     const isMember = await activityRepository.isOrganizationMember(
@@ -555,12 +713,27 @@ async function publishActivity({
     }
 
     // --------------------------------------------------
-    // 8.4. Thực hiện công bố
+    // 10.4. Kiểm tra dữ liệu trước khi công bố
     // --------------------------------------------------
 
-    const published = await activityRepository.publishActivity(
-        activityId
-    );
+    validateActivityData({
+        activityName: existing.activity_name,
+        organizationId: existing.organization_id,
+        location: existing.location,
+        registrationStart: existing.registration_start,
+        registrationEnd: existing.registration_end,
+        activityStart: existing.activity_start,
+        activityEnd: existing.activity_end,
+        maxParticipants: existing.max_participants,
+        expectedPoints: existing.expected_points,
+        registrationMode: existing.registration_mode
+    }, true);
+
+    // --------------------------------------------------
+    // 10.5. Thực hiện công bố
+    // --------------------------------------------------
+
+    const published = await activityRepository.publishActivity(id);
 
     if (!published) {
         throw createError(
@@ -569,16 +742,17 @@ async function publishActivity({
         );
     }
 
-    return activityRepository.findById(activityId);
+    return activityRepository.findById(id);
 }
 
 // ======================================================
-// 9. EXPORT
+// 11. EXPORT
 // ======================================================
 
 module.exports = {
     getActivities,
     getActivityById,
+    getActivityForEdit,
     createActivity,
     updateActivity,
     publishActivity

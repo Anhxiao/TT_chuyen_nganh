@@ -23,6 +23,7 @@ import OrganizerActivityDetail from "./pages/OrganizerActivityDetail";
 import OrganizerOrganizationIntroduction from "./pages/OrganizerOrganizationIntroduction";
 import ActivityDetail from "./pages/ActivityDetail";
 import StudentAttendance from "./pages/StudentAttendance";
+import EditActivityOrganizer from "./pages/EditActivityOrganizer";
 
 function App() {
     return (
@@ -56,6 +57,7 @@ function App() {
             <Route path="/organizer/history" element={<OrganizerActivityHistory />} />
             <Route path="/organizer/activities/:activityId" element={<OrganizerActivityDetail />} />
             <Route path="/organizer/introduction" element={<OrganizerOrganizationIntroduction />} />
+            <Route path="/organizer/activities/:activityId/edit" element={<EditActivityOrganizer />} />
         </Routes>
     );
 }

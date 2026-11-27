@@ -5,7 +5,8 @@ const router = express.Router();
 const activityController = require('../controllers/activity.controller');
 
 const {
-    authenticateToken
+    authenticateToken,
+    optionalAuthenticateToken
 } = require('../middlewares/auth.middleware');
 
 const {
@@ -16,17 +17,45 @@ const {
     validateActivity
 } = require('../validators/activity.validator');
 
+// ======================================================
+// 1. LẤY DANH SÁCH HOẠT ĐỘNG
 // GET /api/activities
-// Xem danh sách hoạt động.
-// Controller/Service cần lọc trạng thái theo quyền xem.
-router.get('/', activityController.getActivities);
+// ======================================================
 
+router.get(
+    '/',
+    optionalAuthenticateToken,
+    activityController.getActivities
+);
+
+// ======================================================
+// 2. LẤY THÔNG TIN BẢN NHÁP ĐỂ CHỈNH SỬA
+// GET /api/activities/:activityId/edit
+// ======================================================
+
+router.get(
+    '/:activityId/edit',
+    authenticateToken,
+    authorizePermission('UPDATE_ACTIVITY'),
+    activityController.getActivityForEdit
+);
+
+// ======================================================
+// 3. LẤY CHI TIẾT HOẠT ĐỘNG
 // GET /api/activities/:activityId
-// Xem chi tiết hoạt động.
-router.get('/:activityId', activityController.getActivityById);
+// ======================================================
 
+router.get(
+    '/:activityId',
+    optionalAuthenticateToken,
+    activityController.getActivityById
+);
+
+// ======================================================
+// 4. TẠO HOẠT ĐỘNG
 // POST /api/activities
-// Yêu cầu quyền tạo hoạt động.
+// ======================================================
+
 router.post(
     '/',
     authenticateToken,
@@ -35,9 +64,11 @@ router.post(
     activityController.createActivity
 );
 
-
+// ======================================================
+// 5. CẬP NHẬT HOẠT ĐỘNG
 // PUT /api/activities/:activityId
-// Yêu cầu quyền cập nhật hoạt động.
+// ======================================================
+
 router.put(
     '/:activityId',
     authenticateToken,
@@ -46,8 +77,11 @@ router.put(
     activityController.updateActivity
 );
 
+// ======================================================
+// 6. CÔNG BỐ HOẠT ĐỘNG
 // PATCH /api/activities/:activityId/publish
-// Yêu cầu quyền công bố hoạt động.
+// ======================================================
+
 router.patch(
     '/:activityId/publish',
     authenticateToken,

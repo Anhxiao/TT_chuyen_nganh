@@ -2,16 +2,46 @@
 const jwt = require('jsonwebtoken');
 
 /**
- * Xác thực JWT.
+ * Giải mã và xác thực JWT.
+ * Trả về thông tin người dùng nếu token hợp lệ.
+ */
+function verifyAccessToken(token, callback) {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        return callback(
+            new Error('Chưa cấu hình JWT_SECRET trong biến môi trường.')
+        );
+    }
+
+    jwt.verify(token, secret, (error, decoded) => {
+        if (error) {
+            return callback(error);
+        }
+
+        if (
+            !decoded ||
+            decoded.userId === undefined ||
+            decoded.userId === null
+        ) {
+            return callback(
+                new Error('Token không chứa định danh người dùng hợp lệ.')
+            );
+        }
+
+        return callback(null, {
+            userId: decoded.userId,
+            username: decoded.username,
+            role: decoded.role
+        });
+    });
+}
+
+/**
+ * Xác thực JWT bắt buộc.
  *
  * Header:
  * Authorization: Bearer <token>
- *
- * Quy ước payload token:
- * {
- *   userId: 1,
- *   username: "student01"
- * }
  */
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -32,15 +62,7 @@ function authenticateToken(req, res, next) {
         });
     }
 
-    const secret = process.env.JWT_SECRET;
-
-    if (!secret) {
-        return next(
-            new Error('Chưa cấu hình JWT_SECRET trong biến môi trường.')
-        );
-    }
-
-    jwt.verify(token, secret, (error, decoded) => {
+    verifyAccessToken(token, (error, user) => {
         if (error) {
             if (error.name === 'TokenExpiredError') {
                 return res.status(401).json({
@@ -49,29 +71,85 @@ function authenticateToken(req, res, next) {
                 });
             }
 
+            if (
+                error.message ===
+                'Chưa cấu hình JWT_SECRET trong biến môi trường.'
+            ) {
+                return next(error);
+            }
+
             return res.status(401).json({
                 success: false,
-                message: 'Token không hợp lệ.'
+                message: error.message ||
+                    'Token không hợp lệ.'
             });
         }
 
-        if (!decoded || decoded.userId === undefined || decoded.userId === null) {
+        req.user = user;
+        return next();
+    });
+}
+
+/**
+ * Xác thực JWT tùy chọn.
+ *
+ * - Không có token: tiếp tục với req.user = null.
+ * - Có token hợp lệ: gắn thông tin người dùng vào req.user.
+ * - Có token không hợp lệ: trả về 401.
+ */
+function optionalAuthenticateToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        req.user = null;
+        return next();
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+            success: false,
+            message: 'Định dạng token xác thực không hợp lệ.'
+        });
+    }
+
+    const token = authHeader.slice(7).trim();
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'Token xác thực không hợp lệ.'
+        });
+    }
+
+    verifyAccessToken(token, (error, user) => {
+        if (error) {
+            if (error.name === 'TokenExpiredError') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Phiên đăng nhập đã hết hạn.'
+                });
+            }
+
+            if (
+                error.message ===
+                'Chưa cấu hình JWT_SECRET trong biến môi trường.'
+            ) {
+                return next(error);
+            }
+
             return res.status(401).json({
                 success: false,
-                message: 'Token không chứa định danh người dùng hợp lệ.'
+                message: error.message ||
+                    'Token không hợp lệ.'
             });
         }
 
-        req.user = {
-            userId: decoded.userId,
-            username: decoded.username,
-            role: decoded.role
-        };
-
-        return next();  
+        req.user = user;
+        return next();
     });
 }
 
 module.exports = {
-    authenticateToken
+    authenticateToken,
+    optionalAuthenticateToken
 };

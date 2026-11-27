@@ -177,7 +177,7 @@ async function isOrganizationMember(
                 1 AS is_member
             FROM dbo.OrganizationUsers
             WHERE user_id = @userId
-            AND organization_id = @organizationId;
+                AND organization_id = @organizationId;
         `);
 
     return result.recordset.length > 0;
@@ -212,7 +212,7 @@ async function createActivity(data) {
         .input(
             'description',
             sql.NVarChar(sql.MAX),
-            data.description
+            data.description ?? null
         )
         .input(
             'location',
@@ -242,7 +242,7 @@ async function createActivity(data) {
         .input(
             'maxParticipants',
             sql.Int,
-            data.maxParticipants
+            data.maxParticipants ?? null
         )
         .input(
             'expectedPoints',
@@ -318,13 +318,10 @@ async function createActivity(data) {
 // 5. CẬP NHẬT HOẠT ĐỘNG
 // ======================================================
 
-async function updateActivity(
-    activityId,
-    data
-) {
+async function updateActivity(activityId, data) {
     const pool = await poolPromise;
 
-    const request = pool.request()
+    const result = await pool.request()
         .input(
             'activityId',
             sql.BigInt,
@@ -333,7 +330,7 @@ async function updateActivity(
         .input(
             'activityName',
             sql.NVarChar(255),
-            data.activityName ?? null
+            data.activityName
         )
         .input(
             'description',
@@ -343,27 +340,27 @@ async function updateActivity(
         .input(
             'location',
             sql.NVarChar(255),
-            data.location ?? null
+            data.location
         )
         .input(
             'registrationStart',
             sql.DateTime,
-            data.registrationStart ?? null
+            data.registrationStart
         )
         .input(
             'registrationEnd',
             sql.DateTime,
-            data.registrationEnd ?? null
+            data.registrationEnd
         )
         .input(
             'activityStart',
             sql.DateTime,
-            data.activityStart ?? null
+            data.activityStart
         )
         .input(
             'activityEnd',
             sql.DateTime,
-            data.activityEnd ?? null
+            data.activityEnd
         )
         .input(
             'maxParticipants',
@@ -373,76 +370,38 @@ async function updateActivity(
         .input(
             'expectedPoints',
             sql.Int,
-            data.expectedPoints ?? null
+            data.expectedPoints
         )
         .input(
             'registrationMode',
             sql.VarChar(20),
-            data.registrationMode ?? null
-        );
+            data.registrationMode
+        )
+        .query(`
+            SET NOCOUNT ON;
 
-    const result = await request.query(`
-        UPDATE dbo.Activities
-        SET
-            activity_name = COALESCE(
-                @activityName,
-                activity_name
-            ),
+            UPDATE dbo.Activities
+            SET
+                activity_name = @activityName,
+                description = @description,
+                location = @location,
+                registration_start = @registrationStart,
+                registration_end = @registrationEnd,
+                activity_start = @activityStart,
+                activity_end = @activityEnd,
+                max_participants = @maxParticipants,
+                expected_points = @expectedPoints,
+                registration_mode = @registrationMode,
+                updated_at = GETDATE()
+            WHERE activity_id = @activityId
+                AND status = 'DRAFT';
 
-            description = COALESCE(
-                @description,
-                description
-            ),
+            SELECT @@ROWCOUNT AS affected_rows;
+        `);
 
-            location = COALESCE(
-                @location,
-                location
-            ),
-
-            registration_start = COALESCE(
-                @registrationStart,
-                registration_start
-            ),
-
-            registration_end = COALESCE(
-                @registrationEnd,
-                registration_end
-            ),
-
-            activity_start = COALESCE(
-                @activityStart,
-                activity_start
-            ),
-
-            activity_end = COALESCE(
-                @activityEnd,
-                activity_end
-            ),
-
-            max_participants = COALESCE(
-                @maxParticipants,
-                max_participants
-            ),
-
-            expected_points = COALESCE(
-                @expectedPoints,
-                expected_points
-            ),
-
-            registration_mode = COALESCE(
-                @registrationMode,
-                registration_mode
-            ),
-
-            updated_at = GETDATE()
-
-        WHERE activity_id = @activityId
-        AND status = 'DRAFT';
-
-        SELECT @@ROWCOUNT AS affected_rows;
-    `);
-
-    return result.recordset[0].affected_rows > 0;
+    return Number(
+        result.recordset?.[0]?.affected_rows || 0
+    ) > 0;
 }
 
 // ======================================================
@@ -459,17 +418,21 @@ async function publishActivity(activityId) {
             activityId
         )
         .query(`
+            SET NOCOUNT ON;
+
             UPDATE dbo.Activities
             SET
                 status = 'PUBLISHED',
                 updated_at = SYSDATETIME()
             WHERE activity_id = @activityId
-            AND status = 'DRAFT';
+                AND status = 'DRAFT';
 
             SELECT @@ROWCOUNT AS affected_rows;
         `);
 
-    return result.recordset[0].affected_rows > 0;
+    return Number(
+        result.recordset?.[0]?.affected_rows || 0
+    ) > 0;
 }
 
 // ======================================================

@@ -17,9 +17,7 @@ import "../styles/organizer-activity-detail.css";
 
 const API_BASE_URL = "/api";
 
-// ======================================================
 // 1. CẤU HÌNH TAB
-// ======================================================
 
 const TABS = [
     { id: "overview", label: "Tổng quan", icon: "bi-info-circle" },
@@ -29,9 +27,7 @@ const TABS = [
     { id: "result", label: "Kết quả", icon: "bi-bar-chart" }
 ];
 
-// ======================================================
 // 2. HÀM XỬ LÝ DỮ LIỆU
-// ======================================================
 
 function getApiData(response) {
     return (
@@ -175,16 +171,12 @@ function getAttendanceStatusLabel(status) {
     return labels[status] || status || "Chưa xác định";
 }
 
-// ======================================================
 // 3. COMPONENT CHÍNH
-// ======================================================
 
 function OrganizerActivityDetail() {
     const { activityId } = useParams();
 
-    // --------------------------------------------------
     // STATE CHUNG
-    // --------------------------------------------------
 
     const [activeTab, setActiveTab] = useState("overview");
     const [activity, setActivity] = useState(null);
@@ -193,9 +185,7 @@ function OrganizerActivityDetail() {
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
 
-    // --------------------------------------------------
     // STATE ĐĂNG KÝ
-    // --------------------------------------------------
 
     const [registrations, setRegistrations] = useState([]);
     const [registrationTotal, setRegistrationTotal] = useState(0);
@@ -212,15 +202,11 @@ function OrganizerActivityDetail() {
 
     const [registrationNote, setRegistrationNote] = useState("");
 
-    // --------------------------------------------------
     // STATE MINH CHỨNG
-    // --------------------------------------------------
 
     const [evidenceFile, setEvidenceFile] = useState(null);
 
-    // --------------------------------------------------
     // STATE ĐIỂM DANH
-    // --------------------------------------------------
 
     const [attendanceRows, setAttendanceRows] = useState([]);
     const [attendanceKeyword, setAttendanceKeyword] = useState("");
@@ -243,9 +229,7 @@ function OrganizerActivityDetail() {
 
     const qrCanvasRef = useRef(null);
 
-    // --------------------------------------------------
     // TOKEN VÀ HEADER
-    // --------------------------------------------------
 
     const token = sessionStorage.getItem("accessToken");
 
@@ -255,9 +239,7 @@ function OrganizerActivityDetail() {
             : {})
     }), [token]);
 
-    // ==================================================
     // 4. LẤY THÔNG TIN HOẠT ĐỘNG
-    // ==================================================
 
     const loadActivity = useCallback(async () => {
         if (!activityId) {
@@ -306,9 +288,7 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // ==================================================
     // 5. LẤY DANH SÁCH ĐĂNG KÝ
-    // ==================================================
 
     const loadRegistrations = useCallback(async () => {
         if (!activityId) return;
@@ -351,9 +331,7 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // ==================================================
     // 6. API ĐIỂM DANH - LẤY DANH SÁCH
-    // ==================================================
 
     const loadAttendance = useCallback(async () => {
         if (!activityId) return;
@@ -393,9 +371,7 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // ==================================================
     // 7. API ĐIỂM DANH - LẤY PHIÊN ĐANG HOẠT ĐỘNG
-    // ==================================================
 
     const loadActiveAttendanceSession = useCallback(async () => {
         if (!activityId) return;
@@ -461,9 +437,7 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // ==================================================
     // 8. API ĐIỂM DANH - TẠO PHIÊN
-    // ==================================================
 
     const createAttendanceSession = async () => {
         if (!activityId) {
@@ -563,9 +537,7 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // ==================================================
     // 9. API ĐIỂM DANH - ĐÓNG PHIÊN
-    // ==================================================
 
     const closeAttendanceSession = async () => {
         const sessionId = attendanceSession?.session_id;
@@ -627,9 +599,7 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // ==================================================
     // 10. TẢI MÃ QR VỀ THIẾT BỊ
-    // ==================================================
 
     const downloadAttendanceQR = () => {
         const canvas = qrCanvasRef.current;
@@ -665,9 +635,7 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // ==================================================
     // 11. TẢI DỮ LIỆU KHI MỞ TRANG
-    // ==================================================
 
     useEffect(() => {
         loadActivity();
@@ -687,9 +655,7 @@ function OrganizerActivityDetail() {
         loadActiveAttendanceSession
     ]);
 
-    // ==================================================
     // 12. DUYỆT / TỪ CHỐI ĐĂNG KÝ
-    // ==================================================
 
     const handleRegistrationAction = async (
         registrationId,
@@ -769,9 +735,7 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // ==================================================
     // 13. CHUẨN HÓA THÔNG TIN HOẠT ĐỘNG
-    // ==================================================
 
     const activityName =
         activity?.activity_name ||
@@ -824,9 +788,7 @@ function OrganizerActivityDetail() {
             ? activityPoints
             : 0;
 
-    // ==================================================
     // 14. LỌC DANH SÁCH ĐĂNG KÝ
-    // ==================================================
 
     const filteredRegistrations = useMemo(() => {
         const keyword = registrationKeyword.trim().toLowerCase();
@@ -875,9 +837,7 @@ function OrganizerActivityDetail() {
             (item.registration_status || item.status) === "APPROVED"
     ).length;
 
-    // ==================================================
     // 15. LỌC DANH SÁCH ĐIỂM DANH
-    // ==================================================
 
     const filteredAttendance = useMemo(() => {
         const keyword = attendanceKeyword.trim().toLowerCase();
@@ -926,9 +886,7 @@ function OrganizerActivityDetail() {
     const sessionIsOpen =
         attendanceSession?.status === "OPEN";
 
-    // ==================================================
     // 16. CHỌN FILE MINH CHỨNG
-    // ==================================================
 
     const handleFileChange = (event) => {
         const file = event.target.files?.[0];
@@ -964,9 +922,7 @@ function OrganizerActivityDetail() {
         );
     };
 
-    // ==================================================
     // 17. TAB TỔNG QUAN
-    // ==================================================
 
     const renderOverview = () => (
         <div className="activity-detail-content">
@@ -1173,9 +1129,7 @@ function OrganizerActivityDetail() {
         </div>
     );
 
-    // ==================================================
     // 18. TAB ĐĂNG KÝ
-    // ==================================================
 
     const renderRegistrations = () => (
         <section className="activity-detail-panel">
@@ -1421,9 +1375,7 @@ function OrganizerActivityDetail() {
         </section>
     );
 
-    // ==================================================
     // 19. TAB ĐIỂM DANH QR
-    // ==================================================
 
     const renderAttendance = () => (
         <div className="activity-detail-content">
@@ -1774,9 +1726,7 @@ function OrganizerActivityDetail() {
         </div>
     );
 
-    // ==================================================
     // 20. TAB MINH CHỨNG
-    // ==================================================
 
     const renderEvidence = () => (
         <div className="activity-detail-content">
@@ -1917,9 +1867,7 @@ function OrganizerActivityDetail() {
         </div>
     );
 
-    // ==================================================
     // 21. TAB KẾT QUẢ
-    // ==================================================
 
     const renderResult = () => (
         <section className="activity-detail-panel">
@@ -1983,9 +1931,7 @@ function OrganizerActivityDetail() {
         </section>
     );
 
-    // ==================================================
     // 22. HIỂN THỊ TAB
-    // ==================================================
 
     const renderActiveTab = () => {
         switch (activeTab) {
@@ -2006,9 +1952,7 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // ==================================================
     // 23. GIAO DIỆN CHÍNH
-    // ==================================================
 
     return (
         <>

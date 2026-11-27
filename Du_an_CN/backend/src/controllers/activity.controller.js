@@ -1,10 +1,11 @@
 
 const activityService = require('../services/activity.service');
 
-/**
- * GET /api/activities
- * Xem danh sách hoạt động được phép hiển thị.
- */
+// ======================================================
+// 1. LẤY DANH SÁCH HOẠT ĐỘNG
+// GET /api/activities
+// ======================================================
+
 async function getActivities(req, res, next) {
     try {
         const result = await activityService.getActivities({
@@ -26,10 +27,11 @@ async function getActivities(req, res, next) {
     }
 }
 
-/**
- * GET /api/activities/:activityId
- * Xem chi tiết một hoạt động.
- */
+// ======================================================
+// 2. LẤY CHI TIẾT HOẠT ĐỘNG
+// GET /api/activities/:activityId
+// ======================================================
+
 async function getActivityById(req, res, next) {
     try {
         const { activityId } = req.params;
@@ -49,10 +51,36 @@ async function getActivityById(req, res, next) {
     }
 }
 
-/**
- * POST /api/activities
- * Đơn vị tổ chức tạo hoạt động.
- */
+// ======================================================
+// 3. LẤY THÔNG TIN BẢN NHÁP ĐỂ CHỈNH SỬA
+// GET /api/activities/:activityId/edit
+// ======================================================
+
+async function getActivityForEdit(req, res, next) {
+    try {
+        const { activityId } = req.params;
+        const actorId = req.user.userId;
+
+        const result = await activityService.getActivityForEdit({
+            activityId,
+            actorId
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy thông tin bản nháp thành công.',
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// ======================================================
+// 4. TẠO HOẠT ĐỘNG
+// POST /api/activities
+// ======================================================
+
 async function createActivity(req, res, next) {
     try {
         const actorId = req.user.userId;
@@ -72,10 +100,11 @@ async function createActivity(req, res, next) {
     }
 }
 
-/**
- * PUT /api/activities/:activityId
- * Cập nhật hoạt động.
- */
+// ======================================================
+// 5. CẬP NHẬT HOẠT ĐỘNG
+// PUT /api/activities/:activityId
+// ======================================================
+
 async function updateActivity(req, res, next) {
     try {
         const { activityId } = req.params;
@@ -97,10 +126,11 @@ async function updateActivity(req, res, next) {
     }
 }
 
-/**
- * PATCH /api/activities/:activityId/publish
- * Công bố hoạt động.
- */
+// ======================================================
+// 6. CÔNG BỐ HOẠT ĐỘNG
+// PATCH /api/activities/:activityId/publish
+// ======================================================
+
 async function publishActivity(req, res, next) {
     try {
         const { activityId } = req.params;
@@ -121,9 +151,14 @@ async function publishActivity(req, res, next) {
     }
 }
 
+// ======================================================
+// 7. EXPORT
+// ======================================================
+
 module.exports = {
     getActivities,
     getActivityById,
+    getActivityForEdit,
     createActivity,
     updateActivity,
     publishActivity
