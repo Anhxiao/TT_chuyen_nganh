@@ -17,7 +17,11 @@ import "../styles/organizer-activity-detail.css";
 
 const API_BASE_URL = "/api";
 
-// 1. CẤU HÌNH TAB
+const ALLOWED_EXTENSIONS = [
+    "pdf", "doc", "docx",
+    "xls", "xlsx",
+    "jpg", "jpeg", "png"
+];
 
 const TABS = [
     { id: "overview", label: "Tổng quan", icon: "bi-info-circle" },
@@ -27,24 +31,17 @@ const TABS = [
     { id: "result", label: "Kết quả", icon: "bi-bar-chart" }
 ];
 
-// 2. HÀM XỬ LÝ DỮ LIỆU
+// ======================================================
+// 1. HÀM XỬ LÝ DỮ LIỆU
+// ======================================================
 
 function getApiData(response) {
-    return (
-        response?.data?.data ??
-        response?.data ??
-        response
-    );
+    return response?.data?.data ?? response?.data ?? response;
 }
 
 function getActivityData(response) {
     const data = getApiData(response);
-
-    return (
-        data?.activity ??
-        data?.data?.activity ??
-        data
-    );
+    return data?.activity ?? data?.data?.activity ?? data;
 }
 
 function getRegistrationData(response) {
@@ -52,19 +49,14 @@ function getRegistrationData(response) {
 
     const rows = Array.isArray(data)
         ? data
-        : Array.isArray(data?.registrations)
-            ? data.registrations
-            : Array.isArray(data?.items)
-                ? data.items
-                : Array.isArray(data?.rows)
-                    ? data.rows
-                    : Array.isArray(data?.recordset)
-                        ? data.recordset
-                        : Array.isArray(data?.data)
-                            ? data.data
-                            : [];
+        : data?.registrations ??
+        data?.items ??
+        data?.rows ??
+        data?.recordset ??
+        data?.data ??
+        [];
 
-    const totalValue =
+    const total =
         data?.total ??
         data?.totalRecords ??
         data?.totalCount ??
@@ -72,8 +64,8 @@ function getRegistrationData(response) {
         data?.pagination?.totalRecords;
 
     return {
-        rows,
-        total: Number(totalValue ?? rows.length) || 0
+        rows: Array.isArray(rows) ? rows : [],
+        total: Number(total ?? rows.length) || 0
     };
 }
 
@@ -82,19 +74,14 @@ function getAttendanceData(response) {
 
     const rows = Array.isArray(data)
         ? data
-        : Array.isArray(data?.attendance)
-            ? data.attendance
-            : Array.isArray(data?.items)
-                ? data.items
-                : Array.isArray(data?.rows)
-                    ? data.rows
-                    : Array.isArray(data?.recordset)
-                        ? data.recordset
-                        : Array.isArray(data?.data)
-                            ? data.data
-                            : [];
+        : data?.attendance ??
+        data?.items ??
+        data?.rows ??
+        data?.recordset ??
+        data?.data ??
+        [];
 
-    return rows;
+    return Array.isArray(rows) ? rows : [];
 }
 
 function getAttendanceSessionData(response) {
@@ -135,6 +122,45 @@ function formatDate(value) {
     });
 }
 
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function getFileExtension(fileName) {
+    return String(fileName || "")
+        .split(".")
+        .pop()
+        .toLowerCase();
+}
+
+function getFileIcon(fileName) {
+    const extension = getFileExtension(fileName);
+
+    if (["jpg", "jpeg", "png"].includes(extension)) {
+        return "bi-file-earmark-image";
+    }
+
+    if (extension === "pdf") {
+        return "bi-file-earmark-pdf";
+    }
+
+    if (["doc", "docx"].includes(extension)) {
+        return "bi-file-earmark-word";
+    }
+
+    if (["xls", "xlsx"].includes(extension)) {
+        return "bi-file-earmark-excel";
+    }
+
+    return "bi-file-earmark";
+}
+
 function getStatusLabel(status) {
     const labels = {
         DRAFT: "Bản nháp",
@@ -171,12 +197,25 @@ function getAttendanceStatusLabel(status) {
     return labels[status] || status || "Chưa xác định";
 }
 
-// 3. COMPONENT CHÍNH
+function escapeWordHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// ======================================================
+// 2. COMPONENT CHÍNH
+// ======================================================
 
 function OrganizerActivityDetail() {
     const { activityId } = useParams();
 
+    // --------------------------------------------------
     // STATE CHUNG
+    // --------------------------------------------------
 
     const [activeTab, setActiveTab] = useState("overview");
     const [activity, setActivity] = useState(null);
@@ -185,61 +224,79 @@ function OrganizerActivityDetail() {
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
 
+    // --------------------------------------------------
     // STATE ĐĂNG KÝ
+    // --------------------------------------------------
 
     const [registrations, setRegistrations] = useState([]);
     const [registrationTotal, setRegistrationTotal] = useState(0);
-
-    const [registrationsLoading, setRegistrationsLoading] =
-        useState(false);
-
+    const [registrationsLoading, setRegistrationsLoading] = useState(false);
     const [registrationError, setRegistrationError] = useState("");
+
     const [registrationKeyword, setRegistrationKeyword] = useState("");
     const [registrationFilter, setRegistrationFilter] = useState("ALL");
-
-    const [processingRegistrationId, setProcessingRegistrationId] =
-        useState(null);
-
     const [registrationNote, setRegistrationNote] = useState("");
+    const [processingRegistrationId, setProcessingRegistrationId] = useState(null);
 
-    // STATE MINH CHỨNG
-
-    const [evidenceFile, setEvidenceFile] = useState(null);
-
+    // --------------------------------------------------
     // STATE ĐIỂM DANH
+    // --------------------------------------------------
 
     const [attendanceRows, setAttendanceRows] = useState([]);
     const [attendanceKeyword, setAttendanceKeyword] = useState("");
-
     const [attendanceLoading, setAttendanceLoading] = useState(false);
     const [attendanceError, setAttendanceError] = useState("");
 
     const [attendanceSession, setAttendanceSession] = useState(null);
-    const [attendanceSessionToken, setAttendanceSessionToken] =
-        useState("");
+    const [attendanceSessionToken, setAttendanceSessionToken] = useState("");
 
-    const attendancePageUrl = attendanceSessionToken
-    ? `http://192.168.2.13:5173/student/attendance?token=${encodeURIComponent(attendanceSessionToken)}`
-    : "";
-
-    const [attendanceSessionLoading, setAttendanceSessionLoading] =
-        useState(false);
-
+    const [attendanceSessionLoading, setAttendanceSessionLoading] = useState(false);
     const [closingSession, setClosingSession] = useState(false);
 
     const qrCanvasRef = useRef(null);
 
+    // --------------------------------------------------
+    // STATE XUẤT MINH CHỨNG
+    // --------------------------------------------------
+
+    const [showEvidencePreview, setShowEvidencePreview] = useState(false);
+
+    // --------------------------------------------------
+    // STATE ĐĂNG TẢI MINH CHỨNG
+    // --------------------------------------------------
+
+    const fileInputRef = useRef(null);
+
+    const [evidenceFiles, setEvidenceFiles] = useState([]);
+    const [uploadedEvidenceFiles, setUploadedEvidenceFiles] = useState([]);
+
+    const [isDragging, setIsDragging] = useState(false);
+    const [showUploadConfirm, setShowUploadConfirm] = useState(false);
+    const [uploadError, setUploadError] = useState("");
+    const [uploadNotice, setUploadNotice] = useState("");
+
+    // --------------------------------------------------
     // TOKEN VÀ HEADER
+    // --------------------------------------------------
 
     const token = sessionStorage.getItem("accessToken");
 
-    const headers = useMemo(() => ({
-        ...(token
-            ? { Authorization: `Bearer ${token}` }
-            : {})
-    }), [token]);
+    const headers = useMemo(
+        () => ({
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }),
+        [token]
+    );
 
-    // 4. LẤY THÔNG TIN HOẠT ĐỘNG
+    const attendancePageUrl = attendanceSessionToken
+        ? `${window.location.origin}/student/attendance?token=${encodeURIComponent(
+            attendanceSessionToken
+        )}`
+        : "";
+
+    // ==================================================
+    // 3. API LẤY THÔNG TIN HOẠT ĐỘNG
+    // ==================================================
 
     const loadActivity = useCallback(async () => {
         if (!activityId) {
@@ -264,19 +321,14 @@ function OrganizerActivityDetail() {
 
             if (!response.ok) {
                 throw new Error(
-                    getErrorMessage(
-                        result,
-                        "Không thể tải thông tin hoạt động."
-                    )
+                    getErrorMessage(result, "Không thể tải thông tin hoạt động.")
                 );
             }
 
             const activityData = getActivityData(result);
 
             if (!activityData || typeof activityData !== "object") {
-                throw new Error(
-                    "Dữ liệu hoạt động từ máy chủ không hợp lệ."
-                );
+                throw new Error("Dữ liệu hoạt động không hợp lệ.");
             }
 
             setActivity(activityData);
@@ -288,7 +340,9 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // 5. LẤY DANH SÁCH ĐĂNG KÝ
+    // ==================================================
+    // 4. API LẤY DANH SÁCH ĐĂNG KÝ
+    // ==================================================
 
     const loadRegistrations = useCallback(async () => {
         if (!activityId) return;
@@ -298,7 +352,9 @@ function OrganizerActivityDetail() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/registrations/activities/${encodeURIComponent(activityId)}?page=1&limit=100`,
+                `${API_BASE_URL}/registrations/activities/${encodeURIComponent(
+                    activityId
+                )}?page=1&limit=100`,
                 {
                     method: "GET",
                     headers
@@ -309,10 +365,7 @@ function OrganizerActivityDetail() {
 
             if (!response.ok) {
                 throw new Error(
-                    getErrorMessage(
-                        result,
-                        "Không thể tải danh sách đăng ký."
-                    )
+                    getErrorMessage(result, "Không thể tải danh sách đăng ký.")
                 );
             }
 
@@ -331,7 +384,9 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // 6. API ĐIỂM DANH - LẤY DANH SÁCH
+    // ==================================================
+    // 5. API LẤY DANH SÁCH ĐIỂM DANH
+    // ==================================================
 
     const loadAttendance = useCallback(async () => {
         if (!activityId) return;
@@ -341,7 +396,9 @@ function OrganizerActivityDetail() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/attendance/activities/${encodeURIComponent(activityId)}`,
+                `${API_BASE_URL}/attendance/activities/${encodeURIComponent(
+                    activityId
+                )}`,
                 {
                     method: "GET",
                     headers
@@ -352,10 +409,7 @@ function OrganizerActivityDetail() {
 
             if (!response.ok) {
                 throw new Error(
-                    getErrorMessage(
-                        result,
-                        "Không thể tải danh sách điểm danh."
-                    )
+                    getErrorMessage(result, "Không thể tải danh sách điểm danh.")
                 );
             }
 
@@ -371,7 +425,9 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // 7. API ĐIỂM DANH - LẤY PHIÊN ĐANG HOẠT ĐỘNG
+    // ==================================================
+    // 6. API LẤY PHIÊN ĐIỂM DANH ĐANG HOẠT ĐỘNG
+    // ==================================================
 
     const loadActiveAttendanceSession = useCallback(async () => {
         if (!activityId) return;
@@ -380,7 +436,9 @@ function OrganizerActivityDetail() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/attendance/activities/${encodeURIComponent(activityId)}/sessions/active`,
+                `${API_BASE_URL}/attendance/activities/${encodeURIComponent(
+                    activityId
+                )}/sessions/active`,
                 {
                     method: "GET",
                     headers
@@ -389,7 +447,6 @@ function OrganizerActivityDetail() {
 
             const result = await response.json().catch(() => ({}));
 
-            // Không có phiên đang hoạt động.
             if (response.status === 404) {
                 setAttendanceSession(null);
                 setAttendanceSessionToken("");
@@ -398,10 +455,7 @@ function OrganizerActivityDetail() {
 
             if (!response.ok) {
                 throw new Error(
-                    getErrorMessage(
-                        result,
-                        "Không thể kiểm tra phiên điểm danh."
-                    )
+                    getErrorMessage(result, "Không thể kiểm tra phiên điểm danh.")
                 );
             }
 
@@ -415,12 +469,7 @@ function OrganizerActivityDetail() {
 
             setAttendanceSession(session);
 
-            // Token chỉ được trả về khi tạo phiên.
-            // Máy chủ chỉ lưu hash nên không thể lấy lại token gốc
-            // thông qua API lấy phiên đang hoạt động.
-            const storageKey =
-                `attendanceQr:${activityId}:${session.session_id}`;
-
+            const storageKey = `attendanceQr:${activityId}:${session.session_id}`;
             const savedToken = sessionStorage.getItem(storageKey);
 
             setAttendanceSessionToken(
@@ -437,7 +486,9 @@ function OrganizerActivityDetail() {
         }
     }, [activityId, headers]);
 
-    // 8. API ĐIỂM DANH - TẠO PHIÊN
+    // ==================================================
+    // 7. TẠO PHIÊN ĐIỂM DANH
+    // ==================================================
 
     const createAttendanceSession = async () => {
         if (!activityId) {
@@ -457,7 +508,7 @@ function OrganizerActivityDetail() {
             !attendanceSessionToken
         ) {
             setAttendanceError(
-                "Hoạt động đã có phiên điểm danh đang mở nhưng trình duyệt không còn lưu mã QR. Vui lòng sử dụng ảnh QR đã tải trước đó hoặc đóng phiên hiện tại rồi tạo phiên mới."
+                "Phiên điểm danh đang mở nhưng trình duyệt không còn lưu mã QR. Vui lòng sử dụng ảnh QR đã tải trước đó hoặc đóng phiên hiện tại rồi tạo phiên mới."
             );
             return;
         }
@@ -468,13 +519,15 @@ function OrganizerActivityDetail() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/attendance/activities/${activityId}/sessions`,
+                `${API_BASE_URL}/attendance/activities/${encodeURIComponent(
+                    activityId
+                )}/sessions`,
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
+                        ...headers,
+                        "Content-Type": "application/json"
+                    }
                 }
             );
 
@@ -482,10 +535,7 @@ function OrganizerActivityDetail() {
 
             if (!response.ok) {
                 throw new Error(
-                    getErrorMessage(
-                        result,
-                        "Không thể tạo phiên điểm danh."
-                    )
+                    getErrorMessage(result, "Không thể tạo phiên điểm danh.")
                 );
             }
 
@@ -498,28 +548,21 @@ function OrganizerActivityDetail() {
                 result?.session_token;
 
             const sessionId =
-                session?.session_id ??
-                session?.sessionId;
+                session?.session_id ?? session?.sessionId;
 
             if (!sessionToken || !sessionId) {
                 throw new Error(
-                    "Máy chủ đã phản hồi nhưng không có session_token hoặc session_id. Kiểm tra lại dữ liệu API tạo phiên."
+                    "Máy chủ không trả về session_token hoặc session_id."
                 );
             }
 
             setAttendanceSession(session);
             setAttendanceSessionToken(sessionToken);
 
-            // Lưu token trong phiên làm việc hiện tại của trình duyệt.
-            // Không lưu token vào CSDL hoặc localStorage.
-            const storageKey =
-                `attendanceQr:${activityId}:${sessionId}`;
-
+            const storageKey = `attendanceQr:${activityId}:${sessionId}`;
             sessionStorage.setItem(storageKey, sessionToken);
 
-            setNotice(
-                "Tạo phiên điểm danh thành công. Mã QR đã sẵn sàng."
-            );
+            setNotice("Tạo phiên điểm danh thành công. Mã QR đã sẵn sàng.");
 
             await loadAttendance();
         } catch (err) {
@@ -529,15 +572,15 @@ function OrganizerActivityDetail() {
                 err.message || "Không thể tạo phiên điểm danh."
             );
 
-            // Nếu máy chủ báo phiên đã tồn tại,
-            // kiểm tra lại phiên đang hoạt động.
             await loadActiveAttendanceSession();
         } finally {
             setAttendanceSessionLoading(false);
         }
     };
 
-    // 9. API ĐIỂM DANH - ĐÓNG PHIÊN
+    // ==================================================
+    // 8. ĐÓNG PHIÊN ĐIỂM DANH
+    // ==================================================
 
     const closeAttendanceSession = async () => {
         const sessionId = attendanceSession?.session_id;
@@ -559,7 +602,9 @@ function OrganizerActivityDetail() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/attendance/sessions/${encodeURIComponent(sessionId)}/close`,
+                `${API_BASE_URL}/attendance/sessions/${encodeURIComponent(
+                    sessionId
+                )}/close`,
                 {
                     method: "PATCH",
                     headers
@@ -570,10 +615,7 @@ function OrganizerActivityDetail() {
 
             if (!response.ok) {
                 throw new Error(
-                    getErrorMessage(
-                        result,
-                        "Không thể đóng phiên điểm danh."
-                    )
+                    getErrorMessage(result, "Không thể đóng phiên điểm danh.")
                 );
             }
 
@@ -599,21 +641,20 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // 10. TẢI MÃ QR VỀ THIẾT BỊ
+    // ==================================================
+    // 9. TẢI MÃ QR
+    // ==================================================
 
     const downloadAttendanceQR = () => {
         const canvas = qrCanvasRef.current;
 
         if (!canvas) {
-            setAttendanceError(
-                "Không tìm thấy mã QR để tải xuống."
-            );
+            setAttendanceError("Không tìm thấy mã QR để tải xuống.");
             return;
         }
 
         try {
             const imageUrl = canvas.toDataURL("image/png");
-
             const link = document.createElement("a");
 
             link.href = imageUrl;
@@ -623,30 +664,30 @@ function OrganizerActivityDetail() {
             link.click();
             document.body.removeChild(link);
 
-            setNotice(
-                "Đã tạo ảnh mã QR. Nếu trình duyệt trên điện thoại không tự lưu ảnh, hãy chọn tải xuống trong thông báo của trình duyệt."
-            );
+            setNotice("Đã tạo ảnh mã QR để tải xuống.");
         } catch (err) {
             console.error("Lỗi tải mã QR:", err);
-
-            setAttendanceError(
-                "Không thể tải mã QR. Vui lòng thử lại trên trình duyệt khác."
-            );
+            setAttendanceError("Không thể tải mã QR. Vui lòng thử lại.");
         }
     };
 
-    // 11. TẢI DỮ LIỆU KHI MỞ TRANG
+    // ==================================================
+    // 10. TẢI DỮ LIỆU KHI MỞ TRANG
+    // ==================================================
 
     useEffect(() => {
         loadActivity();
         loadRegistrations();
     }, [loadActivity, loadRegistrations]);
 
-    // Chỉ gọi API điểm danh khi mở tab điểm danh.
     useEffect(() => {
         if (activeTab === "attendance" && activityId) {
             loadAttendance();
             loadActiveAttendanceSession();
+        }
+
+        if (activeTab === "evidence" && activityId) {
+            loadAttendance();
         }
     }, [
         activeTab,
@@ -655,12 +696,11 @@ function OrganizerActivityDetail() {
         loadActiveAttendanceSession
     ]);
 
-    // 12. DUYỆT / TỪ CHỐI ĐĂNG KÝ
+    // ==================================================
+    // 11. DUYỆT / TỪ CHỐI ĐĂNG KÝ
+    // ==================================================
 
-    const handleRegistrationAction = async (
-        registrationId,
-        action
-    ) => {
+    const handleRegistrationAction = async (registrationId, action) => {
         if (!registrationId) {
             setRegistrationError(
                 "Không tìm thấy mã đăng ký của sinh viên."
@@ -673,8 +713,7 @@ function OrganizerActivityDetail() {
             return;
         }
 
-        const actionLabel =
-            action === "approve" ? "duyệt" : "từ chối";
+        const actionLabel = action === "approve" ? "duyệt" : "từ chối";
 
         const confirmed = window.confirm(
             `Bạn có chắc chắn muốn ${actionLabel} đăng ký này không?`
@@ -688,7 +727,9 @@ function OrganizerActivityDetail() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/registrations/${encodeURIComponent(registrationId)}/${action}`,
+                `${API_BASE_URL}/registrations/${encodeURIComponent(
+                    registrationId
+                )}/${action}`,
                 {
                     method: "PATCH",
                     headers: {
@@ -735,7 +776,9 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // 13. CHUẨN HÓA THÔNG TIN HOẠT ĐỘNG
+    // ==================================================
+    // 12. CHUẨN HÓA THÔNG TIN HOẠT ĐỘNG
+    // ==================================================
 
     const activityName =
         activity?.activity_name ||
@@ -753,28 +796,22 @@ function OrganizerActivityDetail() {
         activity?.location || "Chưa cập nhật địa điểm";
 
     const startDate =
-        activity?.activity_start ||
-        activity?.activityStart;
+        activity?.activity_start || activity?.activityStart;
 
     const endDate =
-        activity?.activity_end ||
-        activity?.activityEnd;
+        activity?.activity_end || activity?.activityEnd;
 
     const registrationStart =
-        activity?.registration_start ||
-        activity?.registrationStart;
+        activity?.registration_start || activity?.registrationStart;
 
     const registrationEnd =
-        activity?.registration_end ||
-        activity?.registrationEnd;
+        activity?.registration_end || activity?.registrationEnd;
 
     const maxParticipants =
-        activity?.max_participants ??
-        activity?.maxParticipants;
+        activity?.max_participants ?? activity?.maxParticipants;
 
     const description =
-        activity?.description ||
-        "Hoạt động chưa có mô tả.";
+        activity?.description || "Hoạt động chưa có mô tả.";
 
     const activityPointsValue =
         activity?.expected_points ??
@@ -788,7 +825,9 @@ function OrganizerActivityDetail() {
             ? activityPoints
             : 0;
 
-    // 14. LỌC DANH SÁCH ĐĂNG KÝ
+    // ==================================================
+    // 13. LỌC DANH SÁCH ĐĂNG KÝ
+    // ==================================================
 
     const filteredRegistrations = useMemo(() => {
         const keyword = registrationKeyword.trim().toLowerCase();
@@ -806,14 +845,14 @@ function OrganizerActivityDetail() {
                 item.class_name || item.className || ""
             ).toLowerCase();
 
+            const status =
+                item.registration_status || item.status;
+
             const matchesKeyword =
                 !keyword ||
                 studentCode.includes(keyword) ||
                 fullName.includes(keyword) ||
                 className.includes(keyword);
-
-            const status =
-                item.registration_status || item.status;
 
             const matchesStatus =
                 registrationFilter === "ALL" ||
@@ -821,11 +860,7 @@ function OrganizerActivityDetail() {
 
             return matchesKeyword && matchesStatus;
         });
-    }, [
-        registrations,
-        registrationKeyword,
-        registrationFilter
-    ]);
+    }, [registrations, registrationKeyword, registrationFilter]);
 
     const pendingCount = registrations.filter(
         item =>
@@ -837,28 +872,24 @@ function OrganizerActivityDetail() {
             (item.registration_status || item.status) === "APPROVED"
     ).length;
 
-    // 15. LỌC DANH SÁCH ĐIỂM DANH
+    // ==================================================
+    // 14. LỌC DANH SÁCH ĐIỂM DANH
+    // ==================================================
 
     const filteredAttendance = useMemo(() => {
         const keyword = attendanceKeyword.trim().toLowerCase();
 
         return attendanceRows.filter((item) => {
             const studentCode = String(
-                item.student_code ||
-                item.studentCode ||
-                ""
+                item.student_code || item.studentCode || ""
             ).toLowerCase();
 
             const fullName = String(
-                item.full_name ||
-                item.fullName ||
-                ""
+                item.full_name || item.fullName || ""
             ).toLowerCase();
 
             const className = String(
-                item.class_name ||
-                item.className ||
-                ""
+                item.class_name || item.className || ""
             ).toLowerCase();
 
             return (
@@ -870,59 +901,478 @@ function OrganizerActivityDetail() {
         });
     }, [attendanceRows, attendanceKeyword]);
 
-    const attendanceCount = attendanceRows.length;
+    // ==================================================
+    // 15. TỔNG HỢP SINH VIÊN CÓ MẶT LẬP MINH CHỨNG
+    // ==================================================
 
-    const attendedCount = attendanceRows.filter((item) =>
-        ["ATTENDED", "PRESENT"].includes(
-            item.attendance_status || item.status
-        )
-    ).length;
+    const evidenceStudents = useMemo(() => {
+        const uniqueStudents = new Map();
 
-    const absentCount = attendanceRows.filter(
-        item =>
-            (item.attendance_status || item.status) === "ABSENT"
-    ).length;
+        attendanceRows.forEach((item) => {
+            const status = String(
+                item.attendance_status ??
+                item.attendanceStatus ??
+                ""
+            ).toUpperCase();
+
+            if (!["ATTENDED", "PRESENT"].includes(status)) {
+                return;
+            }
+
+            const studentCode = String(
+                item.student_code ??
+                item.studentCode ??
+                ""
+            ).trim();
+
+            const studentId =
+                item.student_id ??
+                item.studentId ??
+                item.user_id ??
+                item.userId;
+
+            const uniqueKey = studentCode
+                ? `MSSV:${studentCode.toUpperCase()}`
+                : studentId
+                    ? `ID:${studentId}`
+                    : null;
+
+            if (!uniqueKey) return;
+
+            const student = {
+                student_id: studentId,
+                student_code: studentCode,
+                full_name:
+                    item.full_name ??
+                    item.fullName ??
+                    "",
+                class_name:
+                    item.class_name ??
+                    item.className ??
+                    "",
+                note: "Có mặt"
+            };
+
+            if (!uniqueStudents.has(uniqueKey)) {
+                uniqueStudents.set(uniqueKey, student);
+            }
+        });
+
+        return Array.from(uniqueStudents.values()).sort((a, b) =>
+            String(a.student_code).localeCompare(
+                String(b.student_code),
+                "vi"
+            )
+        );
+    }, [attendanceRows]);
+
+    const attendedCount = evidenceStudents.length;
+    const attendanceCount = attendedCount;
+
+    const absentCount = attendanceRows.filter((item) => {
+        const status = String(
+            item.attendance_status ??
+            item.attendanceStatus ??
+            ""
+        ).toUpperCase();
+
+        return status === "ABSENT";
+    }).length;
 
     const sessionIsOpen =
         attendanceSession?.status === "OPEN";
 
-    // 16. CHỌN FILE MINH CHỨNG
+    // ==================================================
+    // 16. XỬ LÝ ĐĂNG TẢI FILE MINH CHỨNG
+    // ==================================================
 
-    const handleFileChange = (event) => {
-        const file = event.target.files?.[0];
+    const addEvidenceFiles = (selectedFiles) => {
+        const incomingFiles = Array.from(selectedFiles || []);
 
-        setNotice("");
+        const validFiles = [];
+        const invalidFiles = [];
 
-        if (!file) {
-            setEvidenceFile(null);
-            return;
-        }
+        incomingFiles.forEach((file) => {
+            const extension = getFileExtension(file.name);
 
-        const fileName = file.name.toLowerCase();
+            if (ALLOWED_EXTENSIONS.includes(extension)) {
+                validFiles.push(file);
+            } else {
+                invalidFiles.push(file.name);
+            }
+        });
 
-        const isWordFile =
-            fileName.endsWith(".doc") ||
-            fileName.endsWith(".docx");
+        setEvidenceFiles((currentFiles) => {
+            const combinedFiles = [...currentFiles];
 
-        if (!isWordFile) {
-            setEvidenceFile(null);
+            validFiles.forEach((file) => {
+                const duplicated = combinedFiles.some(
+                    (currentFile) =>
+                        currentFile.name === file.name &&
+                        currentFile.size === file.size &&
+                        currentFile.lastModified === file.lastModified
+                );
 
-            setNotice(
-                "Vui lòng chọn file Word có định dạng .doc hoặc .docx."
+                if (!duplicated) {
+                    combinedFiles.push(file);
+                }
+            });
+
+            return combinedFiles;
+        });
+
+        if (invalidFiles.length > 0) {
+            setUploadError(
+                `Các tệp sau không được hỗ trợ: ${invalidFiles.join(", ")}`
             );
+        } else {
+            setUploadError("");
+        }
 
-            event.target.value = "";
+        setUploadNotice("");
+    };
+
+    const handleEvidenceFileChange = (event) => {
+        addEvidenceFiles(event.target.files);
+
+        // Cho phép chọn lại cùng một tệp sau khi xóa.
+        event.target.value = "";
+    };
+
+    const handleEvidenceDrop = (event) => {
+        event.preventDefault();
+        setIsDragging(false);
+
+        addEvidenceFiles(event.dataTransfer.files);
+    };
+
+    const removeEvidenceFile = (index) => {
+        setEvidenceFiles((currentFiles) =>
+            currentFiles.filter((_, fileIndex) => fileIndex !== index)
+        );
+
+        setUploadError("");
+        setUploadNotice("");
+    };
+
+    const openUploadConfirmation = () => {
+        setUploadError("");
+        setUploadNotice("");
+
+        if (evidenceFiles.length === 0) {
+            setUploadError("Vui lòng chọn ít nhất một tệp minh chứng.");
             return;
         }
 
-        setEvidenceFile(file);
+        setShowUploadConfirm(true);
+    };
 
-        setNotice(
-            "Đã chọn file minh chứng. File hiện chỉ nằm trên thiết bị và chưa được tải lên máy chủ."
+    // Xác nhận đăng tải ở giao diện.
+    // Chưa gửi dữ liệu hoặc file lên máy chủ.
+    const confirmEvidenceUpload = () => {
+        const uploadedAt = new Date().toISOString();
+
+        const newUploadedFiles = evidenceFiles.map((file, index) => ({
+            id: `${Date.now()}-${index}`,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadedAt
+        }));
+
+        setUploadedEvidenceFiles((currentFiles) => [
+            ...newUploadedFiles,
+            ...currentFiles
+        ]);
+
+        setEvidenceFiles([]);
+        setShowUploadConfirm(false);
+        setUploadError("");
+
+        setUploadNotice(
+            `Đã xác nhận đăng tải ${newUploadedFiles.length} tệp trên giao diện. Chức năng lưu file lên máy chủ sẽ được tích hợp ở bước tiếp theo.`
         );
     };
 
-    // 17. TAB TỔNG QUAN
+    // ==================================================
+    // 17. TẠO TÊN FILE MINH CHỨNG
+    // ==================================================
+
+    const getEvidenceFileName = () => {
+        const safeName = activityName
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9]+/g, "-")
+            .replace(/^-|-$/g, "");
+
+        return `Minh-chung-${safeName || activityId}.doc`;
+    };
+
+    // ==================================================
+    // 18. TẠO NỘI DUNG FILE WORD
+    // ==================================================
+
+    const buildEvidenceWordDocument = () => {
+        const rowsHtml = evidenceStudents.map((student, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${escapeWordHtml(student.full_name)}</td>
+                <td>${escapeWordHtml(student.class_name)}</td>
+                <td>${escapeWordHtml(student.note)}</td>
+            </tr>
+        `).join("");
+
+        const documentDate = new Date().toLocaleDateString("vi-VN");
+
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Danh sách sinh viên tham gia hoạt động</title>
+
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 2cm;
+                    }
+
+                    body {
+                        font-family: "Times New Roman", serif;
+                        font-size: 13pt;
+                        color: #000;
+                        line-height: 1.5;
+                    }
+
+                    .header {
+                        text-align: center;
+                        font-weight: bold;
+                        line-height: 1.5;
+                    }
+
+                    .document-date {
+                        text-align: right;
+                        margin-top: 24px;
+                        font-style: italic;
+                    }
+
+                    h2 {
+                        text-align: center;
+                        font-size: 16pt;
+                        margin-top: 28px;
+                        margin-bottom: 22px;
+                    }
+
+                    .activity-info {
+                        margin: 8px 0;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 18px;
+                    }
+
+                    th, td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: center;
+                    }
+
+                    th {
+                        font-weight: bold;
+                    }
+
+                    .total {
+                        margin-top: 16px;
+                        font-weight: bold;
+                    }
+
+                    .signature {
+                        width: 100%;
+                        margin-top: 45px;
+                    }
+
+                    .signature td {
+                        border: none;
+                        width: 50%;
+                        vertical-align: top;
+                        text-align: center;
+                    }
+
+                    .signature-space {
+                        height: 85px;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <div class="header">
+                    <div>TRƯỜNG ĐẠI HỌC TRÀ VINH</div>
+                    <div>${escapeWordHtml(organizationName).toUpperCase()}</div>
+                </div>
+
+                <div class="document-date">
+                    Ngày lập: ${escapeWordHtml(documentDate)}
+                </div>
+
+                <h2>DANH SÁCH SINH VIÊN THAM GIA HOẠT ĐỘNG</h2>
+
+                <p class="activity-info">
+                    <strong>Tên hoạt động:</strong>
+                    ${escapeWordHtml(activityName)}
+                </p>
+
+                <p class="activity-info">
+                    <strong>Thời gian:</strong>
+                    ${escapeWordHtml(formatDate(startDate))}
+                    đến
+                    ${escapeWordHtml(formatDate(endDate))}
+                </p>
+
+                <p class="activity-info">
+                    <strong>Đơn vị tổ chức:</strong>
+                    ${escapeWordHtml(organizationName)}
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">STT</th>
+                            <th style="width: 40%">HỌ VÀ TÊN</th>
+                            <th style="width: 25%">LỚP</th>
+                            <th style="width: 25%">GHI CHÚ</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+
+                <p class="total">
+                    Tổng số sinh viên có mặt: ${evidenceStudents.length}
+                </p>
+
+                <table class="signature">
+                    <tr>
+                        <td>
+                            <strong>ĐẠI DIỆN ĐƠN VỊ TỔ CHỨC</strong>
+                            <br />
+                            <em>(Ký và ghi rõ họ tên)</em>
+                            <div class="signature-space"></div>
+                        </td>
+
+                        <td>
+                            <strong>NGƯỜI LẬP DANH SÁCH</strong>
+                            <br />
+                            <em>(Ký và ghi rõ họ tên)</em>
+                            <div class="signature-space"></div>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+        `;
+    };
+
+    // ==================================================
+    // 19. TẢI FILE WORD MINH CHỨNG
+    // ==================================================
+
+    const downloadEvidenceWord = () => {
+        if (evidenceStudents.length === 0) {
+            setNotice(
+                "Chưa có sinh viên điểm danh có mặt để xuất minh chứng."
+            );
+            return;
+        }
+
+        try {
+            const documentHtml = buildEvidenceWordDocument();
+
+            const blob = new Blob(
+                ["\ufeff", documentHtml],
+                {
+                    type: "application/msword;charset=utf-8"
+                }
+            );
+
+            const fileUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = fileUrl;
+            link.download = getEvidenceFileName();
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            window.setTimeout(() => {
+                URL.revokeObjectURL(fileUrl);
+            }, 1000);
+
+            setShowEvidencePreview(false);
+            setNotice(
+                "Đã tạo file Word minh chứng từ danh sách sinh viên điểm danh có mặt."
+            );
+        } catch (err) {
+            console.error("Lỗi xuất file minh chứng:", err);
+
+            setNotice(
+                "Không thể tạo file minh chứng. Vui lòng thử lại."
+            );
+        }
+    };
+
+    // ==================================================
+    // 20. MỞ HỘP THOẠI XUẤT MINH CHỨNG
+    // ==================================================
+
+    const openEvidencePreview = async () => {
+        setAttendanceError("");
+        setNotice("");
+
+        setAttendanceLoading(true);
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/attendance/activities/${encodeURIComponent(
+                    activityId
+                )}`,
+                {
+                    method: "GET",
+                    headers
+                }
+            );
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(
+                    getErrorMessage(
+                        result,
+                        "Không thể cập nhật danh sách điểm danh."
+                    )
+                );
+            }
+
+            setAttendanceRows(getAttendanceData(result));
+            setShowEvidencePreview(true);
+        } catch (err) {
+            console.error("Lỗi cập nhật dữ liệu minh chứng:", err);
+
+            setAttendanceError(
+                err.message || "Không thể tải dữ liệu minh chứng."
+            );
+        } finally {
+            setAttendanceLoading(false);
+        }
+    };
+
+    // ==================================================
+    // 21. TAB TỔNG QUAN
+    // ==================================================
 
     const renderOverview = () => (
         <div className="activity-detail-content">
@@ -1046,15 +1496,17 @@ function OrganizerActivityDetail() {
                     </div>
 
                     <div className="activity-stat-item">
-                        <span>Đã điểm danh</span>
+                        <span>Sinh viên có mặt</span>
                         <strong>
-                            {attendanceLoading ? "..." : attendanceCount}
+                            {attendanceLoading ? "..." : attendedCount}
                         </strong>
                     </div>
 
                     <div className="activity-stat-item">
                         <span>File minh chứng</span>
-                        <strong>Chưa có dữ liệu</strong>
+                        <strong>
+                            {uploadedEvidenceFiles.length} tệp
+                        </strong>
                     </div>
 
                     <div className="activity-stat-note">
@@ -1129,7 +1581,9 @@ function OrganizerActivityDetail() {
         </div>
     );
 
-    // 18. TAB ĐĂNG KÝ
+    // ==================================================
+    // 22. TAB ĐĂNG KÝ
+    // ==================================================
 
     const renderRegistrations = () => (
         <section className="activity-detail-panel">
@@ -1311,7 +1765,9 @@ function OrganizerActivityDetail() {
                                         <td>{formatDate(registeredAt)}</td>
                                         <td>
                                             <span
-                                                className={`activity-detail-status ${String(status || "").toLowerCase()}`}
+                                                className={`activity-detail-status ${String(
+                                                    status || ""
+                                                ).toLowerCase()}`}
                                             >
                                                 {getRegistrationStatusLabel(status)}
                                             </span>
@@ -1375,7 +1831,9 @@ function OrganizerActivityDetail() {
         </section>
     );
 
-    // 19. TAB ĐIỂM DANH QR
+    // ==================================================
+    // 23. TAB ĐIỂM DANH QR
+    // ==================================================
 
     const renderAttendance = () => (
         <div className="activity-detail-content">
@@ -1466,9 +1924,7 @@ function OrganizerActivityDetail() {
 
                             <div
                                 className="bg-white rounded p-3 d-inline-block my-3"
-                                style={{
-                                    border: "1px solid #dee2e6"
-                                }}
+                                style={{ border: "1px solid #dee2e6" }}
                             >
                                 <QRCodeCanvas
                                     ref={qrCanvasRef}
@@ -1479,13 +1935,11 @@ function OrganizerActivityDetail() {
                             </div>
 
                             <div className="small text-muted mb-3">
-                                Mã phiên:{" "}
-                                {attendanceSession.session_id}
+                                Mã phiên: {attendanceSession.session_id}
                             </div>
 
                             <div className="small text-muted mb-3">
-                                Hạn sử dụng:{" "}
-                                {formatDate(attendanceSession.expires_at)}
+                                Hạn sử dụng: {formatDate(attendanceSession.expires_at)}
                             </div>
 
                             <div className="d-flex justify-content-center flex-wrap gap-2">
@@ -1583,17 +2037,17 @@ function OrganizerActivityDetail() {
                         <h2>Danh sách sinh viên đã điểm danh</h2>
 
                         <p>
-                            Thông tin sinh viên được lấy từ cơ sở dữ liệu
-                            sau khi máy chủ xác thực yêu cầu điểm danh.
+                            Danh sách được tổng hợp từ dữ liệu điểm danh
+                            đã lưu trong cơ sở dữ liệu.
                         </p>
                     </div>
 
                     <span className="attendance-total">
-                        {attendanceCount} lượt điểm danh
+                        {attendedCount} sinh viên có mặt
                     </span>
                 </div>
 
-                <div className="activity-table-toolbar">
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                     <div className="activity-search-box">
                         <i className="bi bi-search"></i>
 
@@ -1607,15 +2061,27 @@ function OrganizerActivityDetail() {
                         />
                     </div>
 
-                    <button
-                        type="button"
-                        className="btn btn-outline-primary"
-                        onClick={loadAttendance}
-                        disabled={attendanceLoading}
-                    >
-                        <i className="bi bi-arrow-clockwise me-1"></i>
-                        {attendanceLoading ? "Đang tải..." : "Làm mới"}
-                    </button>
+                    <div className="d-flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            className="btn btn-outline-primary"
+                            onClick={loadAttendance}
+                            disabled={attendanceLoading}
+                        >
+                            <i className="bi bi-arrow-clockwise me-1"></i>
+                            {attendanceLoading ? "Đang tải..." : "Làm mới"}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn btn-success"
+                            onClick={openEvidencePreview}
+                            disabled={attendanceLoading}
+                        >
+                            <i className="bi bi-file-earmark-word me-2"></i>
+                            Xuất file minh chứng
+                        </button>
+                    </div>
                 </div>
 
                 <div className="activity-table-responsive">
@@ -1652,7 +2118,7 @@ function OrganizerActivityDetail() {
 
                                         <strong>
                                             {attendanceRows.length === 0
-                                                ? "Chưa có sinh viên điểm danh"
+                                                ? "Chưa có dữ liệu điểm danh"
                                                 : "Không tìm thấy sinh viên phù hợp"}
                                         </strong>
 
@@ -1688,7 +2154,7 @@ function OrganizerActivityDetail() {
                                     const status =
                                         item.attendance_status ??
                                         item.attendanceStatus ??
-                                        item.status;
+                                        "PENDING";
 
                                     return (
                                         <tr
@@ -1705,7 +2171,9 @@ function OrganizerActivityDetail() {
                                             <td>{formatDate(attendedAt)}</td>
                                             <td>
                                                 <span
-                                                    className={`activity-detail-status ${String(status || "").toLowerCase()}`}
+                                                    className={`activity-detail-status ${String(
+                                                        status
+                                                    ).toLowerCase()}`}
                                                 >
                                                     {getAttendanceStatusLabel(status)}
                                                 </span>
@@ -1719,14 +2187,277 @@ function OrganizerActivityDetail() {
                 </div>
 
                 <div className="mt-3 text-muted">
-                    Đang hiển thị {filteredAttendance.length} trong số{" "}
-                    {attendanceCount} lượt điểm danh.
+                    Đang hiển thị {filteredAttendance.length} dòng dữ liệu.
+                    Có {attendedCount} sinh viên có mặt sau khi loại bỏ
+                    các bản ghi trùng.
                 </div>
             </section>
         </div>
     );
 
-    // 20. TAB MINH CHỨNG
+    // ==================================================
+    // 24. KHU VỰC ĐĂNG TẢI FILE MINH CHỨNG
+    // ==================================================
+
+    const renderEvidenceUpload = () => (
+        <section className="activity-detail-panel evidence-upload-panel">
+            <div className="activity-panel-heading">
+                <div>
+                    <span className="activity-panel-eyebrow">
+                        HỒ SƠ MINH CHỨNG
+                    </span>
+
+                    <h2>Đăng tải file minh chứng</h2>
+
+                    <p>
+                        Đơn vị tổ chức có thể tải lên các tài liệu,
+                        hình ảnh và hồ sơ liên quan đến hoạt động.
+                    </p>
+                </div>
+
+                <span className="evidence-heading-icon">
+                    <i className="bi bi-cloud-arrow-up"></i>
+                </span>
+            </div>
+
+            {uploadError && (
+                <div className="alert alert-danger d-flex align-items-start gap-2">
+                    <i className="bi bi-exclamation-triangle mt-1"></i>
+                    <span>{uploadError}</span>
+
+                    <button
+                        type="button"
+                        className="btn-close ms-auto"
+                        aria-label="Đóng"
+                        onClick={() => setUploadError("")}
+                    ></button>
+                </div>
+            )}
+
+            {uploadNotice && (
+                <div className="alert alert-info d-flex align-items-start gap-2">
+                    <i className="bi bi-info-circle mt-1"></i>
+                    <span>{uploadNotice}</span>
+
+                    <button
+                        type="button"
+                        className="btn-close ms-auto"
+                        aria-label="Đóng"
+                        onClick={() => setUploadNotice("")}
+                    ></button>
+                </div>
+            )}
+
+            <div
+                className={`evidence-dropzone ${
+                    isDragging ? "dragging" : ""
+                }`}
+                onDragEnter={(event) => {
+                    event.preventDefault();
+                    setIsDragging(true);
+                }}
+                onDragOver={(event) => {
+                    event.preventDefault();
+                    setIsDragging(true);
+                }}
+                onDragLeave={(event) => {
+                    event.preventDefault();
+
+                    if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setIsDragging(false);
+                    }
+                }}
+                onDrop={handleEvidenceDrop}
+                onClick={() => fileInputRef.current?.click()}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        fileInputRef.current?.click();
+                    }
+                }}
+            >
+                <div className="evidence-upload-icon">
+                    <i className="bi bi-cloud-arrow-up"></i>
+                </div>
+
+                <h5 className="fw-bold mt-3 mb-2">
+                    Kéo và thả tệp minh chứng vào đây
+                </h5>
+
+                <p className="text-muted mb-3">
+                    Hoặc chọn tệp từ máy tính của bạn
+                </p>
+
+                <button
+                    type="button"
+                    className="btn btn-outline-primary"
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        fileInputRef.current?.click();
+                    }}
+                >
+                    <i className="bi bi-folder2-open me-2"></i>
+                    Chọn tệp
+                </button>
+
+                <div className="small text-muted mt-3">
+                    Định dạng hỗ trợ: PDF, DOC, DOCX, XLS, XLSX,
+                    JPG, JPEG, PNG.
+                </div>
+
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    hidden
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                    onChange={handleEvidenceFileChange}
+                />
+            </div>
+
+            {/* DANH SÁCH FILE ĐANG CHỜ ĐĂNG TẢI */}
+
+            <div className="mt-4">
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h5 className="fw-bold mb-1">
+                            Tệp đang chờ đăng tải
+                        </h5>
+
+                        <p className="text-muted mb-0">
+                            Kiểm tra danh sách trước khi xác nhận.
+                        </p>
+                    </div>
+
+                    <span className="badge bg-primary">
+                        {evidenceFiles.length} tệp
+                    </span>
+                </div>
+
+                {evidenceFiles.length === 0 ? (
+                    <div className="evidence-empty-files">
+                        <i className="bi bi-file-earmark-text"></i>
+
+                        <strong>Chưa có tệp nào được chọn</strong>
+
+                        <span>
+                            Chọn tệp hoặc kéo thả tệp vào khu vực phía trên.
+                        </span>
+                    </div>
+                ) : (
+                    <div className="evidence-file-list">
+                        {evidenceFiles.map((file, index) => (
+                            <div
+                                className="evidence-file-item"
+                                key={`${file.name}-${file.lastModified}-${index}`}
+                            >
+                                <div className="evidence-file-information">
+                                    <div className="evidence-file-icon">
+                                        <i className={`bi ${getFileIcon(file.name)}`}></i>
+                                    </div>
+
+                                    <div className="evidence-file-text">
+                                        <strong>{file.name}</strong>
+                                        <span>{formatFileSize(file.size)}</span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={() => removeEvidenceFile(index)}
+                                    title="Xóa tệp khỏi danh sách"
+                                >
+                                    <i className="bi bi-trash"></i>
+                                    <span className="ms-1">Xóa</span>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="d-flex justify-content-end mt-4">
+                <button
+                    type="button"
+                    className="btn btn-primary px-4"
+                    onClick={openUploadConfirmation}
+                    disabled={evidenceFiles.length === 0}
+                >
+                    <i className="bi bi-cloud-upload me-2"></i>
+                    Đăng tải ({evidenceFiles.length})
+                </button>
+            </div>
+
+            {/* DANH SÁCH FILE ĐÃ ĐĂNG TẢI TRÊN GIAO DIỆN */}
+
+            <div className="mt-5">
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h5 className="fw-bold mb-1">
+                            Danh sách tệp đã đăng tải
+                        </h5>
+
+                        <p className="text-muted mb-0">
+                            Các tệp đã được xác nhận đăng tải trong phiên làm việc này.
+                        </p>
+                    </div>
+
+                    <span className="badge bg-success">
+                        {uploadedEvidenceFiles.length} tệp
+                    </span>
+                </div>
+
+                {uploadedEvidenceFiles.length === 0 ? (
+                    <div className="evidence-empty-files">
+                        <i className="bi bi-folder2-open"></i>
+
+                        <strong>Chưa có tệp minh chứng nào</strong>
+
+                        <span>
+                            Các tệp được xác nhận sẽ hiển thị tại đây.
+                        </span>
+                    </div>
+                ) : (
+                    <div className="evidence-file-list">
+                        {uploadedEvidenceFiles.map((file) => (
+                            <div
+                                className="evidence-file-item uploaded"
+                                key={file.id}
+                            >
+                                <div className="evidence-file-information">
+                                    <div className="evidence-file-icon">
+                                        <i className={`bi ${getFileIcon(file.name)}`}></i>
+                                    </div>
+
+                                    <div className="evidence-file-text">
+                                        <strong>{file.name}</strong>
+
+                                        <span>
+                                            {formatFileSize(file.size)}
+                                            {" · "}
+                                            {formatDate(file.uploadedAt)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <span className="badge bg-success">
+                                    <i className="bi bi-check-circle me-1"></i>
+                                    Đã xác nhận
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+
+    // ==================================================
+    // 25. TAB MINH CHỨNG
+    // ==================================================
 
     const renderEvidence = () => (
         <div className="activity-detail-content">
@@ -1740,8 +2471,8 @@ function OrganizerActivityDetail() {
                         <h2>Danh sách và hồ sơ minh chứng</h2>
 
                         <p>
-                            Minh chứng được tổng hợp dựa trên danh sách
-                            sinh viên đã điểm danh thực tế tại hoạt động.
+                            Danh sách minh chứng chỉ bao gồm sinh viên đã
+                            điểm danh thành công và được ghi nhận có mặt.
                         </p>
                     </div>
 
@@ -1771,103 +2502,141 @@ function OrganizerActivityDetail() {
 
                     <div className="evidence-process-item">
                         <span>4</span>
-                        <strong>Công bố minh chứng</strong>
-                        <p>Cho sinh viên kiểm tra và xác nhận.</p>
+                        <strong>Đăng tải hồ sơ</strong>
+                        <p>Gửi tài liệu minh chứng của hoạt động.</p>
                     </div>
                 </div>
             </section>
+
+            {/* DANH SÁCH SINH VIÊN CÓ MẶT */}
 
             <section className="activity-detail-panel">
                 <div className="activity-panel-heading">
                     <div>
                         <span className="activity-panel-eyebrow">
-                            TỆP MINH CHỨNG
+                            DANH SÁCH MINH CHỨNG
                         </span>
 
-                        <h2>Chọn file minh chứng</h2>
+                        <h2>Sinh viên được ghi nhận có mặt</h2>
+
+                        <p>
+                            Dữ liệu được tổng hợp từ tất cả các phiên QR
+                            của hoạt động và loại bỏ sinh viên trùng lặp.
+                        </p>
                     </div>
+
+                    <span className="attendance-total">
+                        {evidenceStudents.length} sinh viên
+                    </span>
                 </div>
 
-                <div className="evidence-upload-area">
-                    <i className="bi bi-cloud-arrow-up"></i>
+                {attendanceError && (
+                    <div className="alert alert-danger">
+                        {attendanceError}
+                    </div>
+                )}
 
-                    <h3>Chọn file Word minh chứng</h3>
-
-                    <p>
-                        Chọn file tổng hợp danh sách sinh viên đã tham gia
-                        hoạt động (.doc hoặc .docx).
-                    </p>
-
-                    <label className="evidence-select-button">
-                        <i className="bi bi-folder2-open"></i>
-                        Chọn tệp
-
-                        <input
-                            type="file"
-                            accept=".doc,.docx"
-                            onChange={handleFileChange}
-                        />
-                    </label>
-
-                    {evidenceFile && (
-                        <div className="evidence-selected-file">
-                            <i className="bi bi-file-earmark-word"></i>
-
-                            <span>{evidenceFile.name}</span>
-
-                            <small>
-                                {(evidenceFile.size / 1024).toFixed(1)} KB
-                            </small>
-                        </div>
-                    )}
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <button
+                        type="button"
+                        className="btn btn-outline-primary"
+                        onClick={loadAttendance}
+                        disabled={attendanceLoading}
+                    >
+                        <i className="bi bi-arrow-clockwise me-1"></i>
+                        Làm mới danh sách
+                    </button>
 
                     <button
                         type="button"
-                        className="evidence-upload-button"
-                        disabled={!evidenceFile}
-                        onClick={() => {
-                            setNotice(
-                                "File đã được chọn nhưng chức năng tải lên máy chủ chưa được tích hợp."
-                            );
-                        }}
+                        className="btn btn-success"
+                        onClick={() => setShowEvidencePreview(true)}
+                        disabled={
+                            attendanceLoading ||
+                            evidenceStudents.length === 0
+                        }
                     >
-                        <i className="bi bi-upload"></i>
-                        Tải minh chứng lên
+                        <i className="bi bi-file-earmark-word me-2"></i>
+                        Xuất file Word
                     </button>
+                </div>
 
-                    <span className="evidence-upload-note">
-                        Hiện tại hệ thống mới hỗ trợ chọn file trên giao diện.
-                        Chưa lưu file lên máy chủ.
-                    </span>
+                <div className="activity-table-responsive">
+                    <table className="activity-data-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>MSSV</th>
+                                <th>Họ và tên</th>
+                                <th>Lớp</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {attendanceLoading ? (
+                                <tr>
+                                    <td colSpan="5" className="activity-table-empty">
+                                        <div className="spinner-border spinner-border-sm text-primary me-2"></div>
+                                        Đang tải dữ liệu minh chứng...
+                                    </td>
+                                </tr>
+                            ) : evidenceStudents.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="activity-table-empty">
+                                        <i className="bi bi-person-x"></i>
+
+                                        <strong>
+                                            Chưa có sinh viên được ghi nhận có mặt
+                                        </strong>
+
+                                        <span>
+                                            Sinh viên sẽ xuất hiện tại đây sau
+                                            khi điểm danh QR thành công.
+                                        </span>
+                                    </td>
+                                </tr>
+                            ) : (
+                                evidenceStudents.map((student, index) => (
+                                    <tr
+                                        key={
+                                            student.student_id ||
+                                            student.student_code ||
+                                            index
+                                        }
+                                    >
+                                        <td>{index + 1}</td>
+                                        <td>{student.student_code || "--"}</td>
+                                        <td>{student.full_name || "--"}</td>
+                                        <td>{student.class_name || "--"}</td>
+                                        <td>
+                                            <span className="badge bg-success">
+                                                Có mặt
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="mt-3 text-muted">
+                    Tổng cộng {evidenceStudents.length} sinh viên có mặt.
+                    Mỗi sinh viên chỉ được hiển thị một lần trong danh sách
+                    minh chứng.
                 </div>
             </section>
 
-            <section className="activity-detail-panel">
-                <div className="activity-panel-heading">
-                    <div>
-                        <span className="activity-panel-eyebrow">
-                            LỊCH SỬ MINH CHỨNG
-                        </span>
+            {/* KHU VỰC ĐĂNG TẢI FILE */}
 
-                        <h2>Các file minh chứng đã tải lên</h2>
-                    </div>
-                </div>
-
-                <div className="activity-feature-placeholder compact-placeholder">
-                    <i className="bi bi-folder2-open"></i>
-
-                    <h3>Chưa có file minh chứng</h3>
-
-                    <p>
-                        Danh sách file sẽ được hiển thị sau khi chức năng
-                        tải và quản lý minh chứng được kết nối với máy chủ.
-                    </p>
-                </div>
-            </section>
+            {renderEvidenceUpload()}
         </div>
     );
 
-    // 21. TAB KẾT QUẢ
+    // ==================================================
+    // 26. TAB KẾT QUẢ
+    // ==================================================
 
     const renderResult = () => (
         <section className="activity-detail-panel">
@@ -1897,7 +2666,7 @@ function OrganizerActivityDetail() {
 
                 <div className="activity-result-card">
                     <i className="bi bi-person-check"></i>
-                    <span>Đã điểm danh</span>
+                    <span>Đã điểm danh có mặt</span>
                     <strong>
                         {attendanceLoading ? "..." : attendedCount}
                     </strong>
@@ -1931,7 +2700,291 @@ function OrganizerActivityDetail() {
         </section>
     );
 
-    // 22. HIỂN THỊ TAB
+    // ==================================================
+    // 27. HỘP THOẠI XEM TRƯỚC MINH CHỨNG
+    // ==================================================
+
+    const renderEvidencePreviewModal = () => {
+        if (!showEvidencePreview) return null;
+
+        return (
+            <div
+                className="evidence-modal-backdrop"
+                onMouseDown={event => {
+                    if (event.target === event.currentTarget) {
+                        setShowEvidencePreview(false);
+                    }
+                }}
+            >
+                <div
+                    className="evidence-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="evidenceModalTitle"
+                >
+                    <div className="evidence-modal-header">
+                        <div>
+                            <span className="activity-panel-eyebrow">
+                                XUẤT HỒ SƠ MINH CHỨNG
+                            </span>
+
+                            <h2 id="evidenceModalTitle">
+                                Danh sách sinh viên có mặt
+                            </h2>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="evidence-modal-close"
+                            aria-label="Đóng"
+                            onClick={() => setShowEvidencePreview(false)}
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <div className="evidence-modal-body">
+                        <div className="evidence-modal-summary">
+                            <div>
+                                <span>Hoạt động</span>
+                                <strong>{activityName}</strong>
+                            </div>
+
+                            <div>
+                                <span>Đơn vị tổ chức</span>
+                                <strong>{organizationName}</strong>
+                            </div>
+
+                            <div>
+                                <span>Thời gian</span>
+                                <strong>
+                                    {formatDate(startDate)} - {formatDate(endDate)}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Số sinh viên có mặt</span>
+                                <strong className="text-success">
+                                    {evidenceStudents.length} sinh viên
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div className="alert alert-info">
+                            <i className="bi bi-info-circle me-2"></i>
+                            Danh sách chỉ bao gồm sinh viên có trạng thái
+                            điểm danh là <strong>Có mặt</strong>. Sinh viên
+                            trùng lặp giữa các phiên QR chỉ được tính một lần.
+                        </div>
+
+                        <div className="activity-table-responsive evidence-preview-table">
+                            <table className="activity-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>MSSV</th>
+                                        <th>Họ và tên</th>
+                                        <th>Lớp</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {evidenceStudents.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan="5"
+                                                className="activity-table-empty"
+                                            >
+                                                Chưa có sinh viên có mặt.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        evidenceStudents.map((student, index) => (
+                                            <tr
+                                                key={
+                                                    student.student_id ||
+                                                    student.student_code ||
+                                                    index
+                                                }
+                                            >
+                                                <td>{index + 1}</td>
+                                                <td>{student.student_code || "--"}</td>
+                                                <td>{student.full_name || "--"}</td>
+                                                <td>{student.class_name || "--"}</td>
+                                                <td>Có mặt</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="evidence-modal-footer">
+                        <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={() => setShowEvidencePreview(false)}
+                        >
+                            Đóng
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn btn-outline-primary"
+                            onClick={() => {
+                                setShowEvidencePreview(false);
+                                setActiveTab("evidence");
+                            }}
+                        >
+                            <i className="bi bi-eye me-2"></i>
+                            Xem chi tiết
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn btn-success"
+                            onClick={downloadEvidenceWord}
+                            disabled={evidenceStudents.length === 0}
+                        >
+                            <i className="bi bi-download me-2"></i>
+                            Lưu về
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // ==================================================
+    // 28. HỘP THOẠI XÁC NHẬN ĐĂNG TẢI
+    // ==================================================
+
+    const renderUploadConfirmModal = () => {
+        if (!showUploadConfirm) return null;
+
+        const totalSize = evidenceFiles.reduce(
+            (total, file) => total + file.size,
+            0
+        );
+
+        return (
+            <div
+                className="evidence-modal-backdrop"
+                onMouseDown={(event) => {
+                    if (event.target === event.currentTarget) {
+                        setShowUploadConfirm(false);
+                    }
+                }}
+            >
+                <div
+                    className="evidence-confirm-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="uploadConfirmTitle"
+                >
+                    <div className="evidence-modal-header">
+                        <div>
+                            <span className="activity-panel-eyebrow">
+                                XÁC NHẬN THAO TÁC
+                            </span>
+
+                            <h2 id="uploadConfirmTitle">
+                                Xác nhận đăng tải minh chứng
+                            </h2>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="evidence-modal-close"
+                            aria-label="Đóng"
+                            onClick={() => setShowUploadConfirm(false)}
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <div className="evidence-modal-body">
+                        <div className="alert alert-warning">
+                            <i className="bi bi-exclamation-circle me-2"></i>
+
+                            Bạn có chắc chắn muốn đăng tải các tệp minh chứng
+                            đã chọn cho hoạt động này không?
+                        </div>
+
+                        <div className="evidence-confirm-activity">
+                            <span>Hoạt động</span>
+                            <strong>{activityName}</strong>
+                        </div>
+
+                        <div className="evidence-confirm-activity">
+                            <span>Đơn vị đăng tải</span>
+                            <strong>{organizationName}</strong>
+                        </div>
+
+                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <strong>Danh sách tệp ({evidenceFiles.length})</strong>
+
+                            <span className="text-muted small">
+                                Tổng dung lượng: {formatFileSize(totalSize)}
+                            </span>
+                        </div>
+
+                        <div className="evidence-confirm-file-list">
+                            {evidenceFiles.map((file, index) => (
+                                <div
+                                    className="evidence-confirm-file"
+                                    key={`${file.name}-${file.lastModified}-${index}`}
+                                >
+                                    <div className="d-flex align-items-center gap-2 overflow-hidden">
+                                        <i className={`bi ${getFileIcon(file.name)} text-primary fs-5`}></i>
+
+                                        <span className="text-break">
+                                            {file.name}
+                                        </span>
+                                    </div>
+
+                                    <small className="text-muted flex-shrink-0">
+                                        {formatFileSize(file.size)}
+                                    </small>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="small text-muted mt-3">
+                            Sau khi xác nhận, danh sách tệp sẽ được chuyển
+                            sang mục tệp đã đăng tải trên giao diện.
+                        </div>
+                    </div>
+
+                    <div className="evidence-modal-footer">
+                        <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={() => setShowUploadConfirm(false)}
+                        >
+                            Hủy
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={confirmEvidenceUpload}
+                            disabled={evidenceFiles.length === 0}
+                        >
+                            <i className="bi bi-cloud-upload me-2"></i>
+                            Xác nhận đăng tải
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // ==================================================
+    // 29. HIỂN THỊ TAB
+    // ==================================================
 
     const renderActiveTab = () => {
         switch (activeTab) {
@@ -1952,7 +3005,9 @@ function OrganizerActivityDetail() {
         }
     };
 
-    // 23. GIAO DIỆN CHÍNH
+    // ==================================================
+    // 30. GIAO DIỆN CHÍNH
+    // ==================================================
 
     return (
         <>
@@ -2057,6 +3112,9 @@ function OrganizerActivityDetail() {
             </main>
 
             <Footer />
+
+            {renderEvidencePreviewModal()}
+            {renderUploadConfirmModal()}
         </>
     );
 }

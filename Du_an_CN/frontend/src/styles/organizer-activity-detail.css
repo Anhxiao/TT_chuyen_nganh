@@ -1,5 +1,5 @@
 /* =========================================
-   TRANG CHI TIẾT HOẠT ĐỘNG - ORGANIZER
+TRANG CHI TIẾT HOẠT ĐỘNG - ORGANIZER
 ========================================= */
 
 .organizer-activity-detail-page {
@@ -111,7 +111,7 @@
 }
 
 /* =========================================
-   TABS
+TABS
 ========================================= */
 
 .activity-detail-tabs {
@@ -160,7 +160,7 @@
 }
 
 /* =========================================
-   PANEL
+PANEL
 ========================================= */
 
 .activity-detail-content {
@@ -261,7 +261,7 @@
 }
 
 /* =========================================
-   STATISTICS
+STATISTICS
 ========================================= */
 
 .activity-stat-panel .activity-panel-heading > i {
@@ -307,7 +307,7 @@
 }
 
 /* =========================================
-   PROCESS
+PROCESS
 ========================================= */
 
 .activity-process-list {
@@ -355,7 +355,7 @@
 }
 
 /* =========================================
-   EMPTY PLACEHOLDER
+EMPTY PLACEHOLDER
 ========================================= */
 
 .activity-feature-placeholder {
@@ -415,7 +415,7 @@
 }
 
 /* =========================================
-   ATTENDANCE QR
+ATTENDANCE QR
 ========================================= */
 
 .attendance-qr-icon,
@@ -521,7 +521,7 @@
 }
 
 /* =========================================
-   ATTENDANCE TABLE
+ATTENDANCE TABLE
 ========================================= */
 
 .attendance-total {
@@ -619,7 +619,7 @@
 }
 
 /* =========================================
-   EVIDENCE
+EVIDENCE
 ========================================= */
 
 .evidence-process {
@@ -770,7 +770,7 @@
 }
 
 /* =========================================
-   RESULT
+RESULT
 ========================================= */
 
 .activity-result-grid {
@@ -807,7 +807,7 @@
 }
 
 /* =========================================
-   LOADING
+LOADING
 ========================================= */
 
 .activity-detail-loading {
@@ -825,7 +825,7 @@
 }
 
 /* =========================================
-   RESPONSIVE
+RESPONSIVE
 ========================================= */
 
 @media (max-width: 992px) {
@@ -899,5 +899,362 @@
 
     .activity-detail-breadcrumb {
         font-size: 12px;
+    }
+}
+
+/* ======================================================
+HỘP THOẠI XEM TRƯỚC VÀ XUẤT FILE MINH CHỨNG
+====================================================== */
+
+.evidence-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.58);
+    overflow-y: auto;
+}
+
+.evidence-modal {
+    width: 100%;
+    max-width: 1000px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+}
+
+.evidence-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 26px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.evidence-modal-header h2 {
+    margin: 8px 0 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.evidence-modal-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    cursor: pointer;
+}
+
+.evidence-modal-close:hover {
+    background: #e2e8f0;
+}
+
+.evidence-modal-body {
+    padding: 24px 26px;
+    overflow-y: auto;
+}
+
+.evidence-modal-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.evidence-modal-summary > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.evidence-modal-summary span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.evidence-modal-summary strong {
+    color: #1e293b;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.evidence-preview-table {
+    max-height: 350px;
+    overflow: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.evidence-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 18px 26px;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+@media (max-width: 576px) {
+    .evidence-modal-backdrop {
+        padding: 10px;
+    }
+
+    .evidence-modal {
+        max-height: 95vh;
+    }
+
+    .evidence-modal-header,
+    .evidence-modal-body,
+    .evidence-modal-footer {
+        padding: 16px;
+    }
+
+    .evidence-modal-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .evidence-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .evidence-modal-footer button {
+        width: 100%;
+    }
+}
+
+/* ======================================================
+KHU VỰC ĐĂNG TẢI FILE MINH CHỨNG
+====================================================== */
+
+.evidence-upload-panel {
+    width: 100%;
+}
+
+.evidence-dropzone {
+    width: 100%;
+    min-height: 250px;
+    border: 2px dashed #b7c9df;
+    border-radius: 14px;
+    background: #f8fbff;
+    padding: 35px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.evidence-dropzone:hover,
+.evidence-dropzone.dragging {
+    border-color: #0d6efd;
+    background: #edf5ff;
+}
+
+.evidence-upload-icon {
+    font-size: 52px;
+    color: #0d6efd;
+}
+
+.evidence-dropzone h5 {
+    color: #243b53;
+}
+
+.evidence-empty-files {
+    min-height: 150px;
+    padding: 25px;
+    border: 1px dashed #d4dce6;
+    border-radius: 10px;
+    background: #fafbfd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    color: #64748b;
+}
+
+.evidence-empty-files > i {
+    font-size: 36px;
+    color: #94a3b8;
+}
+
+.evidence-empty-files strong {
+    color: #475569;
+}
+
+.evidence-empty-files span {
+    font-size: 13px;
+}
+
+.evidence-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.evidence-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    transition: background 0.2s ease;
+}
+
+.evidence-file-item:hover {
+    background: #f8fafc;
+}
+
+.evidence-file-item.uploaded {
+    border-left: 4px solid #198754;
+}
+
+.evidence-file-information {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.evidence-file-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9px;
+    background: #edf4ff;
+    color: #0d6efd;
+    font-size: 23px;
+}
+
+.evidence-file-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.evidence-file-text strong {
+    color: #243b53;
+    overflow-wrap: anywhere;
+}
+
+.evidence-file-text span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ======================================================
+HỘP THOẠI XÁC NHẬN ĐĂNG TẢI
+====================================================== */
+
+.evidence-confirm-modal {
+    width: min(620px, calc(100vw - 30px));
+    max-height: 88vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 15px 45px rgba(15, 23, 42, 0.22);
+}
+
+.evidence-confirm-activity {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.evidence-confirm-activity span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.evidence-confirm-activity strong {
+    color: #243b53;
+    overflow-wrap: anywhere;
+}
+
+.evidence-confirm-file-list {
+    max-height: 230px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    padding: 0 12px;
+}
+
+.evidence-confirm-file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.evidence-confirm-file:last-child {
+    border-bottom: none;
+}
+
+.evidence-confirm-file > div {
+    min-width: 0;
+}
+
+.evidence-confirm-file > div span {
+    overflow-wrap: anywhere;
+}
+
+/* ======================================================
+RESPONSIVE
+====================================================== */
+
+@media (max-width: 576px) {
+    .evidence-dropzone {
+        min-height: 220px;
+        padding: 25px 12px;
+    }
+
+    .evidence-file-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .evidence-file-item > button,
+    .evidence-file-item > .badge {
+        align-self: flex-end;
+    }
+
+    .evidence-confirm-modal {
+        width: calc(100vw - 20px);
+        max-height: 92vh;
     }
 }

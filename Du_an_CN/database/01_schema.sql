@@ -385,3 +385,89 @@ CREATE TABLE AuditLogs (
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 GO
+
+-- Tạo bảng lưu các phiên điểm danh QR
+IF OBJECT_ID('dbo.ActivityAttendanceSessions', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ActivityAttendanceSessions
+    (
+        session_id BIGINT IDENTITY(1,1) NOT NULL,
+
+        activity_id BIGINT NOT NULL,
+
+        -- SHA-256 hash của mã QR, không lưu mã QR gốc
+        token_hash VARBINARY(32) NOT NULL,
+
+        status VARCHAR(20) NOT NULL
+            CONSTRAINT DF_ActivityAttendanceSessions_Status
+            DEFAULT 'OPEN',
+
+        expires_at DATETIME2(0) NOT NULL,
+
+        created_by BIGINT NOT NULL,
+
+        created_at DATETIME2(0) NOT NULL
+            CONSTRAINT DF_ActivityAttendanceSessions_CreatedAt
+            DEFAULT SYSDATETIME(),
+
+        closed_at DATETIME2(0) NULL,
+
+        CONSTRAINT PK_ActivityAttendanceSessions
+            PRIMARY KEY (session_id),
+
+        CONSTRAINT FK_AttendanceSessions_Activities
+            FOREIGN KEY (activity_id)
+            REFERENCES dbo.Activities(activity_id),
+
+        CONSTRAINT FK_AttendanceSessions_Users
+            FOREIGN KEY (created_by)
+            REFERENCES dbo.Users(user_id),
+
+        CONSTRAINT CK_AttendanceSessions_Status
+            CHECK (status IN ('OPEN', 'CLOSED')),
+
+        CONSTRAINT CK_AttendanceSessions_TokenHash
+            CHECK (DATALENGTH(token_hash) = 32)
+    );
+END;
+GO
+
+-- Không cho phép trùng mã token đã được băm
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'UQ_AttendanceSessions_TokenHash'
+        AND object_id = OBJECT_ID('dbo.ActivityAttendanceSessions')
+)
+BEGIN
+    CREATE UNIQUE INDEX UQ_AttendanceSessions_TokenHash
+    ON dbo.ActivityAttendanceSessions(token_hash);
+END;
+GO
+
+-- Mỗi hoạt động chỉ có một phiên OPEN tại một thời điểm
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'UQ_AttendanceSessions_OneOpenPerActivity'
+        AND object_id = OBJECT_ID('dbo.ActivityAttendanceSessions')
+)
+BEGIN
+    CREATE UNIQUE INDEX UQ_AttendanceSessions_OneOpenPerActivity
+    ON dbo.ActivityAttendanceSessions(activity_id)
+    WHERE status = 'OPEN';
+END;
+GO
+
+-- Hỗ trợ truy vấn phiên điểm danh theo hoạt động
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_AttendanceSessions_Activity_Status'
+        AND object_id = OBJECT_ID('dbo.ActivityAttendanceSessions')
+)
+BEGIN
+    CREATE INDEX IX_AttendanceSessions_Activity_Status
+    ON dbo.ActivityAttendanceSessions(activity_id, status, expires_at);
+END;
+GO
